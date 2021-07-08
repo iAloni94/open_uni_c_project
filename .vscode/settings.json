@@ -1,0 +1,16 @@
+{
+    "code-runner.executorMap": {
+    "c": "cd $dir && gcc -g -Wall -ansi -pedantic $fileName -o $fileNameWithoutExt -lm -m32 && $dir$fileNameWithoutExt"
+},
+ 
+"workbench.colorCustomizations": {
+  "[Night Owl]": {
+    //"activityBar.background": "#000C1D",
+    //"activityBar.border": "#102a44",
+    //"sideBar.background": "#001327",
+    "sideBar.border": "#102a44",
+    //"sideBar.foreground": "#8BADC1"
+  },
+}
+
+//Owl theme color 00162c

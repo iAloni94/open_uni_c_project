@@ -1,31 +1,23 @@
-void getLine();
+#ifndef __INPUT_H
+#define __INPUT_H
 
+enum {
+    false = 0,
+    true = 1
+};
 
-int add_func();
-int sub_func();
-int and_func();
-int or_func();
-int nor_func();
-int move_func();
-int mvhi_func();
-int mvlo_func();
-int addi_func();
-int subi_func();
-int andi_func();
-int ori_func();
-int nori_func();
-int bne_func();
-int beq_func();
-int blt_func();
-int bgt_func();
-int lb_func();
-int sb_func();
-int lw_func();
-int sw_func();
-int lh_func();
-int sh_func();
-int jmp_func();
-int la_func();
-int call_func();
-int stop_func();
-int undef_func();
+typedef struct node {
+    char* val;
+    struct node* next;
+} node_t;
+
+typedef struct flag {
+    char label;
+    char params;
+} flags;
+
+node_t* getLine();
+char checkIfLabel();
+int checkParam();
+
+#endif

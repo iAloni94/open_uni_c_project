@@ -1,1 +1,2 @@
-my name is Ido aloni
+asciz: add $2, $3, $5
+

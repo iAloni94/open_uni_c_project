@@ -14,6 +14,7 @@ typedef struct node {
 typedef struct flag {
     char label;
     char params;
+    char stop;
 } flags;
 
 node_t* getLine();

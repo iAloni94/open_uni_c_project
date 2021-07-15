@@ -24,6 +24,16 @@ char* registerList[] = {
     "$28", "$29", "$30", "$31",
     "$32"};
 
+char* savedWords[] = {
+    "dd", "dw", "db", "asciz", "entry", "extern",
+    "add", "sub", "and", "or",
+    "nor", "move", "mvhi", "mvlo",
+    "addi", "subi", "andi", "ori",
+    "nori", "bne", "beq", "blt",
+    "bgt", "lb", "sb", "lw",
+    "sw", "lh", "sh", "jmp",
+    "la", "call", "stop"};
+
 node_t* initList() {
     node_t* head = malloc(sizeof(node_t));
     head->val = calloc(1, 100);
@@ -89,16 +99,6 @@ node_t* getLine(FILE* fp) { /* saves each word a new node */
     return head;
 }
 
-char* savedWords[] = {
-    "dd", "dw", "db", "asciz", "entry", "extern",
-    "add", "sub", "and", "or",
-    "nor", "move", "mvhi", "mvlo",
-    "addi", "subi", "andi", "ori",
-    "nori", "bne", "beq", "blt",
-    "bgt", "lb", "sb", "lw",
-    "sw", "lh", "sh", "jmp",
-    "la", "call", "stop"};
-
 char checkIfLabel(node_t* input) {
     int i;
     char* temp = input->val;
@@ -129,7 +129,7 @@ int checkParam(int funcNum, node_t* input) {
         case 2:
         case 3:
         case 4:
-            for (i = 0; i < 32; i++) {  /* 32 is number of registerd */
+            for (i = 0; i < 32; i++) { /* 32 is number of registerd */
                 if (strcmp(rs, registerList[i]) == 0 && param1 == false) {
                     param1 = true;
                 }

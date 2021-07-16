@@ -17,8 +17,10 @@ typedef struct flag {
     char stop;
 } flags;
 
+
+
 node_t* getLine();
 char checkIfLabel();
-int checkParam();
+
 
 #endif

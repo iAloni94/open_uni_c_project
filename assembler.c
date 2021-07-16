@@ -4,6 +4,7 @@
 
 #include "func.h"
 #include "input.h"
+#include "param.h"
 
 #define NUM_OF_FUNC 27
 
@@ -31,10 +32,14 @@ int main(int argc, char *argv[]) {
     node_t *node;
     flags *flag = (flags *)malloc(sizeof(flags));
 
+    R *instruction = (R *)calloc(sizeof(R), 1);
+
+    unsigned int this_32bit = 0;
+
     flag->label = false;
     flag->params = false;
     flag->stop = false;
-    
+
     if (argc <= 1) {
         printf("No files were detected");
     } else {
@@ -45,24 +50,45 @@ int main(int argc, char *argv[]) {
                 head = getLine(fp);
                 node = head;
                 flag->label = checkIfLabel(node);
-                node = node->next;
+                if (flag->label) {
+                    node = node->next;
+                    /* handle label */
+                }
+                if (strcmp(head->val, "stop")) {
+                    flag->stop = 1;
+                }
                 if (head) {
-                    funcNum = 27;
-                    for (i = 0; i < 27; i++) {
+                    funcNum = 28;
+                    for (i = 0; i < 28; i++) {
                         if (strcmp(node->val, functionName[i]) == 0) {
                             funcNum = i;
-                            flag->params = checkParam(funcNum, node->next);
+                            if (i <= 8) {
+                                R *instruction = (R *)calloc(sizeof(R), sizeof(char));
+                                if ((instruction = check_r_param(funcNum, node->next, instruction))) {
+                                    functions[funcNum](instruction);
+                                }
+
+                            } else if (i <= 23) {
+                                I *instruction = (I *)calloc(sizeof(I), sizeof(char));
+                                if ((instruction = check_i_param(funcNum, node->next, instruction))) {
+                                    functions[funcNum](instruction);
+                                }
+                            } else if (i <= 27) {
+                                J *instruction = (I *)calloc(sizeof(L), sizeof(char));
+                                if ((instruction = check_j_param(funcNum, node->next, instruction))) {
+                                    functions[funcNum](instruction);
+                                }
+                            }
                             break;
                         }
                     }
-
                     while (head->next != NULL) { /* free current line memory */
                         node_t *currNode = head;
                         head = head->next;
                         free(currNode);
                     }
                     free(head);
-                } 
+                }
             }
     }
     return 1;

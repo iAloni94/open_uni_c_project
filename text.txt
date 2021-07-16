@@ -1,2 +1,2 @@
-asciz: add $2, $3, $5
-
+move $23, $2
+stop

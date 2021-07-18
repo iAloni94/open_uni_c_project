@@ -1,3 +1,5 @@
+#include "assembler.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,14 +29,15 @@ int main(int argc, char *argv[]) {
         sw_func, lh_func, sh_func, jmp_func,
         la_func, call_func, stop_func, undef_func};
 
-    int funcNum, i = 0;
+    int funcNum, i;
     node_t *head;
     node_t *node;
     flags *flag = (flags *)malloc(sizeof(flags));
-
-    R *instruction = (R *)calloc(sizeof(R), 1);
-
     unsigned int this_32bit = 0;
+
+    for (i = 0; i < 32; i++) { /* reg init */
+        regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
+    }
 
     flag->label = false;
     flag->params = false;
@@ -51,31 +54,34 @@ int main(int argc, char *argv[]) {
                 node = head;
                 flag->label = checkIfLabel(node);
                 if (flag->label) {
-                    node = node->next;
                     /* handle label */
+                    node = node->next;
                 }
                 if (strcmp(head->val, "stop")) {
                     flag->stop = 1;
                 }
                 if (head) {
-                    funcNum = 28;
-                    for (i = 0; i < 28; i++) {
+                    funcNum = NUM_OF_FUNC + 1;
+                    for (i = 0; i < NUM_OF_FUNC + 1; i++) {
                         if (strcmp(node->val, functionName[i]) == 0) {
                             funcNum = i;
                             if (i <= 8) {
                                 R *instruction = (R *)calloc(sizeof(R), sizeof(char));
                                 if ((instruction = check_r_param(funcNum, node->next, instruction))) {
-                                    functions[funcNum](instruction);
+                                    this_32bit = r_binary_instruction(instruction);
+                                    functions[funcNum](node->next);
                                 }
 
                             } else if (i <= 23) {
                                 I *instruction = (I *)calloc(sizeof(I), sizeof(char));
                                 if ((instruction = check_i_param(funcNum, node->next, instruction))) {
+                                    this_32bit = i_binary_instruction(instruction);
                                     functions[funcNum](instruction);
                                 }
                             } else if (i <= 27) {
-                                J *instruction = (I *)calloc(sizeof(L), sizeof(char));
+                                J *instruction = (J *)calloc(sizeof(J), sizeof(char));
                                 if ((instruction = check_j_param(funcNum, node->next, instruction))) {
+                                    this_32bit = j_binary_instruction(instruction);
                                     functions[funcNum](instruction);
                                 }
                             }

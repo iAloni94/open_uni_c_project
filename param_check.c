@@ -20,8 +20,8 @@ char* registerList[] = {
 
 R* check_r_param(int funcNum, node_t* input, R* instruction) {
     char param1 = false, param2 = false, param3 = false;
+    int reg1, reg2, reg3;
     int i;
-    unsigned int temp;
 
     switch (funcNum) { /* opcode */
         case 5:
@@ -29,12 +29,15 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
         case 7:
             instruction->opcode = 1;
             break;
+        default:
+            break;
     }
 
-    if (funcNum <= 4) {                     /* arithmatics */
+    if (funcNum <= 4) {                     /* arithmatics - 3 parameters */
         for (i = 0; i < 32 && input; i++) { /* 32 is number of registers */
             if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rs = i;
+                *(input->val) = i;
                 param1 = true;
                 input = input->next;
                 i = 0;
@@ -42,6 +45,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
             }
             if (param2 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rt = i;
+                *(input->val) = i;
                 param2 = true;
                 input = input->next;
                 i = 0;
@@ -50,13 +54,14 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
 
             if (param3 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rd = i;
+                *(input->val) = i;
                 param3 = true;
                 input = input->next;
                 i = 0;
                 continue;
             }
         }
-    } else {                                /* copy */
+    } else {                                /* copy - 2 parameters */
         for (i = 0; i < 32 && input; i++) { /* 32 is number of registers */
             if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rs = i;
@@ -94,24 +99,28 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
         case 4:
             instruction->funct = 5;
             break;
+        default:
+            break;
     }
 
-    if ((param1 && param2 && param3) || (param1 && param2)) {
+    if (funcNum <= 4 && (param1 && param2 && param3)) {
         return instruction;
+    } else if (param1 && param2) {
+        return instruction;
+    } else {
+        printf("Register not in range");
+        return NULL;
     }
-    return NULL;
 }
 
-
-
 I* check_i_param(int funcNum, node_t* input, I* instruction) {
-    char param1 = false, param2 = false, param3 = false;
+    char param1 = false, param2 = false;
     int i;
 
     instruction->opcode = funcNum + 2;
-    instruction->immed = input->next->val;
+    instruction->immed = *(input->next->val);
 
-    if (funcNum <= 12) {  /* addi to nori */
+    if (funcNum <= 12) {                    /* addi to nori */
         for (i = 0; i < 32 && input; i++) { /* 32 is number of registerd */
             if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rs = i;
@@ -132,12 +141,12 @@ I* check_i_param(int funcNum, node_t* input, I* instruction) {
     } else { /* lb to sh */
     }
 
-    if (param1 && param2 && param3) {
+    if (param1 && param2) {
         return instruction;
     }
     return NULL;
 }
 
-J* check_i_param(int funcNum, node_t* input, J* instruction) {
+J* check_j_param(int funcNum, node_t* input, J* instruction) {
     return instruction;
 }

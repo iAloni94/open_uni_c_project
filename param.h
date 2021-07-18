@@ -27,5 +27,6 @@ typedef struct J {
 
 R *check_r_param();
 I *check_i_param();
+J *check_j_param();
 
 #endif

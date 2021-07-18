@@ -2,7 +2,7 @@
     "code-runner.executorMap": {
     "c": "cd $dir && gcc -g -Wall -ansi -pedantic $fileName -o $fileNameWithoutExt -lm -m32 && $dir$fileNameWithoutExt"
 },
- 
+
 "workbench.colorCustomizations": {
   "[Night Owl]": {
     //"activityBar.background": "#000C1D",

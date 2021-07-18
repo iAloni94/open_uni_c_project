@@ -1,6 +1,10 @@
 #ifndef __ASSEMBLER_H
 #define __ASSEMBLER_H
 
+#define NUM_OF_FUNC 27
+#define NUM_OF_DIR 6
+#define NUM_OF_REG 32
+
 typedef struct flag {
     char label;
     char params;
@@ -14,8 +18,7 @@ typedef struct REG {
 typedef struct REG *reg_ptr;
 
 reg_ptr *regArray[32];
-unsigned int DC = 0;
-unsigned int IC = 100;
+
 
 unsigned int r_binary_instruction();
 unsigned int i_binary_instruction();

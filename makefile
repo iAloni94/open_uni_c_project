@@ -10,7 +10,7 @@ assembler.o: assembler.c input.h func.h param.h assembler.h
 input.o: input.c input.h
 	${CC} ${CFLAGS} -c input.c
 
-param_check.o: param_check.c param.h
+param_check.o: param_check.c param.h assembler.h
 	${CC} ${CFLAGS} -c param_check.c
 
 r_type_func.o: r_type_func.c

@@ -4,13 +4,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "assembler.h"
 #include "func.h"
 #include "input.h"
 #include "param.h"
 
-#define NUM_OF_FUNC 27
+void freeList(node_t *node) {
+    while (node->next != NULL) { /* free current line memory */
+        node_t *currNode = node;
+        node = node->next;
+        free(currNode);
+    }
+    free(node);
+}
 
 int main(int argc, char *argv[]) {
+    
+    char *directions[NUM_OF_DIR] = {".dd", ".dw", ".db", "asciz", ".extern", ".entry"};
+    
     char *functionName[NUM_OF_FUNC] = {
         "add", "sub", "and", "or",
         "nor", "move", "mvhi", "mvlo",
@@ -35,7 +46,7 @@ int main(int argc, char *argv[]) {
     flags *flag = (flags *)malloc(sizeof(flags));
     unsigned int this_32bit = 0;
 
-    for (i = 0; i < 32; i++) { /* reg init */
+    for (i = 0; i < NUM_OF_REG; i++) { /* reg init */
         regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
     }
 
@@ -48,7 +59,7 @@ int main(int argc, char *argv[]) {
     } else {
         FILE *fp;
         fp = fopen(argv[1], "r");
-        while (!(flag->stop))
+        while (!(flag->stop)) {
             if (fp) {
                 head = getLine(fp);
                 node = head;
@@ -57,45 +68,50 @@ int main(int argc, char *argv[]) {
                     /* handle label */
                     node = node->next;
                 }
-                if (strcmp(head->val, "stop")) {
+                if (!strcmp(head->val, "stop")) {
                     flag->stop = 1;
+                    free(head);
+                    break;
                 }
                 if (head) {
-                    funcNum = NUM_OF_FUNC + 1;
-                    for (i = 0; i < NUM_OF_FUNC + 1; i++) {
-                        if (strcmp(node->val, functionName[i]) == 0) {
-                            funcNum = i;
-                            if (i <= 8) {
-                                R *instruction = (R *)calloc(sizeof(R), sizeof(char));
-                                if ((instruction = check_r_param(funcNum, node->next, instruction))) {
-                                    this_32bit = r_binary_instruction(instruction);
-                                    functions[funcNum](node->next);
-                                }
+                    for (i = 0; i < NUM_OF_DIR + 1; i++) {
+                        if (strcmp(node->val, directions[i]) == 0) {
+                            /* handle directions */
+                        }
 
-                            } else if (i <= 23) {
-                                I *instruction = (I *)calloc(sizeof(I), sizeof(char));
-                                if ((instruction = check_i_param(funcNum, node->next, instruction))) {
-                                    this_32bit = i_binary_instruction(instruction);
-                                    functions[funcNum](instruction);
-                                }
-                            } else if (i <= 27) {
-                                J *instruction = (J *)calloc(sizeof(J), sizeof(char));
-                                if ((instruction = check_j_param(funcNum, node->next, instruction))) {
-                                    this_32bit = j_binary_instruction(instruction);
-                                    functions[funcNum](instruction);
-                                }
+                        funcNum = NUM_OF_FUNC + 1;
+                        for (i = 0; i < NUM_OF_FUNC + 1; i++) {
+                            if (strcmp(node->val, functionName[i]) == 0) {
+                                funcNum = i;
                             }
-                            break;
+                        }
+
+                        if (funcNum <= 8) {
+                            R *instruction = (R *)calloc(sizeof(R), sizeof(char));
+                            if ((instruction = check_r_param(funcNum, node->next, instruction))) {
+                                this_32bit = r_binary_instruction(instruction);
+                                functions[funcNum](node->next);
+                            }
+                        } else if (funcNum <= 23) {
+                            I *instruction = (I *)calloc(sizeof(I), sizeof(char));
+                            if ((instruction = check_i_param(funcNum, node->next, instruction))) {
+                                this_32bit = i_binary_instruction(instruction);
+                                functions[funcNum](instruction);
+                            }
+                        } else if (funcNum <= 27) {
+                            J *instruction = (J *)calloc(sizeof(J), sizeof(char));
+                            if ((instruction = check_j_param(funcNum, node->next, instruction))) {
+                                this_32bit = j_binary_instruction(instruction);
+                                functions[funcNum](instruction);
+                            }
+                        } else if(funcNum == NUM_OF_FUNC + 1) {
+                            /* undifined function */
                         }
                     }
-                    while (head->next != NULL) { /* free current line memory */
-                        node_t *currNode = head;
-                        head = head->next;
-                        free(currNode);
-                    }
-                    free(head);
                 }
             }
+            freeList(head);
+        }
     }
     return 1;
 }

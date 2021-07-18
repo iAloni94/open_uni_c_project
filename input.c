@@ -48,6 +48,9 @@ node_t* getLine(FILE* fp) { /* saves each word a new node */
     char* currVal = node->val;
 
     while (temp != '\n') {
+        if(temp == ';'){
+            return NULL;
+        }
         if (temp == EOF) {
             node->next = addNode();
             node = node->next;

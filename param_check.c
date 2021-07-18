@@ -6,6 +6,7 @@
 
 #include "input.h"
 #include "param.h"
+#include "assembler.h"
 
 char* registerList[] = {
     "$0", "$1", "$2", "$3",
@@ -34,7 +35,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
     }
 
     if (funcNum <= 4) {                     /* arithmatics - 3 parameters */
-        for (i = 0; i < 32 && input; i++) { /* 32 is number of registers */
+        for (i = 0; i < NUM_OF_REG && input; i++) {
             if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rs = i;
                 *(input->val) = i;
@@ -62,7 +63,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
             }
         }
     } else {                                /* copy - 2 parameters */
-        for (i = 0; i < 32 && input; i++) { /* 32 is number of registers */
+        for (i = 0; i < NUM_OF_REG && input; i++) {
             if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rs = i;
                 param1 = true;

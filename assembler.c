@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
                 if (head) {
                     for (i = 0; i < NUM_OF_DIR + 1; i++) {
                         if (strcmp(node->val, directions[i]) == 0) {
-                            /* handle directions */
+                            /* handle directions - directions.c */
                         }
 
                         funcNum = NUM_OF_FUNC + 1;

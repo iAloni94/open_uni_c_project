@@ -34,7 +34,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
             break;
     }
 
-    if (funcNum <= 4) {                     /* arithmatics - 3 parameters */
+    if (funcNum <= 4) { /* arithmatics functions - 3 parameters */
         for (i = 0; i < NUM_OF_REG && input; i++) {
             if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rs = i;
@@ -62,7 +62,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
                 continue;
             }
         }
-    } else {                                /* copy - 2 parameters */
+    } else {    /* copy functions - 2 parameters */
         for (i = 0; i < NUM_OF_REG && input; i++) {
             if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rs = i;

@@ -102,8 +102,9 @@ char checkIfLabel(node_t* input, flags* flag) {
                 return true;
             }
         }
+        flag->error = true;
+        printf("\nLine: %d - illigal label name", flag->line);
+        return false;
     }
-    flag->error = true;
-    printf("\nLine: %d - illigal label name", flag->line);
     return false;
 }

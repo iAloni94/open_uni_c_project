@@ -9,7 +9,7 @@
 #include "param.h"
 
 void freeList(node_t *node) {
-    while (node->next != NULL) { /* free current line memory */
+    while (node->next != NULL) { 
         node_t *currNode = node;
         node = node->next;
         free(currNode);
@@ -54,15 +54,17 @@ int main(int argc, char *argv[]) {
     flag->stop = false;
     flag->error = false;
     flag->line = 1;
+    flag->pass = 1;
 
     if (argc <= 1) {
-        printf("No files were detected");
+        printf("\nNo files were detected");
     } else {
-        FILE *fp;
-        fp = fopen(argv[1], "r");
+        FILE *f_in, *f_out;
+        f_in = fopen(argv[1], "r");
+        f_out = fopen("file.txt", "w");
         while (!(flag->stop)) {
-            if (fp) {
-                head = getLine(fp, flag);
+            if (f_in) {
+                head = getLine(f_in, flag);
                 node = head;
                 flag->label = checkIfLabel(node, flag);
                 if (flag->label) {
@@ -95,26 +97,29 @@ int main(int argc, char *argv[]) {
                             instruction_32bit = r_binary_instruction(instruction);
                             functions[funcNum](instruction);
                         }
-                    } else if (funcNum <= 23) {
+                    } else if (funcNum < 23) {
                         I *instruction = (I *)calloc(sizeof(I), sizeof(char));
                         if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
                             instruction_32bit = i_binary_instruction(instruction);
                             functions[funcNum](instruction);
                         }
-                    } else if (funcNum <= 27) {
+                    } else if (funcNum < 27) {
                         J *instruction = (J *)calloc(sizeof(J), sizeof(char));
                         if ((instruction = check_j_param(funcNum, node->next, instruction, flag))) {
                             instruction_32bit = j_binary_instruction(instruction);
                             functions[funcNum](instruction);
                         }
                     } else if (funcNum == NUM_OF_FUNC + 1) {
+                        printf("\nLine: %d - unrecognized instruction <%s>", flag->line, node->val);
                         /* undifined function */
                     }
                     freeList(head);
                     flag->line += 1;
+                    IC += 4;
                 }
             }
         }
     }
+    printf("\n");
     return 1;
 }

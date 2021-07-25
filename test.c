@@ -1,10 +1,9 @@
 #include <stdio.h>
 
 int main() {
-    int i;
-    for (i = 0; i < 33; i++) {
-        printf("\"$%d\", ", i);
-
-    }
+    int a = 1;
+    int b = 2;
+    int c = b|a;
+    printf("\n%d\n", c);
     return 1;
 }

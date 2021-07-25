@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -pedantic -ansi -Wall -g
 
-assembler: assembler.o input.o r_type_func.o i_type_func.o j_type_func.o param_check.o to_binary.o
-	${CC} ${CFLAGS} assembler.o -o assembler input.o r_type_func.o i_type_func.o j_type_func.o  param_check.o to_binary.o
+assembler: assembler.o input.o r_type_func.o i_type_func.o j_type_func.o param_check.o num_base.o
+	${CC} ${CFLAGS} assembler.o -o assembler input.o r_type_func.o i_type_func.o j_type_func.o  param_check.o num_base.o
 
 assembler.o: assembler.c input.h func.h param.h assembler.h
 	${CC} ${CFLAGS} -c assembler.c
@@ -22,5 +22,5 @@ i_type_func.o: i_type_func.c param.h input.h assembler.h
 j_type_func.o: j_type_func.c
 	${CC} ${CFLAGS} -c j_type_func.c
 
-to_binary.o: to_binary.c
-	${CC} ${CFLAGS} -c to_binary.c
+num_base.o: num_base.c
+	${CC} ${CFLAGS} -c num_base.c

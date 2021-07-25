@@ -9,7 +9,7 @@
 #include "param.h"
 
 void freeList(node_t *node) {
-    while (node->next != NULL) { 
+    while (node->next != NULL) {
         node_t *currNode = node;
         node = node->next;
         free(currNode);
@@ -17,7 +17,17 @@ void freeList(node_t *node) {
     free(node);
 }
 
+data_node_t *addDataNode() {
+    data_node_t *newNode = malloc(sizeof(data_node_t));
+    newNode->val = 0;
+    newNode->next = NULL;
+    return newNode;
+}
+
 int main(int argc, char *argv[]) {
+    unsigned int DC = 0, IC = 100;
+    int funcNum, i;
+
     char *directions[NUM_OF_DIR] = {".dd", ".dw", ".db", "asciz", ".extern", ".entry"};
 
     char *functionName[NUM_OF_FUNC] = {
@@ -38,30 +48,33 @@ int main(int argc, char *argv[]) {
         sw_func, lh_func, sh_func, jmp_func,
         la_func, call_func, stop_func, undef_func};
 
-    unsigned int DC = 0, IC = 100;
-    int funcNum, i, line = 1;
-    node_t *head;
-    node_t *node;
-    flags *flag = (flags *)malloc(sizeof(flags));
-    unsigned int instruction_32bit = 0;
-
-    for (i = 0; i < NUM_OF_REG; i++) { /* reg init */
-        regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
-    }
-
-    flag->label = false;
-    flag->params = false;
-    flag->stop = false;
-    flag->error = false;
-    flag->line = 1;
-    flag->pass = 1;
-
     if (argc <= 1) {
         printf("\nNo files were detected");
     } else {
         FILE *f_in, *f_out;
+        node_t *head, *node;
+        data_node_t *instruct_node, *instruction_list = calloc(sizeof(data_node_t), 1);
+        sym_t *symbol, *symbol_list = calloc(sizeof(sym_t), 1);
+        flags *flag = (flags *)malloc(sizeof(flags));
+        unsigned int instruction_32bit = 0;
+
         f_in = fopen(argv[1], "r");
-        f_out = fopen("file.txt", "w");
+        f_out = fopen("output.txt", "w");
+
+        flag->label = false;
+        flag->params = false;
+        flag->stop = false;
+        flag->error = false;
+        flag->line = 1;
+        flag->pass = 1;
+
+        instruct_node = instruction_list;
+        symbol = symbol_list;
+
+        for (i = 0; i < NUM_OF_REG; i++) { /* registers init */
+            regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
+        }
+
         while (!(flag->stop)) {
             if (f_in) {
                 head = getLine(f_in, flag);
@@ -95,24 +108,29 @@ int main(int argc, char *argv[]) {
                         R *instruction = (R *)calloc(sizeof(R), sizeof(char));
                         if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
                             instruction_32bit = r_binary_instruction(instruction);
+                            instruct_node->val = instruction_32bit;
                             functions[funcNum](instruction);
                         }
                     } else if (funcNum < 23) {
                         I *instruction = (I *)calloc(sizeof(I), sizeof(char));
                         if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
                             instruction_32bit = i_binary_instruction(instruction);
+                            instruct_node->val = instruction_32bit;
                             functions[funcNum](instruction);
                         }
                     } else if (funcNum < 27) {
                         J *instruction = (J *)calloc(sizeof(J), sizeof(char));
                         if ((instruction = check_j_param(funcNum, node->next, instruction, flag))) {
                             instruction_32bit = j_binary_instruction(instruction);
+                            instruct_node->val = instruction_32bit;
                             functions[funcNum](instruction);
                         }
                     } else if (funcNum == NUM_OF_FUNC + 1) {
                         printf("\nLine: %d - unrecognized instruction <%s>", flag->line, node->val);
                         /* undifined function */
                     }
+                    instruct_node->next = addDataNode();
+                    instruct_node = instruct_node->next;
                     freeList(head);
                     flag->line += 1;
                     IC += 4;

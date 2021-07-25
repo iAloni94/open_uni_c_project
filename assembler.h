@@ -21,9 +21,22 @@ typedef struct flag {
     char params;
     char stop;
     char error;
-    unsigned int line;
     char pass;
+    unsigned int line;
 } flags;
+
+typedef struct dataNode {
+    unsigned int val;
+    struct dataNode *next;
+} data_node_t;
+
+typedef struct symbol {
+    char *name;
+    char *type;
+    unsigned int val;
+    unsigned int ic;
+    unsigned int dc;
+} sym_t;
 
 typedef struct REG {
     unsigned int : 32;

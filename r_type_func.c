@@ -1,22 +1,42 @@
-/* this file is for getting ready for the main function to do its thing */
-
+#include "assembler.h"
 #include "input.h"
 #include "param.h"
 
-void add_func(node_t *input){
-    int reg1 = *(input->val);
-    int reg2 = *(input->next->val);
-    int reg3 = *(input->next->next->val);;
-
-    /*regArray[reg3] = add(regArray[reg1], regArray[reg2]); */
-
+void add_func(R *instruction) {
+    int rs_index = instruction->rs;
+    int rt_index = instruction->rt;
+    int rd_index = instruction->rt;
+    unsigned int rs = *(regArray[rs_index]);
+    unsigned int rt = *(regArray[rt_index]);
+    unsigned int rd = rs + rt;
+    *regArray[rd_index] = rd;
 }
-void sub_func(node_t *input){}
-void and_func(node_t *input){}
-void or_func(node_t *input){}
-void nor_func(node_t *input){}
-void move_func(node_t *input){}
-void mvhi_func(node_t *input){}
-void mvlo_func(node_t *input){}
 
-void undef_func(){}
+void sub_func(R *instruction) {
+    int rs_index = instruction->rs;
+    int rt_index = instruction->rt;
+    int rd_index = instruction->rt;
+}
+void and_func(R *instruction) {
+    int rs_index = instruction->rs;
+    int rt_index = instruction->rt;
+    int rd_index = instruction->rt;
+}
+void or_func(R *instruction) {
+    int rs_index = instruction->rs;
+    int rt_index = instruction->rt;
+    int rd_index = instruction->rt;
+}
+void nor_func(R *instruction) {
+    int rs_index = instruction->rs;
+    int rt_index = instruction->rt;
+    int rd_index = instruction->rt;
+}
+void move_func(R *instruction) {
+}
+void mvhi_func(R *instruction) {
+}
+void mvlo_func(R *instruction) {
+}
+
+void undef_func() {}

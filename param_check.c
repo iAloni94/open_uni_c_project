@@ -1,12 +1,11 @@
-
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "assembler.h"
 #include "input.h"
 #include "param.h"
-#include "assembler.h"
 
 char* registerList[] = {
     "$0", "$1", "$2", "$3",
@@ -19,9 +18,8 @@ char* registerList[] = {
     "$28", "$29", "$30", "$31",
     "$32"};
 
-R* check_r_param(int funcNum, node_t* input, R* instruction) {
+R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
     char param1 = false, param2 = false, param3 = false;
-    int reg1, reg2, reg3;
     int i;
 
     switch (funcNum) { /* opcode */
@@ -62,7 +60,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
                 continue;
             }
         }
-    } else {    /* copy functions - 2 parameters */
+    } else { /* copy functions - 2 parameters */
         for (i = 0; i < NUM_OF_REG && input; i++) {
             if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rs = i;
@@ -109,17 +107,24 @@ R* check_r_param(int funcNum, node_t* input, R* instruction) {
     } else if (param1 && param2) {
         return instruction;
     } else {
-        printf("Register not in range");
+        flag->error = true;
+        printf("\nLine: %d - Register not in range", flag->line);
         return NULL;
     }
 }
 
-I* check_i_param(int funcNum, node_t* input, I* instruction) {
+I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
     char param1 = false, param2 = false;
     int i;
 
     instruction->opcode = funcNum + 2;
-    instruction->immed = *(input->next->val);
+    if (strchr(input->next->val, '.')) {
+        printf("Line : %d", flag->line);
+        printf("This assembler support only integers");
+        flag->error = true;
+        return NULL;
+    }
+    instruction->immed = atoi(input->next->val);
 
     if (funcNum <= 12) {                    /* addi to nori */
         for (i = 0; i < 32 && input; i++) { /* 32 is number of registerd */
@@ -144,10 +149,13 @@ I* check_i_param(int funcNum, node_t* input, I* instruction) {
 
     if (param1 && param2) {
         return instruction;
+    } else {
+        flag->error = true;
+        printf("\nLine: %d - Register not in range", flag->line);
+        return NULL;
     }
-    return NULL;
 }
 
-J* check_j_param(int funcNum, node_t* input, J* instruction) {
+J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag) {
     return instruction;
 }

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "assembler.h"
 node_t* initList();
 
 unsigned int instruction = 0;
@@ -37,7 +38,7 @@ node_t* addNode() {
     return newNode;
 }
 
-node_t* getLine(FILE* fp) { /* saves each word a new node */
+node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
 
     node_t* head = initList();
     node_t* node = head;
@@ -48,7 +49,7 @@ node_t* getLine(FILE* fp) { /* saves each word a new node */
     char* currVal = node->val;
 
     while (temp != '\n') {
-        if(temp == ';'){
+        if (temp == ';') {
             return NULL;
         }
         if (temp == EOF) {
@@ -62,7 +63,11 @@ node_t* getLine(FILE* fp) { /* saves each word a new node */
                 prevChar = temp;
                 temp = fgetc(fp);
             }
-            if ((isspace(prevChar) || temp == ',') && *currVal != -1) {
+            if (comma && temp == ',') {
+                comma = false;
+                flag->error = true;
+                printf("\nLine: %d - consecutive commas", flag->line);
+            } else if ((isspace(prevChar) || temp == ',') && *currVal != -1) {
                 node->next = addNode();
                 node = node->next;
                 currVal = node->val;
@@ -75,10 +80,6 @@ node_t* getLine(FILE* fp) { /* saves each word a new node */
             comma = true;
             prevChar = temp;
             temp = fgetc(fp);
-            if (comma && prevChar == ',') {
-                printf("EROR!!! consecutive commas");
-                comma = false;
-            }
             continue;
         } else {
             comma = false;
@@ -91,17 +92,18 @@ node_t* getLine(FILE* fp) { /* saves each word a new node */
     return head;
 }
 
-char checkIfLabel(node_t* input) {
+char checkIfLabel(node_t* input, flags* flag) {
     int i;
     char* temp = input->val;
     if (strstr(temp, ":") != NULL) {
         temp[strlen(temp) - 1] = '\0';
         for (i = 0; i < 33; i++) { /* 33 is number of saved words*/
             if (strcmp(savedWords[i], input->val) == 0) {
-                printf("illigal label name");
-                return false;
+                return true;
             }
         }
     }
+    flag->error = true;
+    printf("\nLine: %d - illigal label name", flag->line);
     return false;
 }

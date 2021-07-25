@@ -9,15 +9,18 @@ typedef struct flag {
     char label;
     char params;
     char stop;
+    char error;
+    unsigned int line;
 } flags;
 
-typedef struct REG {
+typedef struct REG { 
     unsigned int : 32;
 } reg_t;
 
-typedef struct REG *reg_ptr;
+typedef struct REG *reg_ptr; 
 
 reg_ptr *regArray[32];
+
 
 
 unsigned int r_binary_instruction();

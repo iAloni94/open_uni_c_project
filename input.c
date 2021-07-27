@@ -6,6 +6,8 @@
 #include <string.h>
 
 #include "assembler.h"
+#include "utils.h"
+
 node_t* initList();
 
 unsigned int instruction = 0;
@@ -13,16 +15,6 @@ unsigned int instruction = 0;
 000000 00000 00000 00000 00000 000000
 opcd     rs   rt     rd   fnct  immed   
 */
-
-char* savedWords[] = {
-    "dd", "dw", "db", "asciz", "entry", "extern",
-    "add", "sub", "and", "or",
-    "nor", "move", "mvhi", "mvlo",
-    "addi", "subi", "andi", "ori",
-    "nori", "bne", "beq", "blt",
-    "bgt", "lb", "sb", "lw",
-    "sw", "lh", "sh", "jmp",
-    "la", "call", "stop"};
 
 node_t* initList() {
     node_t* head = malloc(sizeof(node_t));
@@ -95,19 +87,12 @@ node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
     return head;
 }
 
-char checkIfLabel(node_t* input, flags* flag) {
-    int i;
+char checkIfLabel(node_t* input) {
     char* temp = input->val;
     if (strstr(temp, ":") != NULL) {
-        temp[strlen(temp) - 1] = '\0';
-        for (i = 0; i < 33; i++) { /* 33 is number of saved words*/
-            if (strcmp(savedWords[i], input->val) == 0) {
-                return true;
-            }
-        }
-        flag->error = true;
-        printf("\nLine: %d - illigal label name", flag->line);
-        return false;
+        input->val[strlen(temp) - 1] = '\0';
+        if (strlen(temp) <= LABEL_MAX_LENGTH && IS_LETTER(*temp) && isAlphaNumeric(temp) && !isReserved(temp)) return true;
     }
+    printf("\nLine: %d - Illigal label name", 1);
     return false;
 }

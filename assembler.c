@@ -8,15 +8,6 @@
 #include "input.h"
 #include "param.h"
 
-void freeList(node_t *node) {
-    while (node->next != NULL) {
-        node_t *currNode = node;
-        node = node->next;
-        free(currNode);
-    }
-    free(node);
-}
-
 int assemble(char *fname) {
     char *directions[NUM_OF_DIR] = {".dd", ".dw", ".db", "asciz", ".extern", ".entry"};
 
@@ -38,13 +29,12 @@ int assemble(char *fname) {
         sw_func, lh_func, sh_func, jmp_func,
         la_func, call_func, stop_func, undef_func};
 
-    unsigned int DC = 0, IC = 100, icf, idf;
+    unsigned int DC = 0, IC = 100, ICF, DCF;
     int funcNum, i, j;
-    char firstPass = true;
     char tempLine[MAX_LINE_LENGTH] = {0};
     long data_img[1000];
-    long instruction_img[1000];
-    sym_t *symbol, *symbol_list = calloc(sizeof(sym_t), 1);
+    long code_img[1000];
+    sym_t *symbol, *symbol_list_head = calloc(sizeof(sym_t), 1);
 
     node_t *head, *node;
     flags *flag = (flags *)malloc(sizeof(flags));
@@ -57,10 +47,11 @@ int assemble(char *fname) {
     flag->params = false;
     flag->stop = false;
     flag->error = false;
-    flag->firstPassDone = false;
+    flag->direction = false;
+    flag->firstPass = true;
     flag->line = 1;
 
-    symbol = symbol_list;
+    symbol = symbol_list_head;
 
     for (i = 0; i < NUM_OF_REG; i++) { /* registers init */
         regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
@@ -69,22 +60,30 @@ int assemble(char *fname) {
     if (fp) {
         j = 0;
         while (fgets(tempLine, MAX_LINE_LENGTH, fp) != NULL) {
-            if (strchr(tempLine, "\n")) {
-                printf("Line: %d - Line too long. Max line length is &d", flag->line, MAX_LINE_LENGTH);
+            if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
+                printf("/nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
+                flag->firstPass = false;
+                while (getc(fp) != '\n')
+                    ;
+                continue;
             }
+
             head = getLine(tempLine, flag);
             node = head;
-            flag->label = checkIfLabel(node, flag);
-            if (flag->label) {
-                /* handle label - symbol list */
-                node = node->next;
-            }
+
             if (head) {
+                if ((flag->label = checkIfLabel(node))) {
+                    isDeclared(node, symbol_list_head, flag);
+                    node = node->next;
+                }
+
                 for (i = 0; i < NUM_OF_DIR + 1; i++) {
                     if (strcmp(node->val, directions[i]) == 0) {
+                        flag->direction = true;
                         /* handle directions - directions.c */
                     }
                 }
+                if (flag->direction) continue;
 
                 funcNum = NUM_OF_FUNC + 1;
                 for (i = 0; i < NUM_OF_FUNC + 1; i++) {
@@ -113,10 +112,25 @@ int assemble(char *fname) {
                         functions[funcNum](instruction);
                     }
                 } else if (funcNum == NUM_OF_FUNC + 1) {
-                    printf("\nLine: %d - unrecognized instruction <%s>", flag->line, node->val);
+                    printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
                     /* undifined function */
                 }
-                instruction_img[j] = instruction_32bit; /* insert instruction to memory image */
+
+                if (flag->label) {
+                    symbol->name = head->val;
+                    if (flag->direction) {
+                        symbol->address = DC;
+                        symbol->attribute = "code";
+                    } else {
+                        symbol->address = IC;
+                        symbol->attribute = "data";
+                    }
+                    flag->label = false;
+                    symbol->next = calloc(sizeof(sym_t), 1);
+                    symbol = symbol->next;
+                }
+
+                code_img[j] = instruction_32bit; /* insert binary instruction to memory image */
                 freeList(head);
                 flag->line += 1;
                 IC += 4;
@@ -124,7 +138,9 @@ int assemble(char *fname) {
         }
     }
 
-    if (flag->firstPassDone) {
+    if (flag->firstPass) {
+        ICF = IC;
+        DCF = DC;
         printf("first Pass Done");
         /* second pass things */
     }
@@ -135,15 +151,10 @@ int assemble(char *fname) {
 
 int main(int argc, char *argv[]) {
     int i;
-    /* To break line if needed */
     char succeeded = true;
-    /* Process each file by arguments */
     for (i = 1; i < argc; ++i) {
-        /* if last process failed and there's another file, break line: */
         if (!succeeded) puts("");
-        /* foreach argument (file name), send it for full processing. */
         succeeded = assemble(argv[i]);
-        /* Line break if failed */
     }
     return 0;
 }

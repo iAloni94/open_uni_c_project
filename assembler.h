@@ -4,6 +4,8 @@
 #define NUM_OF_FUNC 27
 #define NUM_OF_DIR 6
 #define NUM_OF_REG 32
+#define MAX_LINE_LENGTH 81 /* Limit is 80 + Null terminator*/
+#define LABEL_MAX_LENGTH 31
 
 enum {
     false = 0,
@@ -19,16 +21,21 @@ typedef struct flag {
     char stop;
     char error;
     char pass;
+    char firstPass;
+    char direction;
     unsigned int line;
-    char firstPassDone;
 } flags;
 
+typedef struct node {
+    char *val;
+    struct node *next;
+} node_t;
 
 typedef struct symbol {
     char *name;
     char *attribute;
     unsigned int address;
-    struct symbol* next_label;
+    struct symbol *next;
 } sym_t;
 
 typedef struct REG {

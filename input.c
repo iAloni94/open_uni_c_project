@@ -38,12 +38,12 @@ node_t* addNode() {
     return newNode;
 }
 
-node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
-
+node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
+    int i = 0;
     node_t* head = initList();
     node_t* node = head;
     char comma = false;
-    char temp = fgetc(fp);
+    char temp = *(line);
     char prevChar = temp;
     int j = 0;
     char* currVal = node->val;
@@ -61,7 +61,8 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         if (isspace(temp)) {
             while (isspace(temp) && temp != '\n') {
                 prevChar = temp;
-                temp = fgetc(fp);
+                i++;
+                temp = *(line + i);
             }
             if (comma && temp == ',') {
                 comma = false;
@@ -79,14 +80,16 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         } else if (temp == ',') {
             comma = true;
             prevChar = temp;
-            temp = fgetc(fp);
+            i++;
+            temp = *(line + i);
             continue;
         } else {
             comma = false;
             *(currVal + j) = temp;
             j++;
+            i++;
             prevChar = temp;
-            temp = fgetc(fp);
+            temp = *(line + i);
         }
     }
     return head;

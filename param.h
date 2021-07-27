@@ -20,7 +20,7 @@ typedef struct I {
 typedef struct J {
     unsigned int opcode : 6;
     unsigned int reg : 1;
-    unsigned int adress : 25;
+    unsigned int address : 25;
 } J;
 
 R *check_r_param();

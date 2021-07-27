@@ -1,6 +1,17 @@
 #include "input.h"
 #include "param.h"
 
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
+#define BYTE_TO_BINARY(byte)       \
+    (byte & 0x80 ? '1' : '0'),     \
+        (byte & 0x40 ? '1' : '0'), \
+        (byte & 0x20 ? '1' : '0'), \
+        (byte & 0x10 ? '1' : '0'), \
+        (byte & 0x08 ? '1' : '0'), \
+        (byte & 0x04 ? '1' : '0'), \
+        (byte & 0x02 ? '1' : '0'), \
+        (byte & 0x01 ? '1' : '0')
+
 unsigned int r_binary_instruction(R *instruction) {
     unsigned int my_32bit = 0;
     unsigned int temp;
@@ -53,7 +64,7 @@ unsigned int j_binary_instruction(J *instruction, char type) {
     temp = instruction->reg;
     my_32bit |= (temp << 25);
 
-    temp = instruction->adress;
+    temp = instruction->address;
     my_32bit |= (temp);
 
     return my_32bit;

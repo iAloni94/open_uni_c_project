@@ -5,16 +5,13 @@
 #define NUM_OF_DIR 6
 #define NUM_OF_REG 32
 
-#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
-#define BYTE_TO_BINARY(byte)       \
-    (byte & 0x80 ? '1' : '0'),     \
-        (byte & 0x40 ? '1' : '0'), \
-        (byte & 0x20 ? '1' : '0'), \
-        (byte & 0x10 ? '1' : '0'), \
-        (byte & 0x08 ? '1' : '0'), \
-        (byte & 0x04 ? '1' : '0'), \
-        (byte & 0x02 ? '1' : '0'), \
-        (byte & 0x01 ? '1' : '0')
+enum {
+    false = 0,
+    true = 1,
+    r_type = 2,
+    i_type = 3,
+    j_type = 4
+};
 
 typedef struct flag {
     char label;
@@ -23,19 +20,15 @@ typedef struct flag {
     char error;
     char pass;
     unsigned int line;
+    char firstPassDone;
 } flags;
 
-typedef struct dataNode {
-    unsigned int val;
-    struct dataNode *next;
-} data_node_t;
 
 typedef struct symbol {
     char *name;
-    char *type;
-    unsigned int val;
-    unsigned int ic;
-    unsigned int dc;
+    char *attribute;
+    unsigned int address;
+    struct symbol* next_label;
 } sym_t;
 
 typedef struct REG {

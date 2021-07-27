@@ -17,17 +17,7 @@ void freeList(node_t *node) {
     free(node);
 }
 
-data_node_t *addDataNode() {
-    data_node_t *newNode = malloc(sizeof(data_node_t));
-    newNode->val = 0;
-    newNode->next = NULL;
-    return newNode;
-}
-
-int main(int argc, char *argv[]) {
-    unsigned int DC = 0, IC = 100;
-    int funcNum, i;
-
+int assemble(char *fname) {
     char *directions[NUM_OF_DIR] = {".dd", ".dw", ".db", "asciz", ".extern", ".entry"};
 
     char *functionName[NUM_OF_FUNC] = {
@@ -48,96 +38,112 @@ int main(int argc, char *argv[]) {
         sw_func, lh_func, sh_func, jmp_func,
         la_func, call_func, stop_func, undef_func};
 
-    if (argc <= 1) {
-        printf("\nNo files were detected");
-    } else {
-        FILE *f_in, *f_out;
-        node_t *head, *node;
-        data_node_t *instruct_node, *instruction_list = calloc(sizeof(data_node_t), 1);
-        sym_t *symbol, *symbol_list = calloc(sizeof(sym_t), 1);
-        flags *flag = (flags *)malloc(sizeof(flags));
-        unsigned int instruction_32bit = 0;
+    unsigned int DC = 0, IC = 100, icf, idf;
+    int funcNum, i, j;
+    char firstPass = true;
+    char tempLine[MAX_LINE_LENGTH] = {0};
+    long data_img[1000];
+    long instruction_img[1000];
+    sym_t *symbol, *symbol_list = calloc(sizeof(sym_t), 1);
 
-        f_in = fopen(argv[1], "r");
-        f_out = fopen("output.txt", "w");
+    node_t *head, *node;
+    flags *flag = (flags *)malloc(sizeof(flags));
+    unsigned int instruction_32bit = 0;
 
-        flag->label = false;
-        flag->params = false;
-        flag->stop = false;
-        flag->error = false;
-        flag->line = 1;
-        flag->pass = 1;
+    FILE *fp;
+    fp = fopen(fname, "r");
 
-        instruct_node = instruction_list;
-        symbol = symbol_list;
+    flag->label = false;
+    flag->params = false;
+    flag->stop = false;
+    flag->error = false;
+    flag->firstPassDone = false;
+    flag->line = 1;
 
-        for (i = 0; i < NUM_OF_REG; i++) { /* registers init */
-            regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
-        }
+    symbol = symbol_list;
 
-        while (!(flag->stop)) {
-            if (f_in) {
-                head = getLine(f_in, flag);
-                node = head;
-                flag->label = checkIfLabel(node, flag);
-                if (flag->label) {
-                    /* handle label */
-                    node = node->next;
-                }
-                if (!strcmp(head->val, "stop")) {
-                    flag->stop = 1;
-                    free(head);
-                    break;
-                }
-                if (head) {
-                    for (i = 0; i < NUM_OF_DIR + 1; i++) {
-                        if (strcmp(node->val, directions[i]) == 0) {
-                            /* handle directions - directions.c */
-                        }
+    for (i = 0; i < NUM_OF_REG; i++) { /* registers init */
+        regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
+    }
+
+    if (fp) {
+        j = 0;
+        while (fgets(tempLine, MAX_LINE_LENGTH, fp) != NULL) {
+            if (strchr(tempLine, "\n")) {
+                printf("Line: %d - Line too long. Max line length is &d", flag->line, MAX_LINE_LENGTH);
+            }
+            head = getLine(tempLine, flag);
+            node = head;
+            flag->label = checkIfLabel(node, flag);
+            if (flag->label) {
+                /* handle label - symbol list */
+                node = node->next;
+            }
+            if (head) {
+                for (i = 0; i < NUM_OF_DIR + 1; i++) {
+                    if (strcmp(node->val, directions[i]) == 0) {
+                        /* handle directions - directions.c */
                     }
-
-                    funcNum = NUM_OF_FUNC + 1;
-                    for (i = 0; i < NUM_OF_FUNC + 1; i++) {
-                        if (strcmp(node->val, functionName[i]) == 0) {
-                            funcNum = i;
-                            break;
-                        }
-                    }
-
-                    if (funcNum < 8) {
-                        R *instruction = (R *)calloc(sizeof(R), sizeof(char));
-                        if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
-                            instruction_32bit = r_binary_instruction(instruction);
-                            instruct_node->val = instruction_32bit;
-                            functions[funcNum](instruction);
-                        }
-                    } else if (funcNum < 23) {
-                        I *instruction = (I *)calloc(sizeof(I), sizeof(char));
-                        if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
-                            instruction_32bit = i_binary_instruction(instruction);
-                            instruct_node->val = instruction_32bit;
-                            functions[funcNum](instruction);
-                        }
-                    } else if (funcNum < 27) {
-                        J *instruction = (J *)calloc(sizeof(J), sizeof(char));
-                        if ((instruction = check_j_param(funcNum, node->next, instruction, flag))) {
-                            instruction_32bit = j_binary_instruction(instruction);
-                            instruct_node->val = instruction_32bit;
-                            functions[funcNum](instruction);
-                        }
-                    } else if (funcNum == NUM_OF_FUNC + 1) {
-                        printf("\nLine: %d - unrecognized instruction <%s>", flag->line, node->val);
-                        /* undifined function */
-                    }
-                    instruct_node->next = addDataNode();
-                    instruct_node = instruct_node->next;
-                    freeList(head);
-                    flag->line += 1;
-                    IC += 4;
                 }
+
+                funcNum = NUM_OF_FUNC + 1;
+                for (i = 0; i < NUM_OF_FUNC + 1; i++) {
+                    if (strcmp(node->val, functionName[i]) == 0) {
+                        funcNum = i;
+                        break;
+                    }
+                }
+
+                if (funcNum < 8) {
+                    R *instruction = (R *)calloc(sizeof(R), sizeof(char));
+                    if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
+                        instruction_32bit = r_binary_instruction(instruction);
+                        functions[funcNum](instruction);
+                    }
+                } else if (funcNum < 23) {
+                    I *instruction = (I *)calloc(sizeof(I), sizeof(char));
+                    if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
+                        instruction_32bit = i_binary_instruction(instruction);
+                        functions[funcNum](instruction);
+                    }
+                } else if (funcNum < 27) {
+                    J *instruction = (J *)calloc(sizeof(J), sizeof(char));
+                    if ((instruction = check_j_param(funcNum, node->next, instruction, flag))) {
+                        instruction_32bit = j_binary_instruction(instruction);
+                        functions[funcNum](instruction);
+                    }
+                } else if (funcNum == NUM_OF_FUNC + 1) {
+                    printf("\nLine: %d - unrecognized instruction <%s>", flag->line, node->val);
+                    /* undifined function */
+                }
+                instruction_img[j] = instruction_32bit; /* insert instruction to memory image */
+                freeList(head);
+                flag->line += 1;
+                IC += 4;
             }
         }
     }
+
+    if (flag->firstPassDone) {
+        printf("first Pass Done");
+        /* second pass things */
+    }
+
     printf("\n");
     return 1;
+}
+
+int main(int argc, char *argv[]) {
+    int i;
+    /* To break line if needed */
+    char succeeded = true;
+    /* Process each file by arguments */
+    for (i = 1; i < argc; ++i) {
+        /* if last process failed and there's another file, break line: */
+        if (!succeeded) puts("");
+        /* foreach argument (file name), send it for full processing. */
+        succeeded = assemble(argv[i]);
+        /* Line break if failed */
+    }
+    return 0;
 }

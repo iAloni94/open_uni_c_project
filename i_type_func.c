@@ -1,6 +1,6 @@
 #include "assembler.h"
-#include "input.h"
 #include "param.h"
+
 
 void addi_func(I *instruction) {
     unsigned int rs_index = instruction->rs;

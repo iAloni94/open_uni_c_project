@@ -15,22 +15,6 @@ enum {
     j_type = 4
 };
 
-typedef struct flag {
-    char label;
-    char params;
-    char stop;
-    char error;
-    char pass;
-    char firstPass;
-    char direction;
-    unsigned int line;
-} flags;
-
-typedef struct node {
-    char *val;
-    struct node *next;
-} node_t;
-
 typedef struct symbol {
     char *name;
     char *attribute;

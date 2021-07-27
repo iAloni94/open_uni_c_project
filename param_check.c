@@ -4,8 +4,8 @@
 #include <string.h>
 
 #include "assembler.h"
-#include "input.h"
 #include "param.h"
+#include "utils.h"
 
 char* registerList[] = {
     "$0", "$1", "$2", "$3",

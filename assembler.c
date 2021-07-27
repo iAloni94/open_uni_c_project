@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "func.h"
-#include "input.h"
+#include "utils.h"
 #include "param.h"
 
 int assemble(char *fname) {

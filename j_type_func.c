@@ -1,4 +1,5 @@
-#include "input.h"
+#include "assembler.h"
+#include "utils.h"
 
 void jmp_func(node_t *input){}
 void la_func(node_t *input){}

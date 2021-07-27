@@ -1,6 +1,6 @@
 #include "assembler.h"
-#include "input.h"
 #include "param.h"
+#include "utils.h"
 
 void add_func(R *instruction) {
     int rs_index = instruction->rs;

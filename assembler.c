@@ -5,11 +5,11 @@
 #include <string.h>
 
 #include "func.h"
-#include "utils.h"
 #include "param.h"
+#include "utils.h"
 
 int assemble(char *fname) {
-    char *directions[NUM_OF_DIR] = {".dd", ".dw", ".db", "asciz", ".extern", ".entry"};
+    char *directions[NUM_OF_DIR] = {".dh", ".dw", ".db", "asciz", ".extern", ".entry"};
 
     char *functionName[NUM_OF_FUNC] = {
         "add", "sub", "and", "or",
@@ -46,12 +46,13 @@ int assemble(char *fname) {
     flag->label = false;
     flag->params = false;
     flag->stop = false;
-    flag->error = false;
     flag->direction = false;
     flag->firstPass = true;
     flag->line = 1;
+    flag->fileName = fname;
 
     symbol = symbol_list_head;
+    printf("%s", flag->fileName);
 
     for (i = 0; i < NUM_OF_REG; i++) { /* registers init */
         regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
@@ -61,7 +62,7 @@ int assemble(char *fname) {
         j = 0;
         while (fgets(tempLine, MAX_LINE_LENGTH, fp) != NULL) {
             if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
-                printf("/nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
+                printf("/nLine: %d - Line too long. Max line length is %d. File - %s", flag->line, MAX_LINE_LENGTH - 1, flag->fileName);
                 flag->firstPass = false;
                 while (getc(fp) != '\n')
                     ;
@@ -72,7 +73,7 @@ int assemble(char *fname) {
             node = head;
 
             if (head) {
-                if ((flag->label = checkIfLabel(node))) {
+                if ((flag->label = isLabel(node, flag))) {
                     isDeclared(node, symbol_list_head, flag);
                     node = node->next;
                 }
@@ -81,9 +82,9 @@ int assemble(char *fname) {
                     if (strcmp(node->val, directions[i]) == 0) {
                         flag->direction = true;
                         /* handle directions - directions.c */
+                        break;
                     }
                 }
-                if (flag->direction) continue;
 
                 funcNum = NUM_OF_FUNC + 1;
                 for (i = 0; i < NUM_OF_FUNC + 1; i++) {
@@ -113,6 +114,7 @@ int assemble(char *fname) {
                     }
                 } else if (funcNum == NUM_OF_FUNC + 1) {
                     printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
+                    flag->firstPass = false;
                     /* undifined function */
                 }
 
@@ -141,7 +143,6 @@ int assemble(char *fname) {
     if (flag->firstPass) {
         ICF = IC;
         DCF = DC;
-        printf("first Pass Done");
         /* second pass things */
     }
 

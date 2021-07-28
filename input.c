@@ -6,27 +6,6 @@
 #include "assembler.h"
 #include "utils.h"
 
-node_t* initList();
-
-unsigned int instruction = 0;
-/* 32 bit command 
-000000 00000 00000 00000 00000 000000
-opcd     rs   rt     rd   fnct  immed   
-*/
-
-node_t* initList() {
-    node_t* head = malloc(sizeof(node_t));
-    head->val = calloc(1, 100);
-    head->next = NULL;
-    return head;
-}
-
-node_t* addNode() {
-    node_t* newNode = malloc(sizeof(node_t));
-    newNode->val = calloc(1, 100);
-    newNode->next = NULL;
-    return newNode;
-}
 
 node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
     int i = 0;
@@ -56,7 +35,7 @@ node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
             }
             if (comma && temp == ',') {
                 comma = false;
-                flag->error = true;
+                flag->firstPass = false;
                 printf("\nLine: %d - consecutive commas", flag->line);
             } else if ((isspace(prevChar) || temp == ',') && *currVal != -1) {
                 node->next = addNode();
@@ -85,12 +64,13 @@ node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
     return head;
 }
 
-char checkIfLabel(node_t* input) {
+char isLabel(node_t* input, flags *flag) {
     char* temp = input->val;
     if (strstr(temp, ":") != NULL) {
         input->val[strlen(temp) - 1] = '\0';
         if (strlen(temp) <= LABEL_MAX_LENGTH && IS_LETTER(*temp) && isAlphaNumeric(temp) && !isReserved(temp)) return true;
     }
+    flag->firstPass = false;
     printf("\nLine: %d - Illigal label name", 1);
     return false;
 }

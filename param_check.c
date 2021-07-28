@@ -107,7 +107,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
     } else if (param1 && param2) {
         return instruction;
     } else {
-        flag->error = true;
+        flag->firstPass = false;
         printf("\nLine: %d - Register not in range", flag->line);
         return NULL;
     }
@@ -119,9 +119,8 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
 
     instruction->opcode = funcNum + 2;
     if (strchr(input->next->val, '.')) {
-        printf("Line : %d", flag->line);
-        printf("This assembler support only integers");
-        flag->error = true;
+        printf("Line : %d = This assembler support only integers", flag->line);
+        flag->firstPass = false;
         return NULL;
     }
     instruction->immed = atoi(input->next->val);
@@ -150,7 +149,7 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
     if (param1 && param2) {
         return instruction;
     } else {
-        flag->error = true;
+        flag->firstPass = false;
         printf("\nLine: %d - Register not in range", flag->line);
         return NULL;
     }

@@ -54,7 +54,7 @@ int assemble(char *fname) {
     symbol = symbol_list_head;
     printf("%s", flag->fileName);
 
-    for (i = 0; i < NUM_OF_REG; i++) { /* registers init */
+    for (i = 0; i < NUM_OF_REG; i++) { /* registers init - regArray contains pointers to all registers 0-31 */
         regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
     }
 
@@ -118,7 +118,7 @@ int assemble(char *fname) {
                     /* undifined function */
                 }
 
-                if (flag->label) {
+                if (flag->label) { /* if found, inserts label into symbol table. each node is a a label */
                     symbol->name = head->val;
                     if (flag->direction) {
                         symbol->address = DC;

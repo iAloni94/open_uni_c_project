@@ -1,6 +1,7 @@
 #include "assembler.h"
 #include "param.h"
 #include "utils.h"
+#include "func.h"
 
 void add_func(R *instruction) {
     unsigned int rs = (regArray[instruction->rs]->val);

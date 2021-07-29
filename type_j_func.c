@@ -1,5 +1,6 @@
 #include "assembler.h"
 #include "param.h"
+#include "func.h"
 
 void jmp_func(J *instruction){}
 void la_func(J *instruction){}

@@ -1,5 +1,6 @@
 #include "assembler.h"
 #include "param.h"
+#include "func.h"
 
 
 void addi_func(I *instruction) {\

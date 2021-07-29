@@ -23,12 +23,12 @@ typedef struct symbol {
 } sym_t;
 
 typedef struct REG {
-    unsigned int : 32;
+    unsigned int val : 32;
 } reg_t;
 
 typedef struct REG *reg_ptr;
 
-reg_ptr *regArray[32];
+reg_ptr regArray[NUM_OF_REG];
 
 unsigned int r_binary_instruction();
 unsigned int i_binary_instruction();

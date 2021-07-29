@@ -6,7 +6,6 @@
 #include "assembler.h"
 #include "utils.h"
 
-
 node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
     int i = 0;
     node_t* head = initList();
@@ -64,13 +63,16 @@ node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
     return head;
 }
 
-char isLabel(node_t* input, flags *flag) {
+char isLabel(node_t* input, flags* flag) {
     char* temp = input->val;
     if (strstr(temp, ":") != NULL) {
         input->val[strlen(temp) - 1] = '\0';
-        if (strlen(temp) <= LABEL_MAX_LENGTH && IS_LETTER(*temp) && isAlphaNumeric(temp) && !isReserved(temp)) return true;
+        if (strlen(temp) <= LABEL_MAX_LENGTH && IS_LETTER(*temp) && isAlphaNumeric(temp) && !isReserved(temp))
+            return true;
+        else {
+            flag->firstPass = false;
+            printf("\nLine: %d - Illigal label name", 1);
+        }
     }
-    flag->firstPass = false;
-    printf("\nLine: %d - Illigal label name", 1);
     return false;
 }

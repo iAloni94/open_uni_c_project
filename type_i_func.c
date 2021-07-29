@@ -2,41 +2,41 @@
 #include "param.h"
 
 
-void addi_func(I *instruction) {
+void addi_func(I *instruction) {\
     unsigned int rs_index = instruction->rs;
     unsigned int immed = instruction->immed;
-    unsigned int rs_val = *(regArray[rs_index]);
+    unsigned int rs_val = (regArray[rs_index]->val);
     unsigned int res = immed + rs_val;
-    *(regArray[instruction->rt]) = res;
+    (regArray[instruction->rt]->val) = res;
 }
 
 void subi_func(I* instruction) {
     unsigned int rs_index = instruction->rs;
     unsigned int immed = instruction->immed;
-    unsigned int rs_val = *(regArray[rs_index]);
+    unsigned int rs_val = (regArray[rs_index]->val);
     unsigned int res = immed - rs_val;
-    *(regArray[instruction->rt]) = res;
+    (regArray[instruction->rt]->val) = res;
 }
 void andi_func(I* instruction) {
     unsigned int rs_index = instruction->rs;
     unsigned int immed = instruction->immed;
-    unsigned int rs_val = *(regArray[rs_index]);
+    unsigned int rs_val = (regArray[rs_index]->val);
     unsigned int res = immed & rs_val;
-    *(regArray[instruction->rt]) = res;
+    (regArray[instruction->rt]->val) = res;
 }
 void ori_func(I* instruction) {
     unsigned int rs_index = instruction->rs;
     unsigned int immed = instruction->immed;
-    unsigned int rs_val = *(regArray[rs_index]);
+    unsigned int rs_val = (regArray[rs_index]->val);
     unsigned int res = immed | rs_val;
-    *(regArray[instruction->rt]) = res;
+    (regArray[instruction->rt]->val) = res;
 }
 void nori_func(I* instruction) {
     unsigned int rs_index = instruction->rs;
     unsigned int immed = instruction->immed;
-    unsigned int rs_val = *(regArray[rs_index]);
+    unsigned int rs_val = (regArray[rs_index]->val);
     unsigned int res = ~(immed | rs_val);
-    *(regArray[instruction->rt]) = res;
+    (regArray[instruction->rt]->val) = res;
 }
 void bne_func(I* instruction) {
 }

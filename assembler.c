@@ -55,7 +55,7 @@ int assemble(char *fname) {
     printf("%s", flag->fileName);
 
     for (i = 0; i < NUM_OF_REG; i++) { /* registers init - regArray contains pointers to all registers 0-31 */
-        regArray[i] = (reg_ptr *)calloc(sizeof(reg_t), 1);
+        regArray[i] = (reg_ptr)calloc(sizeof(reg_t), 1);
     }
 
     if (fp) {

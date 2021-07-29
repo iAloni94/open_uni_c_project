@@ -1,4 +1,4 @@
 addi $1, 10, $2
 addi $1, 1, $3
-mvlo $2, $3
+HELLO: mvlo $2, $3, $22
 stop

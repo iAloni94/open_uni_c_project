@@ -49,10 +49,9 @@ int assemble(char *fname) {
     flag->direction = false;
     flag->firstPass = true;
     flag->line = 1;
-    flag->fileName = fname;
 
     symbol = symbol_list_head;
-    printf("%s", flag->fileName);
+    printf("Assembling file: %s", fname);
 
     for (i = 0; i < NUM_OF_REG; i++) { /* registers init - regArray contains pointers to all registers 0-31 */
         regArray[i] = (reg_ptr)calloc(sizeof(reg_t), 1);
@@ -62,7 +61,7 @@ int assemble(char *fname) {
         j = 0;
         while (fgets(tempLine, MAX_LINE_LENGTH, fp) != NULL) {
             if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
-                printf("/nLine: %d - Line too long. Max line length is %d. File - %s", flag->line, MAX_LINE_LENGTH - 1, flag->fileName);
+                printf("/nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
                 flag->firstPass = false;
                 while (getc(fp) != '\n')
                     ;

@@ -78,6 +78,11 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
             }
         }
     }
+    if(input != NULL){
+        printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
+        flag->firstPass = false;
+        return NULL;
+    }
 
     switch (funcNum) { /* funct */
         case 0:
@@ -115,18 +120,27 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
 
 I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
     char param1 = false, param2 = false;
-    int i;
+    int i = 0;
 
     instruction->opcode = funcNum + 2;
+
     if (strchr(input->next->val, '.')) {
         printf("Line : %d = This assembler support only integers", flag->line);
         flag->firstPass = false;
         return NULL;
     }
+    while (*(input->next->val + i) != NULL) {
+        if (!IS_NUM(*(input->next->val + i))) {
+            printf("\nLine: %d - Illigal parameter. Immed value should only be an integer", flag->line);
+            flag->firstPass = false;
+            return NULL;
+        }
+        i++;
+    }
     instruction->immed = atoi(input->next->val);
 
-    if (funcNum <= 12) {                    /* addi to nori */
-        for (i = 0; i < 32 && input; i++) { /* 32 is number of registerd */
+    if (funcNum <= 12) {                            /* addi to nori */
+        for (i = 0; i < NUM_OF_REG && input; i++) { /* 32 is number of registerd */
             if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
                 instruction->rs = i;
                 param1 = true;
@@ -141,7 +155,7 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
                 continue;
             }
         }
-    } else if (funcNum <= 16) { /* bne to bgt */
+    } else if (funcNum <= (NUM_OF_REG) / 2) { /* bne to bgt */
 
     } else { /* lb to sh */
     }

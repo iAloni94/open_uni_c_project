@@ -11,7 +11,6 @@ typedef struct flag { /* this struct contains all the differnt flags and indicat
     char pass;
     char firstPass;
     char direction;
-    char *fileName;
     unsigned int line;
 } flags;
 

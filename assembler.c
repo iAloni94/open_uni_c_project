@@ -20,7 +20,7 @@ int assemble(char *fname) {
         "sw", "lh", "sh", "jmp",
         "la", "call", "stop"};
 
-    char (*functions[NUM_OF_FUNC + 1])() = {
+    void (*functions[NUM_OF_FUNC + 1])() = {
         add_func, sub_func, and_func, or_func,
         nor_func, move_func, mvhi_func, mvlo_func,
         addi_func, subi_func, andi_func, ori_func,
@@ -30,7 +30,7 @@ int assemble(char *fname) {
         la_func, call_func, stop_func, undef_func};
 
     unsigned int DC = 0, IC = 100, ICF, DCF;
-    int funcNum, i, j;
+    int funcNum, i, j = 0;
     char tempLine[MAX_LINE_LENGTH] = {0};
     long data_img[1000];
     long code_img[1000];
@@ -58,84 +58,74 @@ int assemble(char *fname) {
     }
 
     if (fp) {
-        j = 0;
-        while (fgets(tempLine, MAX_LINE_LENGTH, fp) != NULL) {
-            if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
-                printf("/nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
+        head = getLine(fp, flag);
+        node = head;
+
+        if (head) {
+            if ((flag->label = isLabel(node, flag))) {
+                isDeclared(node, symbol_list_head, flag);
+                node = node->next;
+            }
+
+            for (i = 0; i < NUM_OF_DIR + 1; i++) {
+                if (strcmp(node->val, directions[i]) == 0) {
+                    flag->direction = true;
+                    /* handle directions - directions.c */
+                    break;
+                }
+            }
+
+            funcNum = NUM_OF_FUNC + 1;
+            for (i = 0; i < NUM_OF_FUNC + 1; i++) {
+                if (strcmp(node->val, functionName[i]) == 0) {
+                    funcNum = i;
+                    break;
+                }
+            }
+
+            if (funcNum < 8) {
+                R *instruction = (R *)calloc(sizeof(R), sizeof(char));
+                if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
+                    instruction_32bit = r_binary_instruction(instruction);
+                    functions[funcNum](instruction);
+                }
+            } else if (funcNum < 23) {
+                I *instruction = (I *)calloc(sizeof(I), sizeof(char));
+                if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
+                    instruction_32bit = i_binary_instruction(instruction);
+                    functions[funcNum](instruction);
+                }
+            } else if (funcNum < 27) {
+                J *instruction = (J *)calloc(sizeof(J), sizeof(char));
+                if ((instruction = check_j_param(funcNum, node->next, instruction, flag))) {
+                    instruction_32bit = j_binary_instruction(instruction);
+                    functions[funcNum](instruction);
+                }
+            } else if (funcNum == NUM_OF_FUNC + 1) {
+                printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
                 flag->firstPass = false;
-                while (getc(fp) != '\n')
-                    ;
-                continue;
+                /* undifined function handeling */
             }
 
-            head = getLine(tempLine, flag);
-            node = head;
-
-            if (head) {
-                if ((flag->label = isLabel(node, flag))) {
-                    isDeclared(node, symbol_list_head, flag);
-                    node = node->next;
+            if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
+                symbol->name = head->val;
+                if (flag->direction) {
+                    symbol->address = DC;
+                    symbol->attribute = "code";
+                } else {
+                    symbol->address = IC;
+                    symbol->attribute = "data";
                 }
-
-                for (i = 0; i < NUM_OF_DIR + 1; i++) {
-                    if (strcmp(node->val, directions[i]) == 0) {
-                        flag->direction = true;
-                        /* handle directions - directions.c */
-                        break;
-                    }
-                }
-
-                funcNum = NUM_OF_FUNC + 1;
-                for (i = 0; i < NUM_OF_FUNC + 1; i++) {
-                    if (strcmp(node->val, functionName[i]) == 0) {
-                        funcNum = i;
-                        break;
-                    }
-                }
-
-                if (funcNum < 8) {
-                    R *instruction = (R *)calloc(sizeof(R), sizeof(char));
-                    if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
-                        instruction_32bit = r_binary_instruction(instruction);
-                        functions[funcNum](instruction);
-                    }
-                } else if (funcNum < 23) {
-                    I *instruction = (I *)calloc(sizeof(I), sizeof(char));
-                    if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
-                        instruction_32bit = i_binary_instruction(instruction);
-                        functions[funcNum](instruction);
-                    }
-                } else if (funcNum < 27) {
-                    J *instruction = (J *)calloc(sizeof(J), sizeof(char));
-                    if ((instruction = check_j_param(funcNum, node->next, instruction, flag))) {
-                        instruction_32bit = j_binary_instruction(instruction);
-                        functions[funcNum](instruction);
-                    }
-                } else if (funcNum == NUM_OF_FUNC + 1) {
-                    printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
-                    flag->firstPass = false;
-                    /* undifined function handeling */
-                }
-
-                if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
-                    symbol->name = head->val;
-                    if (flag->direction) {
-                        symbol->address = DC;
-                        symbol->attribute = "code";
-                    } else {
-                        symbol->address = IC;
-                        symbol->attribute = "data";
-                    }
-                    flag->label = false;
-                    symbol->next = calloc(sizeof(sym_t), 1);
-                    symbol = symbol->next;
-                }
-
-                code_img[j] = instruction_32bit; /* insert binary instruction to memory image */
-                freeList(head);
-                flag->line += 1;
-                IC += 4;
+                flag->label = false;
+                symbol->next = calloc(sizeof(sym_t), 1);
+                symbol = symbol->next;
             }
+
+            code_img[j] = instruction_32bit; /* insert binary instruction to memory image */
+            freeList(head);
+            flag->line += 1;
+            IC += 4;
+            j++;
         }
     }
 

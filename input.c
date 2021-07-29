@@ -6,15 +6,23 @@
 #include "assembler.h"
 #include "utils.h"
 
-node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
-    int i = 0;
+node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
+    int i = 0, j = 0;
     node_t* head = initList();
     node_t* node = head;
-    char comma = false;
-    char temp = *(line);
-    char prevChar = temp;
-    int j = 0;
+    char temp, prevChar, comma = false;
     char* currVal = node->val;
+    char tempLine[MAX_LINE_LENGTH];
+
+    fgets(tempLine, MAX_LINE_LENGTH, fp);
+
+    if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
+        printf("/nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
+        flag->firstPass = false;
+        while ((temp = getc(fp)) != '\n')
+            ;
+    }
+    prevChar = temp;
 
     while (temp != '\n') {
         if (temp == ';') {
@@ -30,7 +38,7 @@ node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
             while (isspace(temp) && temp != '\n') {
                 prevChar = temp;
                 i++;
-                temp = *(line + i);
+                temp = getc(fp);
             }
             if (comma && temp == ',') {
                 comma = false;
@@ -49,7 +57,7 @@ node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
             comma = true;
             prevChar = temp;
             i++;
-            temp = *(line + i);
+            temp = getc(fp);
             continue;
         } else {
             comma = false;
@@ -57,7 +65,7 @@ node_t* getLine(char* line, flags* flag) { /* saves each word a new node */
             j++;
             i++;
             prevChar = temp;
-            temp = *(line + i);
+            temp = getc(fp);
         }
     }
     return head;

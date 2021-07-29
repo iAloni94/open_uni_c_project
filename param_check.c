@@ -7,7 +7,7 @@
 #include "param.h"
 #include "utils.h"
 
-char* registerList[] = {
+char* registerList[NUM_OF_REG] = {
     "$0", "$1", "$2", "$3",
     "$4", "$5", "$6", "$7",
     "$8", "$9", "$10", "$11",
@@ -15,8 +15,7 @@ char* registerList[] = {
     "$16", "$17", "$18", "$19",
     "$20", "$21", "$22", "$23",
     "$24", "$25", "$26", "$27",
-    "$28", "$29", "$30", "$31",
-    "$32"};
+    "$28", "$29", "$30", "$31"};
 
 R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
     char rs = false, rt = false, rd = false;
@@ -78,7 +77,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
             }
         }
     }
-    if(input != NULL){
+    if (input != NULL) {
         printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
         flag->firstPass = false;
         return NULL;
@@ -129,7 +128,7 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
         flag->firstPass = false;
         return NULL;
     }
-    while (*(input->next->val + i) != NULL) {
+    while ((input->next->val + i) != NULL) {
         if (!IS_NUM(*(input->next->val + i))) {
             printf("\nLine: %d - Illigal parameter. Immed value should only be an integer", flag->line);
             flag->firstPass = false;

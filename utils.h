@@ -19,10 +19,17 @@ typedef struct node { /* input nodes */
     struct node *next;
 } node_t;
 
+node_t *initList();
+node_t* addNode();
 
 char isAlphaNumeric();
 char isReserved();
 void isDeclared();
 void freeList();
+
+/* these function are in input.c */
+node_t* getLine();
+char isLabel();
+
 
 #endif

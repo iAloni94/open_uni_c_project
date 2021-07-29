@@ -52,8 +52,8 @@ char isReserved(char* str) {
     int i;
     for (i = 0; i < 33; i++) { /* 33 is number of saved words*/
         if (strcmp(savedWords[i], str) == 0) return true;
-        return false;
     }
+    return false;
 }
 
 void isDeclared(char* str, sym_t* symbol, flags* flag) {

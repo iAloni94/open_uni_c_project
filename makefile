@@ -10,16 +10,16 @@ assembler.o: assembler.c func.h param.h assembler.h utils.h
 input.o: input.c assembler.h utils.h
 	${CC} ${CFLAGS} -c input.c
 
-param_check.o: param_check.c param.h assembler.h utils.h
+param_check.o: param_check.c param.h assembler.h 
 	${CC} ${CFLAGS} -c param_check.c
 
-type_r_func.o: type_r_func.c param.h assembler.h utils.h
+type_r_func.o: type_r_func.c param.h assembler.h
 	${CC} ${CFLAGS} -c type_r_func.c
 
-type_i_func.o: type_i_func.c param.h assembler.h utils.h
+type_i_func.o: type_i_func.c param.h assembler.h 
 	${CC} ${CFLAGS} -c type_i_func.c
 
-type_j_func.o: type_j_func.c utils.h
+type_j_func.o: type_j_func.c param.h assembler.h
 	${CC} ${CFLAGS} -c type_j_func.c
 
 num_base.o: num_base.c

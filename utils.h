@@ -4,7 +4,7 @@
 #define IS_LETTER(c) (c >= 65 && c <= 122) ? true : false /* 65 = 'A', 122 = 'z' */
 #define IS_NUM(c) (c >= 48 && c <= 57) ? true : false     /* 45 = '0', 57 = '9' */
 
-typedef struct flag {
+typedef struct flag { /* this struct contains all the differnt flags and indicators for the assembly operation */
     char label;
     char params;
     char stop;

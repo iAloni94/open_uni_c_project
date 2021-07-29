@@ -115,10 +115,10 @@ int assemble(char *fname) {
                 } else if (funcNum == NUM_OF_FUNC + 1) {
                     printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
                     flag->firstPass = false;
-                    /* undifined function */
+                    /* undifined function handeling */
                 }
 
-                if (flag->label) { /* if found, inserts label into symbol table. each node is a a label */
+                if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
                     symbol->name = head->val;
                     if (flag->direction) {
                         symbol->address = DC;

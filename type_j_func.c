@@ -1,7 +1,7 @@
 #include "assembler.h"
-#include "utils.h"
+#include "param.h"
 
-void jmp_func(node_t *input){}
-void la_func(node_t *input){}
-void call_func(node_t *input){}
-void stop_func(node_t *input){} 
+void jmp_func(J *instruction){}
+void la_func(J *instruction){}
+void call_func(J *instruction){}
+void stop_func(J *instruction){} 

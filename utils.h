@@ -38,7 +38,7 @@ typedef enum functions {
     la = 24,
     call = 25,
     stop = 26
-}
+};
 
 typedef struct flag { /* this struct contains all the differnt flags and indicators for the assembly operation */
     char label;

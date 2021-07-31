@@ -76,7 +76,7 @@ int assemble(char *fname) {
                     }
                 }
 
-                funcNum = NUM_OF_FUNC + 1;
+                funcNum = NUM_OF_FUNC;
                 for (i = 0; i < NUM_OF_FUNC + 1; i++) {
                     if (!strcmp(node->val, functionName[i])) {
                         funcNum = i;

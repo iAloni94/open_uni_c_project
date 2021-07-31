@@ -33,7 +33,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
 
     if (funcNum <= 4) { /* arithmatics functions - 3 parameters */
         for (i = 0; i < NUM_OF_REG && input; i++) {
-            if (rs == false && strcmp(input->val, registerList[i]) == 0) {
+            if (rs == false && !strcmp(input->val, registerList[i])) {
                 instruction->rs = i;
                 *(input->val) = i;
                 rs = true;
@@ -41,7 +41,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
                 i = 0;
                 continue;
             }
-            if (rt == false && strcmp(input->val, registerList[i]) == 0) {
+            if (rt == false && !strcmp(input->val, registerList[i])) {
                 instruction->rt = i;
                 *(input->val) = i;
                 rt = true;
@@ -50,7 +50,7 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
                 continue;
             }
 
-            if (rd == false && strcmp(input->val, registerList[i]) == 0) {
+            if (rd == false && !strcmp(input->val, registerList[i])) {
                 instruction->rd = i;
                 *(input->val) = i;
                 rd = true;
@@ -61,14 +61,14 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
         }
     } else { /* copy functions - 2 parameters rs + rd */
         for (i = 0; i < NUM_OF_REG && input; i++) {
-            if (rs == false && strcmp(input->val, registerList[i]) == 0) {
+            if (rs == false && !strcmp(input->val, registerList[i])) {
                 instruction->rs = i;
                 rs = true;
                 input = input->next;
                 i = 0;
                 continue;
             }
-            if (rd == false && strcmp(input->val, registerList[i]) == 0) {
+            if (rd == false && !strcmp(input->val, registerList[i])) {
                 instruction->rd = i;
                 rd = true;
                 input = input->next;
@@ -123,12 +123,7 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
 
     instruction->opcode = funcNum + 2;
 
-    if (strchr(input->next->val, '.')) {
-        printf("Line : %d = This assembler support only integers", flag->line);
-        flag->firstPass = false;
-        return NULL;
-    }
-    while ((input->next->val + i) != NULL) {
+    while (i < strlen(input->next->val)) {
         if (!IS_NUM(*(input->next->val + i))) {
             printf("\nLine: %d - Illigal parameter. Immed value should only be an integer", flag->line);
             flag->firstPass = false;
@@ -140,14 +135,14 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
 
     if (funcNum <= 12) {                            /* addi to nori */
         for (i = 0; i < NUM_OF_REG && input; i++) { /* 32 is number of registerd */
-            if (param1 == false && strcmp(input->val, registerList[i]) == 0) {
+            if (param1 == false && !strcmp(input->val, registerList[i])) {
                 instruction->rs = i;
                 param1 = true;
                 input = input->next->next;
                 i = 0;
                 continue;
             }
-            if (param2 == false && strcmp(input->val, registerList[i]) == 0) {
+            if (param2 == false && !strcmp(input->val, registerList[i])) {
                 instruction->rt = i;
                 param2 = true;
                 input = input->next;
@@ -168,6 +163,87 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
     }
 }
 
-J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag) {
+J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t* symbol) {
+    int i;
+    char declared = false;
+    node_t* tempNode = calloc(sizeof(node_t), 1);
+    char temp[MAX_LINE_LENGTH] = {0};
+    strcpy(temp, input->val);
+    strcat(temp, ":");
+    tempNode->val = temp;
+
+    if (strcmp(input->val, "stop")) {
+        if (input->next->next != NULL) {
+            printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
+            flag->firstPass = false;
+            return NULL;
+        }
+    }
+
+    switch (funcNum) { /* opcode */
+        case 23:       /* jmp */
+            instruction->opcode = 30;
+            break;
+        case 24: /* la */
+            instruction->opcode = 31;
+            break;
+        case 25: /* call */
+            instruction->opcode = 32;
+            break;
+        case 26: /* stop */
+            instruction->opcode = 63;
+            if (input->next != NULL) {
+                printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
+                flag->firstPass = false;
+                return NULL;
+                instruction->opcode = 63;
+            }
+            break;
+        default:
+            break;
+    }
+
+    if (instruction->opcode != 63) {
+        input = input->next;
+        if (instruction->opcode == 30) { /* JMP */
+            if (strchr(input->val, '$')) {
+                for (i = 0; i < NUM_OF_REG; i++) {
+                    if (!strcmp(input->val, registerList[i])) {
+                        instruction->reg = true;
+                        instruction->address = i;
+                        break;
+                    }
+                }
+                if (i == NUM_OF_REG) {
+                    flag->firstPass = false;
+                    printf("\nLine: %d - Register not in range", flag->line);
+                    return NULL;
+                }
+            }
+        }
+        if (isLabel(tempNode, flag)) { /* Label */
+
+            instruction->reg = false;
+
+            while (symbol->name != NULL) { /* checking if the label was already declared */
+                if (!strcmp(input->val, symbol->name)) {
+                    if (!strcmp(symbol->attribute, "external")) {
+                        instruction->address = 0;
+                        break;
+                    }
+                    instruction->address = symbol->address;
+                    declared = true;
+                    break;
+                }
+                symbol = symbol->next;
+            }
+
+            if (!declared) {
+                instruction->address = undef_address;
+            }
+        }
+
+        free(tempNode);
+    }
     return instruction;
 }

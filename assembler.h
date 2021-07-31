@@ -7,17 +7,9 @@
 #define MAX_LINE_LENGTH 81 /* Limit is 80 + Null terminator*/
 #define LABEL_MAX_LENGTH 31
 
-enum {
-    false = 0,
-    true = 1,
-    r_type = 2,
-    i_type = 3,
-    j_type = 4
-};
-
 typedef struct symbol {
     char *name;
-    char *attribute;
+    char *attribute; /* code, data, external, entry */
     unsigned int address;
     struct symbol *next;
 } sym_t;

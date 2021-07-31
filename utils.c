@@ -50,15 +50,15 @@ char isAlphaNumeric(char* str) {
 
 char isReserved(char* str) {
     int i;
-    for (i = 0; i < 33; i++) { /* 33 is number of saved words*/
-        if (strcmp(savedWords[i], str) == 0) return true;
+    for (i = 0; i < 33; i++) { /* 33 is number of reserved words*/
+        if (!strcmp(savedWords[i], str)) return true;
     }
     return false;
 }
 
-void isDeclared(char* str, sym_t* symbol, flags* flag) {
+void isDeclared(char* str, sym_t* symbol, flags* flag) { /* this functions check if a label was already decalred*/
     while (symbol->name != NULL) {
-        if (strcmp(str, symbol->name) == 0) {
+        if (!strcmp(str, symbol->name)) {
             printf("\nLine: %d - Label was already declared", flag->line);
             flag->firstPass = false;
         }

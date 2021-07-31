@@ -19,9 +19,9 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
         printf("/nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
         flag->firstPass = false;
-        while ((temp = getc(fp)) != '\n')
-            ;
+        return NULL;
     }
+    temp = tempLine[0];
     prevChar = temp;
 
     while (temp != '\n') {
@@ -38,7 +38,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
             while (isspace(temp) && temp != '\n') {
                 prevChar = temp;
                 i++;
-                temp = getc(fp);
+                temp = tempLine[i];
             }
             if (comma && temp == ',') {
                 comma = false;
@@ -57,7 +57,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
             comma = true;
             prevChar = temp;
             i++;
-            temp = getc(fp);
+            temp = tempLine[i];
             continue;
         } else {
             comma = false;
@@ -65,7 +65,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
             j++;
             i++;
             prevChar = temp;
-            temp = getc(fp);
+            temp = tempLine[i];
         }
     }
     return head;

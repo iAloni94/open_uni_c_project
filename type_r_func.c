@@ -1,5 +1,6 @@
 #include "assembler.h"
 #include "param.h"
+#include "utils.h"
 #include "func.h"
 
 void add_func(R *instruction) {

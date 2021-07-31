@@ -77,26 +77,26 @@ int assemble(char *fname) {
                 }
 
                 funcNum = NUM_OF_FUNC;
-                for (i = 0; i < NUM_OF_FUNC + 1; i++) {
+                for (i = 0; i < NUM_OF_FUNC; i++) {
                     if (!strcmp(node->val, functionName[i])) {
                         funcNum = i;
                         break;
                     }
                 }
 
-                if (funcNum <= mvlo) {
+                if (funcNum <= mvlo) { /* R type function */
                     R *instruction = (R *)calloc(sizeof(R), sizeof(char));
                     if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = r_binary_instruction(instruction);
                         functions[funcNum](instruction);
                     }
-                } else if (funcNum <= sh) {
+                } else if (funcNum <= sh) { /* I type function */
                     I *instruction = (I *)calloc(sizeof(I), sizeof(char));
                     if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = i_binary_instruction(instruction);
                         functions[funcNum](instruction);
                     }
-                } else if (funcNum <= stop) {
+                } else if (funcNum <= stop) { /* J type function */
                     J *instruction = (J *)calloc(sizeof(J), sizeof(char));
                     if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
                         first_pass_32bit = j_binary_instruction(instruction);
@@ -106,10 +106,9 @@ int assemble(char *fname) {
                             functions[funcNum](instruction);
                         }
                     }
-                } else if (funcNum == NUM_OF_FUNC) {
+                } else if (funcNum == NUM_OF_FUNC) { /* undefined function */
                     printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
                     flag->firstPass = false;
-                    /* undifined function handeling */
                 }
 
                 if (flag->label) { /* if found, inserts label into symbol table. each node is a label */

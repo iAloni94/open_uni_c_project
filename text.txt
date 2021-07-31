@@ -1,3 +1,4 @@
+sadg as
 HELLO: mvlo $2, $3, $22
 main: addi $1, 30, $2
 addi $1, 1, $3

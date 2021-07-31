@@ -48,7 +48,7 @@ char isAlphaNumeric(char* str) {
     return true;
 }
 
-char isReserved(char* str) {
+char isReserved(char* str) { /* checks if label is a reseved word */
     int i;
     for (i = 0; i < 33; i++) { /* 33 is number of reserved words*/
         if (!strcmp(savedWords[i], str)) return true;

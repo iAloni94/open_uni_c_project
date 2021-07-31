@@ -4,7 +4,7 @@
 #define IS_LETTER(c) (c >= 65 && c <= 122) ? true : false /* 65 = 'A', 122 = 'z' */
 #define IS_NUM(c) (c >= 48 && c <= 57) ? true : false     /* 45 = '0', 57 = '9' */
 
-typedef enum boolean {
+enum  {
     false = 0,
     true = 1,
     undef_address = 666 /* 100 + 4X = 666 => X is not an integer, hence this address cannot be naturally created by the assembler. i.e IC != 666 */
@@ -38,7 +38,7 @@ typedef enum functions {
     la = 24,
     call = 25,
     stop = 26
-};
+}
 
 typedef struct flag { /* this struct contains all the differnt flags and indicators for the assembly operation */
     char label;

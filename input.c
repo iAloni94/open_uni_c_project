@@ -13,62 +13,76 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     char temp, prevChar, comma = false;
     char* currVal = node->val;
     char tempLine[MAX_LINE_LENGTH];
+    if (head) {
+        fgets(tempLine, MAX_LINE_LENGTH, fp);
 
-    fgets(tempLine, MAX_LINE_LENGTH, fp);
-
-    if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
-        printf("/nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
-        flag->firstPass = false;
-        return NULL;
-    }
-    temp = tempLine[0];
-    prevChar = temp;
-
-    while (temp != '\n') {
-        if (temp == ';') {
+        if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
+            printf("/nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
+            flag->firstPass = false;
             return NULL;
         }
-        if (temp == EOF) {
-            node->next = addNode();
-            node = node->next;
-            *(node->val) = temp;
-            return head;
-        }
-        if (isspace(temp)) {
-            while (isspace(temp) && temp != '\n') {
+        temp = tempLine[0];
+        prevChar = temp;
+
+        while (temp != '\n') {
+            if (temp == ';') {
+                return NULL;
+            }
+            if (temp == EOF) {
+                node->next = addNode();
+                if (node->next != NULL) {
+                    node = node->next;
+                    *(node->val) = temp;
+                    return head;
+                } else {
+                    printf("Memory allocation error");
+                    return NULL;
+                }
+            }
+            if (isspace(temp)) {
+                while (isspace(temp) && temp != '\n') {
+                    prevChar = temp;
+                    i++;
+                    temp = tempLine[i];
+                }
+                if (comma && temp == ',') {
+                    comma = false;
+                    flag->firstPass = false;
+                    printf("\nLine: %d - consecutive commas", flag->line);
+                } else if ((isspace(prevChar) || temp == ',') && *currVal != -1) {
+                    node->next = addNode();
+                    if (node->next != NULL) {
+                        node = node->next;
+                        currVal = node->val;
+                        *(currVal) = -1;
+                        j = 0;
+                        prevChar = temp;
+                    } else {
+                        printf("Memory allocation error");
+                        return NULL;
+                    }
+                }
+                continue;
+            } else if (temp == ',') {
+                comma = true;
                 prevChar = temp;
                 i++;
                 temp = tempLine[i];
-            }
-            if (comma && temp == ',') {
+                continue;
+            } else {
                 comma = false;
-                flag->firstPass = false;
-                printf("\nLine: %d - consecutive commas", flag->line);
-            } else if ((isspace(prevChar) || temp == ',') && *currVal != -1) {
-                node->next = addNode();
-                node = node->next;
-                currVal = node->val;
-                *(currVal) = -1;
-                j = 0;
+                *(currVal + j) = temp;
+                j++;
+                i++;
                 prevChar = temp;
+                temp = tempLine[i];
             }
-            continue;
-        } else if (temp == ',') {
-            comma = true;
-            prevChar = temp;
-            i++;
-            temp = tempLine[i];
-            continue;
-        } else {
-            comma = false;
-            *(currVal + j) = temp;
-            j++;
-            i++;
-            prevChar = temp;
-            temp = tempLine[i];
         }
+        return head;
+    } else {
+        printf("Memory allocation error");
+        return NULL;
     }
-    return head;
 }
 
 char isLabel(node_t* input, flags* flag) {

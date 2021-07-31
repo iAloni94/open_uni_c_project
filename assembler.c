@@ -35,9 +35,9 @@ int assemble(char *fname) {
     long data_img[1000];
     long code_img[1000];
     sym_t *symbol, *symbol_list_head = calloc(sizeof(sym_t), 1);
+    flags *flag = (flags *)malloc(sizeof(flags));
 
     node_t *head, *node;
-    flags *flag = (flags *)malloc(sizeof(flags));
     unsigned int first_pass_32bit = 0;
 
     FILE *fp;
@@ -53,8 +53,17 @@ int assemble(char *fname) {
     symbol = symbol_list_head;
     printf("Assembling file: %s", fname);
 
+    if (symbol_list_head == NULL || flag == NULL) {
+        printf("Memory allocation error");
+        return false;
+    }
+
     for (i = 0; i < NUM_OF_REG; i++) { /* registers init - regArray contains pointers to all registers 0-31 */
         regArray[i] = (reg_ptr)calloc(sizeof(reg_t), 1);
+        if (regArray[i] == NULL) {
+            printf("Memory allocation error");
+            return false;
+        }
     }
 
     if (fp) {
@@ -86,18 +95,30 @@ int assemble(char *fname) {
 
                 if (funcNum <= mvlo) { /* R type function */
                     R *instruction = (R *)calloc(sizeof(R), sizeof(char));
+                    if (instruction == NULL) {
+                        printf("Memory allocation error");
+                        return false;
+                    }
                     if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = r_binary_instruction(instruction);
                         functions[funcNum](instruction);
                     }
                 } else if (funcNum <= sh) { /* I type function */
                     I *instruction = (I *)calloc(sizeof(I), sizeof(char));
+                    if (instruction == NULL) {
+                        printf("Memory allocation error");
+                        return false;
+                    }
                     if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = i_binary_instruction(instruction);
                         functions[funcNum](instruction);
                     }
                 } else if (funcNum <= stop) { /* J type function */
                     J *instruction = (J *)calloc(sizeof(J), sizeof(char));
+                    if (instruction == NULL) {
+                        printf("Memory allocation error");
+                        return false;
+                    }
                     if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
                         first_pass_32bit = j_binary_instruction(instruction);
                         if (instruction->opcode == 32) {
@@ -137,7 +158,7 @@ int assemble(char *fname) {
     if (flag->firstPass) {
         ICF = IC;
         DCF = DC;
-        /* second pass things */
+        /* second pass things - updating symbol list, printing file, freeing memory, close file*/
     }
 
     printf("\n");

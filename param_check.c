@@ -133,8 +133,8 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
     }
     instruction->immed = atoi(input->next->val);
 
-    if (funcNum <= nori) {                            /* addi to nori */
-        for (i = 0; i < NUM_OF_REG && input; i++) { /* 32 is number of registerd */
+    if (funcNum <= nori) { /* addi to nori  - 3 parameters */
+        for (i = 0; i < NUM_OF_REG && input; i++) {
             if (param1 == false && !strcmp(input->val, registerList[i])) {
                 instruction->rs = i;
                 param1 = true;
@@ -172,81 +172,86 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
     strcat(temp, ":");
     tempNode->val = temp;
 
-    if (strcmp(input->val, "stop")) {
-        if (input->next->next != NULL) {
-            printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
-            flag->firstPass = false;
-            return NULL;
-        }
-    }
-
-    switch (funcNum) { /* opcode */
-        case jmp:       /* jmp */
-            instruction->opcode = 30;
-            break;
-        case la: 
-            instruction->opcode = 31;
-            instruction->reg = 0;
-            break;
-        case call: 
-            instruction->opcode = 32;
-            instruction->reg = 0;
-            break;
-        case stop:
-            if (input->next != NULL) {
+    if (tempNode) {
+        if (strcmp(input->val, "stop")) {
+            if (input->next->next != NULL) {
                 printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
                 flag->firstPass = false;
                 return NULL;
             }
-            instruction->opcode = 63;
-            instruction->reg = 0;
-            instruction->address = 0;
-            break;
-        default:
-            break;
-    }
+        }
 
-    if (instruction->opcode != 63) {
-        input = input->next;
-        if (instruction->opcode == 30) { /* JMP */
-            if (strchr(input->val, '$')) {
-                for (i = 0; i < NUM_OF_REG; i++) {
-                    if (!strcmp(input->val, registerList[i])) {
-                        instruction->reg = true;
-                        instruction->address = i;
-                        break;
-                    }
-                }
-                if (i == NUM_OF_REG) {
+        switch (funcNum) { /* opcode */
+            case jmp:      /* jmp */
+                instruction->opcode = 30;
+                break;
+            case la:
+                instruction->opcode = 31;
+                instruction->reg = 0;
+                break;
+            case call:
+                instruction->opcode = 32;
+                instruction->reg = 0;
+                break;
+            case stop:
+                if (input->next != NULL) {
+                    printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
                     flag->firstPass = false;
-                    printf("\nLine: %d - Register not in range", flag->line);
                     return NULL;
                 }
-            }
+                instruction->opcode = 63;
+                instruction->reg = 0;
+                instruction->address = 0;
+                break;
+            default:
+                break;
         }
-        if (isLabel(tempNode, flag)) { /* Label */
 
-            instruction->reg = false;
+        if (instruction->opcode != 63) {
+            input = input->next;
+            if (instruction->opcode == 30) { /* JMP */
+                if (strchr(input->val, '$')) {
+                    for (i = 0; i < NUM_OF_REG; i++) {
+                        if (!strcmp(input->val, registerList[i])) {
+                            instruction->reg = true;
+                            instruction->address = i;
+                            break;
+                        }
+                    }
+                    if (i == NUM_OF_REG) {
+                        flag->firstPass = false;
+                        printf("\nLine: %d - Register not in range", flag->line);
+                        return NULL;
+                    }
+                }
+            }
+            if (isLabel(tempNode, flag)) { /* Label */
 
-            while (symbol->name != NULL) { /* checking if the label was already declared */
-                if (!strcmp(input->val, symbol->name)) {
-                    if (!strcmp(symbol->attribute, "external")) {
-                        instruction->address = 0;
+                instruction->reg = false;
+
+                while (symbol->name != NULL) { /* checking if the label was already declared */
+                    if (!strcmp(input->val, symbol->name)) {
+                        if (!strcmp(symbol->attribute, "external")) {
+                            instruction->address = 0;
+                            break;
+                        }
+                        instruction->address = symbol->address;
+                        declared = true;
                         break;
                     }
-                    instruction->address = symbol->address;
-                    declared = true;
-                    break;
+                    symbol = symbol->next;
                 }
-                symbol = symbol->next;
+
+                if (!declared) {
+                    instruction->address = undef_address;
+                }
             }
 
-            if (!declared) {
-                instruction->address = undef_address;
-            }
+            free(tempNode);
         }
-
-        free(tempNode);
+        return instruction;
+    } else {
+            printf("Memory allocation error");
+            return NULL;
+        }
     }
-    return instruction;
-}

@@ -96,7 +96,7 @@ int assemble(char *fname) {
                         first_pass_32bit = i_binary_instruction(instruction);
                         functions[funcNum](instruction);
                     }
-                } else if (funcNum <= 26) {
+                } else if (funcNum <= stop) {
                     J *instruction = (J *)calloc(sizeof(J), sizeof(char));
                     if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
                         first_pass_32bit = j_binary_instruction(instruction);

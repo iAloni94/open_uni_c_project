@@ -31,7 +31,30 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
             break;
     }
 
-    if (funcNum <= 4) { /* arithmatics functions - 3 parameters */
+    switch (funcNum) { /* funct */
+        case add:
+        case move:
+            instruction->funct = 1;
+            break;
+        case sub:
+        case mvhi:
+            instruction->funct = 2;
+            break;
+        case and:
+        case mvlo:
+            instruction->funct = 3;
+            break;
+        case or:
+            instruction->funct = 4;
+            break;
+        case nor:
+            instruction->funct = 5;
+            break;
+        default:
+            break;
+    }
+
+    if (funcNum <= nor) { /* arithmatics functions - 3 parameters */
         for (i = 0; i < NUM_OF_REG && input; i++) {
             if (rs == false && !strcmp(input->val, registerList[i])) {
                 instruction->rs = i;
@@ -83,29 +106,6 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
         return NULL;
     }
 
-    switch (funcNum) { /* funct */
-        case 0:
-        case 5:
-            instruction->funct = 1;
-            break;
-        case 1:
-        case 6:
-            instruction->funct = 2;
-            break;
-        case 2:
-        case 7:
-            instruction->funct = 3;
-            break;
-        case 3:
-            instruction->funct = 4;
-            break;
-        case 4:
-            instruction->funct = 5;
-            break;
-        default:
-            break;
-    }
-
     if (funcNum <= 4 && (rs && rt && rd)) {
         return instruction;
     } else if (rs && rd) {
@@ -133,7 +133,7 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
     }
     instruction->immed = atoi(input->next->val);
 
-    if (funcNum <= 12) {                            /* addi to nori */
+    if (funcNum <= nori) {                            /* addi to nori */
         for (i = 0; i < NUM_OF_REG && input; i++) { /* 32 is number of registerd */
             if (param1 == false && !strcmp(input->val, registerList[i])) {
                 instruction->rs = i;
@@ -149,7 +149,7 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
                 continue;
             }
         }
-    } else if (funcNum <= (NUM_OF_REG) / 2) { /* bne to bgt */
+    } else if (funcNum <= bgt) { /* bne to bgt */
 
     } else { /* lb to sh */
     }
@@ -181,23 +181,26 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
     }
 
     switch (funcNum) { /* opcode */
-        case 23:       /* jmp */
+        case jmp:       /* jmp */
             instruction->opcode = 30;
             break;
-        case 24: /* la */
+        case la: 
             instruction->opcode = 31;
+            instruction->reg = 0;
             break;
-        case 25: /* call */
+        case call: 
             instruction->opcode = 32;
+            instruction->reg = 0;
             break;
-        case 26: /* stop */
-            instruction->opcode = 63;
+        case stop:
             if (input->next != NULL) {
                 printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
                 flag->firstPass = false;
                 return NULL;
-                instruction->opcode = 63;
             }
+            instruction->opcode = 63;
+            instruction->reg = 0;
+            instruction->address = 0;
             break;
         default:
             break;

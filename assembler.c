@@ -38,7 +38,7 @@ int assemble(char *fname) {
 
     node_t *head, *node;
     flags *flag = (flags *)malloc(sizeof(flags));
-    unsigned int instruction_32bit = 0;
+    unsigned int first_pass_32bit = 0;
 
     FILE *fp;
     fp = fopen(fname, "r");
@@ -84,25 +84,29 @@ int assemble(char *fname) {
                     }
                 }
 
-                if (funcNum < 8) {
+                if (funcNum <= mvlo) {
                     R *instruction = (R *)calloc(sizeof(R), sizeof(char));
                     if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
-                        instruction_32bit = r_binary_instruction(instruction);
+                        first_pass_32bit = r_binary_instruction(instruction);
                         functions[funcNum](instruction);
                     }
-                } else if (funcNum < 23) {
+                } else if (funcNum <= sh) {
                     I *instruction = (I *)calloc(sizeof(I), sizeof(char));
                     if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
-                        instruction_32bit = i_binary_instruction(instruction);
+                        first_pass_32bit = i_binary_instruction(instruction);
                         functions[funcNum](instruction);
                     }
-                } else if (funcNum < 27) {
+                } else if (funcNum <= 26) {
                     J *instruction = (J *)calloc(sizeof(J), sizeof(char));
                     if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
-                        instruction_32bit = j_binary_instruction(instruction);
-                        functions[funcNum](instruction);
+                        first_pass_32bit = j_binary_instruction(instruction);
+                        if (instruction->opcode == 32) {
+                            functions[funcNum](instruction, IC);
+                        } else {
+                            functions[funcNum](instruction);
+                        }
                     }
-                } else if (funcNum == NUM_OF_FUNC + 1) {
+                } else if (funcNum == NUM_OF_FUNC) {
                     printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
                     flag->firstPass = false;
                     /* undifined function handeling */
@@ -122,7 +126,7 @@ int assemble(char *fname) {
                     symbol = symbol->next;
                 }
 
-                code_img[j] = instruction_32bit; /* insert binary instruction to memory image */
+                code_img[j] = first_pass_32bit; /* insert binary instruction to memory image */
                 freeList(head);
                 flag->line += 1;
                 IC += 4;

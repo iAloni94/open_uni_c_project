@@ -10,6 +10,36 @@ enum {
     undef_address = 666 /* 100 + 4X = 666 => X is not an integer, hence this address cannot be naturally created by the assembler. i.e IC != 666 */
 };
 
+typedef enum functions {
+    add = 0,
+    sub = 1,
+    and = 2,
+    or = 3,
+    nor = 4,
+    move = 5,
+    mvhi = 6,
+    mvlo = 7,
+    addi = 8,
+    subi = 9,
+    andi = 10,
+    ori = 11,
+    nori = 12,
+    bne = 13,
+    beq = 14,
+    blt = 15,
+    bgt = 16,
+    lb = 17,
+    sb = 18,
+    lw = 19 ,
+    sw = 20,
+    lh = 21,
+    sh = 22,
+    jmp = 23,
+    la = 24,
+    call = 25,
+    stop = 26
+};
+
 typedef struct flag { /* this struct contains all the differnt flags and indicators for the assembly operation */
     char label;
     char params;
@@ -26,7 +56,7 @@ typedef struct node { /* input nodes */
 } node_t;
 
 node_t *initList();
-node_t* addNode();
+node_t *addNode();
 
 char isAlphaNumeric();
 char isReserved();
@@ -34,8 +64,7 @@ void isDeclared();
 void freeList();
 
 /* these function are in input.c */
-node_t* getLine();
+node_t *getLine();
 char isLabel();
-
 
 #endif

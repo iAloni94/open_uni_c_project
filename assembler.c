@@ -67,10 +67,9 @@ int assemble(char *fname) {
     }
 
     if (fp) {
-        while (fp) {
-            head = getLine(fp, flag);
+        head = getLine(fp, flag);
+        while (head != NULL) {
             node = head;
-
             if (head) {
                 if ((flag->label = isLabel(node, flag))) {
                     isDeclared(node, symbol_list_head, flag);
@@ -151,6 +150,7 @@ int assemble(char *fname) {
                 flag->line += 1;
                 IC += 4;
                 j++;
+                head = getLine(fp, flag);
             }
         }
     }

@@ -174,8 +174,6 @@ int main(int argc, char *argv[]) {
         if (!assembled) puts("");
         char *token = strchr(argv[i], '.');
         if (!strcmp(token, FILE_EXT)) {
-            printf("This is a text file!!!");
-            printf("arg[v] is: %s\n\n", argv[i]);
             assembled = assemble(argv[i]);
         } else {
             printf("\nError! File: %s - Input file extentions should only be \".as\"\n", argv[i]);

@@ -16,16 +16,22 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     if (head) {
         fgets(tempLine, MAX_LINE_LENGTH, fp);
 
-        if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
-            if(tempLine[0] == '\0'){
+        if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length or last line in file */
+            if (feof(fp)) {
+                flag->lastLine = true;
+                return NULL;
+            } else {
+                printf("\nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
+                flag->firstPass = false;
                 return NULL;
             }
-            printf("\nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
-            flag->firstPass = false;
-            return NULL;
         }
         temp = tempLine[0];
         prevChar = temp;
+
+        if (temp == '\n') { /* if empty line */
+            return NULL;
+        }
 
         while (temp != '\n') {
             if (temp == ';') {
@@ -39,6 +45,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                     return head;
                 } else {
                     printf("Memory allocation error");
+                    flag->firstPass = false;
                     return NULL;
                 }
             }
@@ -62,6 +69,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                         prevChar = temp;
                     } else {
                         printf("Memory allocation error");
+                        flag->firstPass = false;
                         return NULL;
                     }
                 }
@@ -75,15 +83,16 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
             } else {
                 comma = false;
                 *(currVal + j) = temp;
-                j++; 
+                j++;
                 i++;
                 prevChar = temp;
                 temp = tempLine[i];
-            } 
+            }
         }
         return head;
     } else {
         printf("Memory allocation error");
+        flag->firstPass = false;
         return NULL;
     }
 }

@@ -44,7 +44,8 @@ int assemble(char *fname) {
     flag->label = false;     /* if a label was found */
     flag->direction = false; /* if its a direction line */
     flag->firstPass = true;  /* if the 1st pass was successful */
-    flag->line = 1;          /* indicates which line is being proccessed */
+    flag->lastLine = false;
+    flag->line = 1; /* indicates which line is being proccessed */
 
     symbol = symbol_list_head;
 
@@ -64,8 +65,8 @@ int assemble(char *fname) {
     }
 
     if (fp) {
-        head = getLine(fp, flag);
-        while (head != NULL) {
+        while (!(flag->lastLine)) {
+            head = getLine(fp, flag);
             node = head;
             if (head) {
                 if ((flag->label = isLabel(node, flag))) {
@@ -92,6 +93,7 @@ int assemble(char *fname) {
                 if (funcNum <= mvlo) { /* R type function */
                     R *instruction = (R *)calloc(sizeof(R), sizeof(char));
                     if (instruction == NULL) {
+                        flag->firstPass = false;
                         printf("\nMemory allocation error");
                         return false;
                     }
@@ -102,6 +104,7 @@ int assemble(char *fname) {
                 } else if (funcNum <= sh) { /* I type function */
                     I *instruction = (I *)calloc(sizeof(I), sizeof(char));
                     if (instruction == NULL) {
+                        flag->firstPass = false;
                         printf("\nMemory allocation error");
                         return false;
                     }
@@ -112,6 +115,7 @@ int assemble(char *fname) {
                 } else if (funcNum <= stop) { /* J type function */
                     J *instruction = (J *)calloc(sizeof(J), sizeof(char));
                     if (instruction == NULL) {
+                        flag->firstPass = false;
                         printf("\nMemory allocation error");
                         return false;
                     }
@@ -123,9 +127,9 @@ int assemble(char *fname) {
                             functions[funcNum](instruction);
                         }
                     }
-                } else if (funcNum == NUM_OF_FUNC) { /* undefined function */
-                    printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
+                } else if (funcNum == NUM_OF_FUNC && isAlphaNumeric(head->val)) { /* undefined function */
                     flag->firstPass = false;
+                    printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
                 }
 
                 if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
@@ -148,6 +152,8 @@ int assemble(char *fname) {
                 IC += 4;
                 j++;
                 head = getLine(fp, flag);
+            } else { /* if there was an input problen, advance IC and proccess next line */
+                IC += 4;
             }
         }
     } else {
@@ -170,10 +176,11 @@ int assemble(char *fname) {
 int main(int argc, char *argv[]) {
     int i;
     char assembled = true;
+    char *ext;
     for (i = 1; i < argc; ++i) {
         if (!assembled) puts("");
-        char *token = strchr(argv[i], '.');
-        if (!strcmp(token, FILE_EXT)) {
+        ext = strchr(argv[i], '.');
+        if (!strcmp(ext, FILE_EXT)) {
             assembled = assemble(argv[i]);
         } else {
             printf("\nError! File: %s - Input file extentions should only be \".as\"\n", argv[i]);

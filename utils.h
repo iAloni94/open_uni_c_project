@@ -44,6 +44,7 @@ typedef struct flag { /* this struct contains all the differnt flags and indicat
     char label;
     char firstPass; 
     char direction;
+    char lastLine;
     unsigned int line;
 } flags;
 

@@ -1,10 +1,11 @@
+#include "param.h"
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "assembler.h"
-#include "param.h"
 #include "utils.h"
 
 char* registerList[NUM_OF_REG] = {
@@ -101,8 +102,8 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
         }
     }
     if (input != NULL) {
-        printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
         flag->firstPass = false;
+        printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
         return NULL;
     }
 
@@ -125,8 +126,8 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
 
     while (i < strlen(input->next->val)) {
         if (!IS_NUM(*(input->next->val + i))) {
-            printf("\nLine: %d - Illigal parameter. Immed value should only be an integer", flag->line);
             flag->firstPass = false;
+            printf("\nLine: %d - Illigal parameter. Immed value should only be an integer", flag->line);
             return NULL;
         }
         i++;
@@ -175,8 +176,8 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
     if (tempNode) {
         if (strcmp(input->val, "stop")) {
             if (input->next->next != NULL) {
-                printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
                 flag->firstPass = false;
+                printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
                 return NULL;
             }
         }
@@ -195,8 +196,8 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
                 break;
             case stop:
                 if (input->next != NULL) {
-                    printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
                     flag->firstPass = false;
+                    printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
                     return NULL;
                 }
                 instruction->opcode = 63;
@@ -245,13 +246,14 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
                 if (!declared) {
                     instruction->address = undef_address;
                 }
-            } 
- 
+            }
+
             free(tempNode);
         }
         return instruction;
     } else {
-            printf("Memory allocation error");
-            return NULL;
-        }
+        printf("Memory allocation error");
+        flag->firstPass = false;
+        return NULL;
     }
+}

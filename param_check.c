@@ -245,8 +245,8 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
                 if (!declared) {
                     instruction->address = undef_address;
                 }
-            }
-
+            } 
+ 
             free(tempNode);
         }
         return instruction;

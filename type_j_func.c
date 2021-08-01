@@ -14,4 +14,4 @@ void call_func(J *instruction, unsigned int IC) {
 }
 void stop_func(J *instruction) {
     return;
-}
+}  

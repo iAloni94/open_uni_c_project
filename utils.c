@@ -16,7 +16,7 @@ char* savedWords[] = {
     "bgt", "lb", "sb", "lw",
     "sw", "lh", "sh", "jmp",
     "la", "call", "stop"};
-
+  
 node_t* initList() {
     node_t* head = malloc(sizeof(node_t));
     head->val = calloc(1, 100);

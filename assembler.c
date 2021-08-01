@@ -56,7 +56,7 @@ int assemble(char *fname) {
     if (symbol_list_head == NULL || flag == NULL) {
         printf("Memory allocation error");
         return false;
-    }
+    } 
 
     for (i = 0; i < NUM_OF_REG; i++) { /* registers init - regArray contains pointers to all registers 0-31 */
         regArray[i] = (reg_ptr)calloc(sizeof(reg_t), 1);
@@ -74,7 +74,7 @@ int assemble(char *fname) {
                 if ((flag->label = isLabel(node, flag))) {
                     isDeclared(node, symbol_list_head, flag);
                     node = node->next;
-                }
+                } 
 
                 for (i = 0; i < NUM_OF_DIR + 1; i++) {
                     if (!strcmp(node->val, directions[i])) {
@@ -153,6 +153,9 @@ int assemble(char *fname) {
                 head = getLine(fp, flag);
             }
         }
+    }else{
+        printf("Failed to open file. Trying next file.");
+        return false;
     }
 
     if (flag->firstPass) {

@@ -8,8 +8,8 @@ typedef struct R {
     unsigned int rd : 5;
     unsigned int funct : 5;
     unsigned int notused : 6;
-} R;
-
+} R; 
+ 
 typedef struct I {
     unsigned int opcode : 6;
     unsigned int rs : 5;

@@ -3,11 +3,11 @@
 
 void add_func();
 void sub_func();
-void and_func();
+void and_func(); 
 void or_func();
 void nor_func();
 void move_func();
-void mvhi_func();
+void mvhi_func(); 
 void mvlo_func();
 void addi_func();
 void subi_func();

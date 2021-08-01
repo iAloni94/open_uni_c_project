@@ -22,7 +22,7 @@ type_i_func.o: type_i_func.c assembler.h param.h  utils.h func.h
 type_j_func.o: type_j_func.c assembler.h param.h  utils.h func.h
 	${CC} ${CFLAGS} -c type_j_func.c
 
-num_base.o: num_base.c
+num_base.o: num_base.c param.h
 	${CC} ${CFLAGS} -c num_base.c
 
 utils.o: utils.c assembler.h utils.h 

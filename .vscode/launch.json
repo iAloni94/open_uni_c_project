@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${fileDirname}/assembler",
             "args": [
-                "text.txt"
+                "text.as"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

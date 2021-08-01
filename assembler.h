@@ -6,6 +6,7 @@
 #define NUM_OF_REG 32
 #define MAX_LINE_LENGTH 81 /* Limit is 80 + Null terminator*/
 #define LABEL_MAX_LENGTH 31
+#define FILE_EXT ".as"
  
 typedef struct symbol {
     char *name;

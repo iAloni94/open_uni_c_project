@@ -9,8 +9,6 @@
 #include "utils.h"
 
 int assemble(char *fname) {
-    char *directions[NUM_OF_DIR] = {".dh", ".dw", ".db", "asciz", ".extern", ".entry"};
-
     char *functionName[NUM_OF_FUNC] = {
         "add", "sub", "and", "or",
         "nor", "move", "mvhi", "mvlo",
@@ -29,34 +27,33 @@ int assemble(char *fname) {
         sw_func, lh_func, sh_func, jmp_func,
         la_func, call_func, stop_func, undef_func};
 
+    char *directions[NUM_OF_DIR] = {".dh", ".dw", ".db", "asciz", ".extern", ".entry"};
+
     unsigned int DC = 0, IC = 100, ICF, DCF;
     int funcNum, i, j = 0;
-    char tempLine[MAX_LINE_LENGTH] = {0};
     long data_img[1000];
     long code_img[1000];
     sym_t *symbol, *symbol_list_head = calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
-
     node_t *head, *node;
     unsigned int first_pass_32bit = 0;
-
     FILE *fp;
+
     fp = fopen(fname, "r");
 
-    flag->label = false;
-    flag->params = false;
-    flag->stop = false;
-    flag->direction = false;
-    flag->firstPass = true;
-    flag->line = 1;
+    flag->label = false;     /* if a label was found */
+    flag->direction = false; /* if its a direction line */
+    flag->firstPass = true;  /* if the 1st pass was successful */
+    flag->line = 1;          /* indicates which line is being proccessed */
 
     symbol = symbol_list_head;
-    printf("Assembling file: %s", fname);
+
+    printf("Assembling file: %s\n", fname);
 
     if (symbol_list_head == NULL || flag == NULL) {
         printf("Memory allocation error");
         return false;
-    } 
+    }
 
     for (i = 0; i < NUM_OF_REG; i++) { /* registers init - regArray contains pointers to all registers 0-31 */
         regArray[i] = (reg_ptr)calloc(sizeof(reg_t), 1);
@@ -74,7 +71,7 @@ int assemble(char *fname) {
                 if ((flag->label = isLabel(node, flag))) {
                     isDeclared(node, symbol_list_head, flag);
                     node = node->next;
-                } 
+                }
 
                 for (i = 0; i < NUM_OF_DIR + 1; i++) {
                     if (!strcmp(node->val, directions[i])) {
@@ -95,7 +92,7 @@ int assemble(char *fname) {
                 if (funcNum <= mvlo) { /* R type function */
                     R *instruction = (R *)calloc(sizeof(R), sizeof(char));
                     if (instruction == NULL) {
-                        printf("Memory allocation error");
+                        printf("\nMemory allocation error");
                         return false;
                     }
                     if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
@@ -105,7 +102,7 @@ int assemble(char *fname) {
                 } else if (funcNum <= sh) { /* I type function */
                     I *instruction = (I *)calloc(sizeof(I), sizeof(char));
                     if (instruction == NULL) {
-                        printf("Memory allocation error");
+                        printf("\nMemory allocation error");
                         return false;
                     }
                     if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
@@ -115,7 +112,7 @@ int assemble(char *fname) {
                 } else if (funcNum <= stop) { /* J type function */
                     J *instruction = (J *)calloc(sizeof(J), sizeof(char));
                     if (instruction == NULL) {
-                        printf("Memory allocation error");
+                        printf("\nMemory allocation error");
                         return false;
                     }
                     if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
@@ -146,14 +143,14 @@ int assemble(char *fname) {
                 }
 
                 code_img[j] = first_pass_32bit; /* insert binary instruction to memory image */
-                freeList(head);
+                freeInputList(head);
                 flag->line += 1;
                 IC += 4;
                 j++;
                 head = getLine(fp, flag);
             }
         }
-    }else{
+    } else {
         printf("Failed to open file. Trying next file.");
         return false;
     }
@@ -161,7 +158,9 @@ int assemble(char *fname) {
     if (flag->firstPass) {
         ICF = IC;
         DCF = DC;
-        /* second pass things - updating symbol list, printing file, freeing memory, close file*/
+        /* second pass things - updating symbol list, printing file, freeing memory, closing file*/
+
+        freeSymbolTable(symbol_list_head);
     }
 
     printf("\n");
@@ -170,10 +169,17 @@ int assemble(char *fname) {
 
 int main(int argc, char *argv[]) {
     int i;
-    char succeeded = true;
+    char assembled = true;
     for (i = 1; i < argc; ++i) {
-        if (!succeeded) puts("");
-        succeeded = assemble(argv[i]);
+        if (!assembled) puts("");
+        char *token = strchr(argv[i], '.');
+        if (!strcmp(token, FILE_EXT)) {
+            printf("This is a text file!!!");
+            printf("arg[v] is: %s\n\n", argv[i]);
+            assembled = assemble(argv[i]);
+        } else {
+            printf("\nError! File: %s - Input file extentions should only be \".as\"\n", argv[i]);
+        }
     }
     return 0;
 }

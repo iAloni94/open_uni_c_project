@@ -31,9 +31,18 @@ node_t* addNode() {
     return newNode;
 }
 
-void freeList(node_t* node) {
+void freeInputList(node_t* node) {
     while (node != NULL) {
         node_t* currNode = node;
+        node = node->next;
+        free(currNode);
+    }
+    free(node);
+}
+
+void freeSymbolTable(sym_t* node) {
+    while (node != NULL) {
+        sym_t* currNode = node;
         node = node->next;
         free(currNode);
     }

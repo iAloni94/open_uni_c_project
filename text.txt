@@ -1,2 +1,0 @@
-HELLO: mvlo $2, $3, $22
-stop

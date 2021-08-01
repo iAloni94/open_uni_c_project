@@ -12,12 +12,15 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     node_t* node = head;
     char temp, prevChar, comma = false;
     char* currVal = node->val;
-    char tempLine[MAX_LINE_LENGTH];
+    char tempLine[MAX_LINE_LENGTH] = {0};
     if (head) {
         fgets(tempLine, MAX_LINE_LENGTH, fp);
 
         if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length */
-            printf("/nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
+            if(tempLine[0] == '\0'){
+                return NULL;
+            }
+            printf("\nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
             flag->firstPass = false;
             return NULL;
         }
@@ -73,6 +76,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                 comma = false;
                 *(currVal + j) = temp;
                 j++; 
+                i++;
                 prevChar = temp;
                 temp = tempLine[i];
             } 

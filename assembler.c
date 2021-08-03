@@ -18,14 +18,14 @@ int assemble(char *fname) {
         "sw", "lh", "sh", "jmp",
         "la", "call", "stop"};
 
-    void (*functions[NUM_OF_FUNC + 1])() = {
+    void (*functions[NUM_OF_FUNC])() = {
         add_func, sub_func, and_func, or_func,
         nor_func, move_func, mvhi_func, mvlo_func,
         addi_func, subi_func, andi_func, ori_func,
         nori_func, bne_func, beq_func, blt_func,
         bgt_func, lb_func, sb_func, lw_func,
         sw_func, lh_func, sh_func, jmp_func,
-        la_func, call_func, stop_func, undef_func};
+        la_func, call_func, stop_func};
 
     char *directions[NUM_OF_DIR] = {".dh", ".dw", ".db", "asciz", ".extern", ".entry"};
 
@@ -170,6 +170,9 @@ int assemble(char *fname) {
         return false;
     }
 
+    ICF = IC;
+    DCF = DC;
+
     if (flag->firstPass) {
         /* second pass things - updating symbol list, printing file, freeing memory, closing file*/
         FILE *f_obj, *f_ent, *f_ext;
@@ -183,35 +186,24 @@ int assemble(char *fname) {
             f_ent = createFile(fname, ".ent");
         }
 
-
-
-
-
-
         /* Closing files and clearing memory before ending assembly proccess */
+        fclose(f_obj);
+
         if (flag->external) {
             fclose(f_ext);
         }
         if (flag->entry) {
             fclose(f_ent);
         }
-        fclose(f_obj);
-        fclose(fp);
-        freeSymbolTable(symbol_list_head);
-        free(flag);
-        for (i = 0; i < NUM_OF_REG; i++) {
-            free(regArray[i]);
-        }
-    } else { /*  first pass failed*/
-        fclose(fp);
-        freeSymbolTable(symbol_list_head);
-        free(flag);
-        for (i = 0; i < NUM_OF_REG; i++) {
-            free(regArray[i]);
-        }
+    }
+    fclose(fp);
+    freeSymbolTable(symbol_list_head);
+    free(flag);
+    for (i = 0; i < NUM_OF_REG; i++) {
+        free(regArray[i]);
     }
     printf("\n");
-    return 1;
+    return true;
 }
 
 int main(int argc, char *argv[]) {

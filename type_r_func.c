@@ -59,5 +59,3 @@ void mvlo_func(R *instruction) {
     }
     regArray[instruction->rd]->val = rd;
 }
-
-void undef_func() {}

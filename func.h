@@ -28,4 +28,3 @@ void jmp_func();
 void la_func();
 void call_func();
 void stop_func();
-void undef_func();

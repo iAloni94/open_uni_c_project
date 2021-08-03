@@ -1,6 +1,5 @@
 #include "utils.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,14 +36,16 @@ void freeInputList(node_t* node) {
         currNode = node;
         node = node->next;
         free(currNode->val);
-        free(currNode);  
+        free(currNode);
     }
 }
 
 void freeSymbolTable(sym_t* node) {
+    sym_t* currNode = node;
     while (node != NULL) {
-        sym_t* currNode = node;
+        currNode = node;
         node = node->next;
+        free(currNode->name);
         free(currNode);
     }
     free(node);
@@ -61,18 +62,36 @@ char isAlphaNumeric(char* str) {
 char isReserved(char* str, flags* flag) { /* checks if label is a reseved word */
     int i;
     for (i = 0; i < 33; i++) { /* 33 is number of reserved words*/
-        if (!strcmp(savedWords[i], str)) return true;
+        if (!strcmp(savedWords[i], str)) {
+            flag->firstPass = false;
+            return true;
+        }
     }
-    printf("Line: %d - Label name is a reserved word", flag->line);
     return false;
 }
 
-void isDeclared(char* str, sym_t* symbol, flags* flag) { /* this functions check if a label was already decalred*/
-    while (symbol->name != NULL) {
+char isDeclared(char* str, sym_t* symbol, flags* flag) { /* this functions check if a label was already decalred*/
+    while (symbol != NULL && symbol->name != NULL) {
         if (!strcmp(str, symbol->name)) {
-            printf("\nLine: %d - Label was already declared", flag->line);
             flag->firstPass = false;
+            return true; /* label was declared */
         }
         symbol = symbol->next;
     }
+    return false;
+}
+
+FILE* createFile(char* fname, char* extention) {
+    int i;
+    char ext_diff = strlen(fname) - 3;
+    char* fname_no_extention = calloc(sizeof(char), ext_diff); /* length of ".as" = 3 */
+    FILE* output_file;
+
+    for (i = 0; i < (ext_diff); i++) {
+        *(fname_no_extention + i) = *(fname + i);
+    }
+    /* Opening file for output */
+    output_file = fopen(strcat(fname_no_extention, extention), "w");
+    free(fname_no_extention);
+    return output_file;
 }

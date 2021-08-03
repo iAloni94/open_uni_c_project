@@ -1,5 +1,9 @@
-add $1, $2, $3
-;fdsfdsfdg
-addi $2, 12, $15
+ido: mvlo $2, $4
+
+
+
+
+
+idoA: mvlo $2, $5
 
 stop

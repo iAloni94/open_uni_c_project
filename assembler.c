@@ -44,32 +44,41 @@ int assemble(char *fname) {
     flag->label = false;     /* if a label was found */
     flag->direction = false; /* if its a direction line */
     flag->firstPass = true;  /* if the 1st pass was successful */
-    flag->lastLine = false;
-    flag->line = 1; /* indicates which line is being proccessed */
+    flag->lastLine = false;  /* marks last line in input file */
+    flag->external = false;  /* this marks the second pass whether to create the .ext fie */
+    flag->entry = false;     /* this marks wheter we need the .ent file */
+    flag->line = 1;          /* indicates which line is being proccessed */
 
     symbol = symbol_list_head;
 
-    printf("Assembling file: %s\n", fname);
+    printf("Assembling file: %s", fname);
 
     if (symbol_list_head == NULL || flag == NULL) {
         printf("Memory allocation error");
-        return false;
+        exit(0);
     }
 
     for (i = 0; i < NUM_OF_REG; i++) { /* registers init - regArray contains pointers to all registers 0-31 */
         regArray[i] = (reg_ptr)calloc(sizeof(reg_t), 1);
         if (regArray[i] == NULL) {
             printf("Memory allocation error");
-            return false;
+            exit(0);
         }
     }
 
     if (fp) {
         while (!(flag->lastLine)) {
-            if ((head = getLine(fp, flag)) != NULL) {
+            head = getLine(fp, flag); /* each node in input list contains a single word */
+
+            if (head == NULL) {
+                freeInputList(head);
+                flag->line += 1;
+                flag->direction = false;
+                IC += 4;
+            } else {
                 node = head;
-                if ((flag->label = isLabel(node, flag))) {
-                    isDeclared(node, symbol_list_head, flag);
+                if (isColon(node, flag)) {
+                    flag->label = isLabel(node, flag, symbol_list_head); /* raise flag for label. */
                     node = node->next;
                 }
 
@@ -80,7 +89,6 @@ int assemble(char *fname) {
                         break;
                     }
                 }
-
                 funcNum = NUM_OF_FUNC;
                 for (i = 0; i < NUM_OF_FUNC; i++) {
                     if (!strcmp(node->val, functionName[i])) {
@@ -94,7 +102,7 @@ int assemble(char *fname) {
                     if (instruction == NULL) {
                         flag->firstPass = false;
                         printf("\nMemory allocation error");
-                        return false;
+                        exit(0);
                     }
                     if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = r_binary_instruction(instruction);
@@ -106,7 +114,7 @@ int assemble(char *fname) {
                     if (instruction == NULL) {
                         flag->firstPass = false;
                         printf("\nMemory allocation error");
-                        return false;
+                        exit(0);
                     }
                     if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = i_binary_instruction(instruction);
@@ -118,7 +126,7 @@ int assemble(char *fname) {
                     if (instruction == NULL) {
                         flag->firstPass = false;
                         printf("\nMemory allocation error");
-                        return false;
+                        exit(0);
                     }
                     if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
                         first_pass_32bit = j_binary_instruction(instruction);
@@ -129,13 +137,14 @@ int assemble(char *fname) {
                         }
                         free(instruction);
                     }
-                } else if (funcNum == NUM_OF_FUNC && isAlphaNumeric(head->val)) { /* undefined function */
+                } else if (funcNum == NUM_OF_FUNC && flag->direction == false) { /* undefined function */
                     flag->firstPass = false;
                     printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
                 }
 
                 if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
-                    symbol->name = head->val;
+                    symbol->name = calloc(sizeof(char), strlen(head->val));
+                    memcpy(symbol->name, head->val, strlen(head->val));
                     if (flag->direction) {
                         symbol->address = DC;
                         symbol->attribute = "code";
@@ -143,14 +152,15 @@ int assemble(char *fname) {
                         symbol->address = IC;
                         symbol->attribute = "data";
                     }
-                    flag->label = false;
                     symbol->next = calloc(sizeof(sym_t), 1);
                     symbol = symbol->next;
+                    flag->label = false;
                 }
 
                 code_img[j] = first_pass_32bit; /* insert binary instruction to memory image */
                 freeInputList(head);
                 flag->line += 1;
+                flag->direction = false;
                 IC += 4;
                 j++;
             }
@@ -161,10 +171,38 @@ int assemble(char *fname) {
     }
 
     if (flag->firstPass) {
-        ICF = IC;
-        DCF = DC;
         /* second pass things - updating symbol list, printing file, freeing memory, closing file*/
+        FILE *f_obj, *f_ent, *f_ext;
 
+        /* creating oputput files */
+        f_obj = createFile(fname, ".ob"); /* hex machine code */
+        if (flag->external) {
+            f_ext = createFile(fname, ".ext");
+        }
+        if (flag->entry) {
+            f_ent = createFile(fname, ".ent");
+        }
+
+
+
+
+
+
+        /* Closing files and clearing memory before ending assembly proccess */
+        if (flag->external) {
+            fclose(f_ext);
+        }
+        if (flag->entry) {
+            fclose(f_ent);
+        }
+        fclose(f_obj);
+        fclose(fp);
+        freeSymbolTable(symbol_list_head);
+        free(flag);
+        for (i = 0; i < NUM_OF_REG; i++) {
+            free(regArray[i]);
+        }
+    } else { /*  first pass failed*/
         fclose(fp);
         freeSymbolTable(symbol_list_head);
         free(flag);
@@ -172,7 +210,6 @@ int assemble(char *fname) {
             free(regArray[i]);
         }
     }
-
     printf("\n");
     return 1;
 }
@@ -182,7 +219,7 @@ int main(int argc, char *argv[]) {
     char assembled = true;
     char *ext;
     for (i = 1; i < argc; ++i) {
-        if (!assembled) puts("");
+        if (!assembled) printf("\n");
         ext = strchr(argv[i], '.');
         if (!strcmp(ext, FILE_EXT)) {
             assembled = assemble(argv[i]);

@@ -4,7 +4,9 @@
 #define IS_LETTER(c) (c >= 65 && c <= 122) ? true : false /* 65 = 'A', 122 = 'z' */
 #define IS_NUM(c) (c >= 48 && c <= 57) ? true : false     /* 45 = '0', 57 = '9' */
 
-enum  {
+#include <stdio.h>
+
+enum {
     false = 0,
     true = 1,
     undef_address = 666 /* 100 + 4X = 666 => X is not an integer, hence this address cannot be naturally created by the assembler. i.e IC != 666 */
@@ -13,7 +15,7 @@ enum  {
 typedef enum functions {
     add = 0,
     sub = 1,
-    and = 2,
+        and = 2,
     or = 3,
     nor = 4,
     move = 5,
@@ -30,7 +32,7 @@ typedef enum functions {
     bgt = 16,
     lb = 17,
     sb = 18,
-    lw = 19 ,
+    lw = 19,
     sw = 20,
     lh = 21,
     sh = 22,
@@ -39,12 +41,14 @@ typedef enum functions {
     call = 25,
     stop = 26
 } functions;
- 
+
 typedef struct flag { /* this struct contains all the differnt flags and indicators for the assembly operation */
     char label;
-    char firstPass; 
+    char firstPass;
     char direction;
     char lastLine;
+    char external;
+    char entry;
     unsigned int line;
 } flags;
 
@@ -53,19 +57,21 @@ typedef struct node { /* input nodes */
     struct node *next;
 } node_t;
 
+FILE *createFile();
 node_t *initList();
 node_t *addNode();
 
 char isAlphaNumeric();
 char isReserved();
-void isDeclared();
+char isDeclared();
 void freeList();
 
 void freeSymbolTable();
-void freeInputList(); 
+void freeInputList();
 
 /* these function are in input.c */
 node_t *getLine();
 char isLabel();
+char isColon();
 
 #endif

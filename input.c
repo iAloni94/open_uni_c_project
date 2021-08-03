@@ -23,6 +23,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                 return NULL;
             } else {
                 printf("\nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
+                freeInputList(head);
                 flag->firstPass = false;
                 return NULL;
             }
@@ -31,12 +32,13 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         prevChar = temp;
 
         if (temp == '\n') { /* if empty line */
-            free(head);
+            freeInputList(head);
             return NULL;
         }
 
         while (temp != '\n') {
             if (temp == ';') {
+                freeInputList(head);
                 return NULL;
             }
             if (isspace(temp)) {
@@ -48,7 +50,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                 if (comma && temp == ',') {
                     comma = false;
                     flag->firstPass = false;
-                    printf("\nLine: %d - consecutive commas", flag->line);
+                    printf("\nLine: %d - Consecutive commas", flag->line);
                 } else if ((isspace(prevChar) || temp == ',') && *currVal != -1) {
                     node->next = addNode();
                     if (node->next != NULL) {
@@ -59,8 +61,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                         prevChar = temp;
                     } else {
                         printf("Memory allocation error");
-                        flag->firstPass = false;
-                        return NULL;
+                        exit(0);
                     }
                 }
                 continue;
@@ -82,21 +83,25 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         return head;
     } else {
         printf("Memory allocation error");
-        flag->firstPass = false;
-        return NULL;
+        exit(0);
     }
 }
 
-char isLabel(node_t* input, flags* flag) {
-    char* temp = input->val;
-    if (strstr(temp, ":") != NULL) {
-        input->val[strlen(temp) - 1] = '\0';
-        if (strlen(temp) <= LABEL_MAX_LENGTH && IS_LETTER(*temp) && isAlphaNumeric(temp) && !isReserved(temp, flag))
-            return true;
-        else {
-            flag->firstPass = false;
-            printf("\nLine: %d - Illigal label name", 1);
-        }
+char isLabel(node_t* input, flags* flag, sym_t* symbol) {
+    input->val[strlen(input->val) - 1] = '\0';
+    if ((strlen(input->val) <= LABEL_MAX_LENGTH) &&
+        (isAlphaNumeric(input->val)) &&
+        (!isReserved(input->val, flag)) &&
+        (!isDeclared(input->val, symbol, flag)))
+        return true;
+    else {
+        flag->firstPass = false;
+        printf("\nLine: %d - Illigal label name", flag->line);
     }
+    return false;
+}
+
+char isColon(node_t* input, flags* flag) {
+    if (strchr(input->val, ':') != NULL) return true;
     return false;
 }

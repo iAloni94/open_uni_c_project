@@ -253,8 +253,7 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
         return instruction;
     } else {
         printf("Memory allocation error");
-        flag->firstPass = false;
         free(tempNode);
-        return NULL;
+        exit(0);
     }
 }

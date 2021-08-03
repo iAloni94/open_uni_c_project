@@ -16,7 +16,7 @@ char* savedWords[] = {
     "bgt", "lb", "sb", "lw",
     "sw", "lh", "sh", "jmp",
     "la", "call", "stop"};
-  
+
 node_t* initList() {
     node_t* head = malloc(sizeof(node_t));
     head->val = calloc(1, 100);
@@ -32,12 +32,13 @@ node_t* addNode() {
 }
 
 void freeInputList(node_t* node) {
+    node_t* currNode;
     while (node != NULL) {
-        node_t* currNode = node;
+        currNode = node;
         node = node->next;
-        free(currNode);
+        free(currNode->val);
+        free(currNode);  
     }
-    free(node);
 }
 
 void freeSymbolTable(sym_t* node) {
@@ -57,11 +58,12 @@ char isAlphaNumeric(char* str) {
     return true;
 }
 
-char isReserved(char* str) { /* checks if label is a reseved word */
+char isReserved(char* str, flags* flag) { /* checks if label is a reseved word */
     int i;
     for (i = 0; i < 33; i++) { /* 33 is number of reserved words*/
         if (!strcmp(savedWords[i], str)) return true;
     }
+    printf("Line: %d - Label name is a reserved word", flag->line);
     return false;
 }
 

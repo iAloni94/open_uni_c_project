@@ -66,9 +66,8 @@ int assemble(char *fname) {
 
     if (fp) {
         while (!(flag->lastLine)) {
-            head = getLine(fp, flag);
-            node = head;
-            if (head) {
+            if ((head = getLine(fp, flag)) != NULL) {
+                node = head;
                 if ((flag->label = isLabel(node, flag))) {
                     isDeclared(node, symbol_list_head, flag);
                     node = node->next;
@@ -100,6 +99,7 @@ int assemble(char *fname) {
                     if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = r_binary_instruction(instruction);
                         functions[funcNum](instruction);
+                        free(instruction);
                     }
                 } else if (funcNum <= sh) { /* I type function */
                     I *instruction = (I *)calloc(sizeof(I), sizeof(char));
@@ -111,6 +111,7 @@ int assemble(char *fname) {
                     if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = i_binary_instruction(instruction);
                         functions[funcNum](instruction);
+                        free(instruction);
                     }
                 } else if (funcNum <= stop) { /* J type function */
                     J *instruction = (J *)calloc(sizeof(J), sizeof(char));
@@ -126,6 +127,7 @@ int assemble(char *fname) {
                         } else {
                             functions[funcNum](instruction);
                         }
+                        free(instruction);
                     }
                 } else if (funcNum == NUM_OF_FUNC && isAlphaNumeric(head->val)) { /* undefined function */
                     flag->firstPass = false;
@@ -151,11 +153,8 @@ int assemble(char *fname) {
                 flag->line += 1;
                 IC += 4;
                 j++;
-                head = getLine(fp, flag);
-            } else { /* if there was an input problen, advance IC and proccess next line */
-                IC += 4;
             }
-        }
+        } /* while loop */
     } else {
         printf("Failed to open file. Trying next file.");
         return false;
@@ -166,7 +165,12 @@ int assemble(char *fname) {
         DCF = DC;
         /* second pass things - updating symbol list, printing file, freeing memory, closing file*/
 
+        fclose(fp);
         freeSymbolTable(symbol_list_head);
+        free(flag);
+        for (i = 0; i < NUM_OF_REG; i++) {
+            free(regArray[i]);
+        }
     }
 
     printf("\n");

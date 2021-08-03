@@ -61,6 +61,9 @@ char isReserved();
 void isDeclared();
 void freeList();
 
+void freeSymbolTable();
+void freeInputList(); 
+
 /* these function are in input.c */
 node_t *getLine();
 char isLabel();

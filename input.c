@@ -19,6 +19,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length or last line in file */
             if (feof(fp)) {
                 flag->lastLine = true;
+                freeInputList(head);
                 return NULL;
             } else {
                 printf("\nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
@@ -30,24 +31,13 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         prevChar = temp;
 
         if (temp == '\n') { /* if empty line */
+            free(head);
             return NULL;
         }
 
         while (temp != '\n') {
             if (temp == ';') {
                 return NULL;
-            }
-            if (temp == EOF) {
-                node->next = addNode();
-                if (node->next != NULL) {
-                    node = node->next;
-                    *(node->val) = temp;
-                    return head;
-                } else {
-                    printf("Memory allocation error");
-                    flag->firstPass = false;
-                    return NULL;
-                }
             }
             if (isspace(temp)) {
                 while (isspace(temp) && temp != '\n') {
@@ -101,7 +91,7 @@ char isLabel(node_t* input, flags* flag) {
     char* temp = input->val;
     if (strstr(temp, ":") != NULL) {
         input->val[strlen(temp) - 1] = '\0';
-        if (strlen(temp) <= LABEL_MAX_LENGTH && IS_LETTER(*temp) && isAlphaNumeric(temp) && !isReserved(temp))
+        if (strlen(temp) <= LABEL_MAX_LENGTH && IS_LETTER(*temp) && isAlphaNumeric(temp) && !isReserved(temp, flag))
             return true;
         else {
             flag->firstPass = false;

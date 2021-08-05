@@ -136,25 +136,27 @@ int getNumericValue(int binaryNumber)
 }
 
 /* This function get the numeric value of a binary number using the Two's complement method */
-// int getNumericValueCompTwo(int binaryNumber, int significantBits)
-// {
-//     int base = pow(2, significantBits - 1);
-//     int decimalValue = 0;
-//     int cloneBinary = binaryNumber;
-//     int i;
+/*
+int getNumericValueCompTwo(int binaryNumber, int significantBits)
+{
+    int base = pow(2, significantBits - 1);
+    int decimalValue = 0;
+    int cloneBinary = binaryNumber;
+    int i;
 
-//     for (i = 0; i < significantBits; ++i)
-//     {
-//         if (i == 0 && binary[i] != '0')
-//         {
-//             decimalValue = base * -1;
-//         }
-//         else
-//         {
-//             decimalValue += (binary[i] - '0') * base;
-//         }
-//         base /= 2;
-//     }
+    for (i = 0; i < significantBits; ++i)
+    {
+        if (i == 0 && binary[i] != '0')
+        {
+            decimalValue = base * -1;
+        }
+        else
+        {
+            decimalValue += (binary[i] - '0') * base;
+        }
+        base /= 2;
+    }
 
-//     return decimalValue;
-// }
+    return decimalValue;
+}
+*/

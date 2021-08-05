@@ -8,9 +8,7 @@
 * Each Instruction has a uniqe name field, the "funct" field, which is uniqe for each Instruction.
 */
 
-#include "assembler.h"
-#include "param.h"
-#include "func.h"
+
 #include "global.h"
 
 void add_func(R *instruction)

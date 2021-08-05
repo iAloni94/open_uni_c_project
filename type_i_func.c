@@ -8,9 +8,7 @@
 * Each Instruction has a uniqe name field, the "funct" field, which is uniqe for each Instruction.
 */
 
-#include "assembler.h"
-#include "param.h"
-#include "func.h"
+
 #include "global.h"
 
 /* Here are 4 Math and Logic Instructions: addi, subi, andi, ori, nori. */
@@ -157,14 +155,14 @@ void lb_func(I *instruction)
     int i;
     unsigned int rs = (regArray[instruction->rs]->val);
     unsigned int immed = instruction->immed;
-    // int immedNumericValue =
+    /* int immedNumericValue = */
     unsigned int memDist = rs + immed;
 
     for (i = 7; i > -1; i--)
     {
-        // CHANGE_BIT(rd, bit, i);
+        /* CHANGE_BIT(rd, bit, i); */
     }
-    // regArray[instruction->rd]->val = rd;
+    /* regArray[instruction->rd]->val = rd; */
 }
 
 /* */

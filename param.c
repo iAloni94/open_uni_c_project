@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "functions.h"
+#include "global.h"
 
 char* registerList[NUM_OF_REG] = {
     "$0", "$1", "$2", "$3",

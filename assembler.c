@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "functions.h" 
+#include "global.h" 
 
 int assemble(char *fname) {
     char *functionName[NUM_OF_FUNC] = {

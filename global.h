@@ -2,6 +2,9 @@
 * This file contains ALL the function declaration from all c files and also includes the main header files.
 */
 
+#ifndef __GLOBAL_H
+#define __GLOBAL_H
+
 #include <stdio.h>
 
 #include "assembler.h"
@@ -69,3 +72,5 @@ char isColon(char *, flags *);
 /* write_files.c */
 FILE *createFile(char *, char *);
 void printObj(FILE *, unsigned int *, unsigned int *, unsigned int, unsigned int);
+
+#endif

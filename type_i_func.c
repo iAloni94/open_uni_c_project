@@ -1,4 +1,4 @@
-#include "functions.h"
+#include "global.h"
 
 
 void addi_func(I *instruction) {\

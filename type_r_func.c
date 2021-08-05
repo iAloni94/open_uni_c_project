@@ -1,4 +1,4 @@
-#include "functions.h"
+#include "global.h"
 
 void add_func(R *instruction) {
     unsigned int rs = (regArray[instruction->rs]->val);

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
  
-#include "functions.h"
+#include "global.h"
 
 node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     int i = 0, j = 0;

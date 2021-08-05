@@ -1,4 +1,4 @@
-#include "functions.h"
+#include "global.h"
 
 void jmp_func(J *instruction) {
     return;

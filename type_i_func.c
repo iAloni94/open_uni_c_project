@@ -1,7 +1,4 @@
-#include "assembler.h"
-#include "param.h"
-#include "utils.h"
-#include "func.h"
+#include "functions.h"
 
 
 void addi_func(I *instruction) {\
@@ -12,7 +9,7 @@ void addi_func(I *instruction) {\
     (regArray[instruction->rt]->val) = res;
 }
 
-void subi_func(I* instruction) {
+void subi_func(I* instruction) { 
     unsigned int rs_index = instruction->rs;
     unsigned int immed = instruction->immed;
     unsigned int rs_val = (regArray[rs_index]->val);

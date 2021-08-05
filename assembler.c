@@ -1,12 +1,8 @@
-#include "assembler.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "func.h"
-#include "param.h"
-#include "utils.h"
+#include "functions.h" 
 
 int assemble(char *fname) {
     char *functionName[NUM_OF_FUNC] = {
@@ -32,7 +28,7 @@ int assemble(char *fname) {
     unsigned int DC = 0, IC = 100, ICF, DCF;
     int funcNum, i, j = 0;
     unsigned int data_img[1000];
-    unsigned int code_img[1000];
+    unsigned int code_img[1000] = {0};
     unsigned int code_address[1000];
     sym_t *symbol, *symbol_list_head = calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
@@ -75,7 +71,7 @@ int assemble(char *fname) {
                 flag->line += 1;
             } else {
                 node = head;
-                if (isColon(node, flag)) {
+                if (isColon(node->val, flag)) {
                     if ((flag->label = isLabel(node, flag, symbol_list_head))) {      /* raise flag for label. */
                         if (isDeclared(node->val, symbol, flag)) flag->label = false; /* check if label was already declared*/
                     }
@@ -89,7 +85,7 @@ int assemble(char *fname) {
                         break;
                     }
                 }
-               
+
                 funcNum = NUM_OF_FUNC;
                 for (i = 0; i < NUM_OF_FUNC; i++) {
                     if (!strcmp(node->val, functionName[i])) {
@@ -152,6 +148,7 @@ int assemble(char *fname) {
                         symbol->next = calloc(sizeof(sym_t), 1);
                         symbol = symbol->next;
                         flag->label = false;
+                        flag->line += 1;
                         continue;
                     } else {
                         symbol->address = IC;
@@ -202,7 +199,7 @@ int assemble(char *fname) {
         if (flag->entry) {
             fclose(f_ent);
         }
-        printf("\nAssembly completed without errors.\n");
+        printf("\nAssembly completed.\n");
     }
     fclose(fp);
     freeSymbolTable(symbol_list_head);
@@ -210,6 +207,7 @@ int assemble(char *fname) {
     for (i = 0; i < NUM_OF_REG; i++) {
         free(regArray[i]);
     }
+    printf("\n");
     return true;
 }
 

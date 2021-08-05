@@ -2,9 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "assembler.h"
-#include "utils.h"
+ 
+#include "functions.h"
 
 node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     int i = 0, j = 0;
@@ -104,7 +103,7 @@ char isLabel(node_t* input, flags* flag, sym_t* symbol) {
     return false;
 }
 
-char isColon(node_t* input, flags* flag) {
-    if (strchr(input->val, ':') != NULL) return true;
+char isColon(char* input, flags* flag) {
+    if (strchr(input, ':') != NULL) return true;
     return false;
 }

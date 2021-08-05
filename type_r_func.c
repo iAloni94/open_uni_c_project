@@ -1,7 +1,4 @@
-#include "assembler.h"
-#include "param.h"
-#include "utils.h"
-#include "func.h"
+#include "functions.h"
 
 void add_func(R *instruction) {
     unsigned int rs = (regArray[instruction->rs]->val);
@@ -13,7 +10,7 @@ void add_func(R *instruction) {
 void sub_func(R *instruction) {
     unsigned int rs = (regArray[instruction->rs]->val);
     unsigned int rt = (regArray[instruction->rt]->val);
-    unsigned int rd = rs - rt;
+    unsigned int rd = rs - rt; 
     regArray[instruction->rd]->val = rd;
 }  
 void and_func(R *instruction) {

@@ -1,12 +1,9 @@
-#include "param.h"
-
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "assembler.h"
-#include "utils.h"
+#include "functions.h"
 
 char* registerList[NUM_OF_REG] = {
     "$0", "$1", "$2", "$3",
@@ -17,7 +14,7 @@ char* registerList[NUM_OF_REG] = {
     "$20", "$21", "$22", "$23",
     "$24", "$25", "$26", "$27",
     "$28", "$29", "$30", "$31"};
-
+ 
 R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
     char rs = false, rt = false, rd = false;
     int i;
@@ -184,7 +181,6 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
 
 J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t* symbol) {
     int i;
-    char declared = false;
     char temp[MAX_LINE_LENGTH] = {0};
     node_t* tempNode = calloc(sizeof(node_t), 1);
 
@@ -254,4 +250,5 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
             return NULL;
         }
     }
+    return instruction;
 }

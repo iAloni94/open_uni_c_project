@@ -95,18 +95,4 @@ unsigned int getSymbolAddress(char* name, sym_t* symbol) {
     }
     return false;
 }
-
-FILE* createFile(char* fname, char* extention) {
-    int i;
-    char ext_diff = strlen(fname) - 3;
-    char* fname_no_extention = calloc(sizeof(char), ext_diff); /* length of ".as" = 3 */
-    FILE* output_file;
-
-    for (i = 0; i < (ext_diff); i++) {
-        *(fname_no_extention + i) = *(fname + i);
-    }
-    /* Opening file for output */
-    output_file = fopen(strcat(fname_no_extention, extention), "w");
-    free(fname_no_extention);
-    return output_file;
-}
+ 

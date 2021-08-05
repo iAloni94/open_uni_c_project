@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* 
 * R type Instructions.
 * Math and Logic Instructions: add, sub, and, or, nor.
@@ -11,6 +12,9 @@
 #include "assembler.h"
 #include "param.h"
 #include "func.h"
+=======
+#include "global.h"
+>>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9
 
 void add_func(R *instruction)
 {
@@ -24,11 +28,16 @@ void sub_func(R *instruction)
 {
     unsigned int rs = (regArray[instruction->rs]->val);
     unsigned int rt = (regArray[instruction->rt]->val);
-    unsigned int rd = rs - rt;
+    unsigned int rd = rs - rt; 
     regArray[instruction->rd]->val = rd;
+<<<<<<< HEAD
 }
 void and_func(R *instruction)
 {
+=======
+}  
+void and_func(R *instruction) {
+>>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9
     unsigned int rs = (regArray[instruction->rs]->val);
     unsigned int rt = (regArray[instruction->rt]->val);
     unsigned int rd = rs & rt;
@@ -87,5 +96,3 @@ void mvlo_func(R *instruction)
     }
     regArray[instruction->rd]->val = rd;
 }
-
-void undef_func() {}

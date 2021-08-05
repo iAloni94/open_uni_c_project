@@ -1,6 +1,5 @@
 #include "utils.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,12 +32,30 @@ node_t *addNode()
     return newNode;
 }
 
+<<<<<<< HEAD
 void freeList(node_t *node)
 {
     while (node != NULL)
     {
         node_t *currNode = node;
+=======
+void freeInputList(node_t* node) {
+    node_t* currNode;
+    while (node != NULL) {
+        currNode = node;
+>>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9
         node = node->next;
+        free(currNode->val);
+        free(currNode);
+    }
+}
+
+void freeSymbolTable(sym_t* node) {
+    sym_t* currNode = node;
+    while (node != NULL) {
+        currNode = node;
+        node = node->next;
+        free(currNode->name);
         free(currNode);
     }
     free(node);
@@ -47,14 +64,24 @@ void freeList(node_t *node)
 char isAlphaNumeric(char *str)
 {
     int i;
+<<<<<<< HEAD
     for (i = 0; i < strlen(str); i++)
     {
         if (!IS_LETTER(*(str + i)) && !IS_NUM(*(str + i)))
             return false;
+=======
+    for (i = 0; i < strlen(str); i++) {
+        if (IS_LETTER(*(str + i)) || IS_NUM(*(str + i))) {
+            continue;
+        } else {
+            return false;
+        }
+>>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9
     }
     return true;
 }
 
+<<<<<<< HEAD
 char isReserved(char *str)
 {
     int i;
@@ -62,10 +89,20 @@ char isReserved(char *str)
     { /* 33 is number of saved words*/
         if (strcmp(savedWords[i], str) == 0)
             return true;
+=======
+char isReserved(char* str, flags* flag) { /* checks if label is a reseved word */
+    int i;
+    for (i = 0; i < 33; i++) { /* 33 is number of reserved words*/
+        if (!strcmp(savedWords[i], str)) {
+            flag->firstPass = false;
+            return true;
+        }
+>>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9
     }
     return false;
 }
 
+<<<<<<< HEAD
 void isDeclared(char *str, sym_t *symbol, flags *flag)
 {
     while (symbol->name != NULL)
@@ -73,11 +110,30 @@ void isDeclared(char *str, sym_t *symbol, flags *flag)
         if (strcmp(str, symbol->name) == 0)
         {
             printf("\nLine: %d - Label was already declared", flag->line);
+=======
+char isDeclared(char* str, sym_t* symbol, flags* flag) { /* this functions check if a label was already decalred*/
+    while (symbol != NULL && symbol->name != NULL) {
+        if (!strcmp(str, symbol->name)) {
+            printf("\nLine: %d - Label name already in use", flag->line);
+>>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9
             flag->firstPass = false;
+            return true; /* label was declared */
         }
         symbol = symbol->next;
     }
+    return false;
 }
+
+unsigned int getSymbolAddress(char* name, sym_t* symbol) {
+    while (symbol != NULL && symbol->name != NULL) {
+        if (!strcmp(name, symbol->name)) {
+            return symbol->address;
+        }
+        symbol = symbol->next;
+    }
+    return false;
+}
+<<<<<<< HEAD
 
 /* This function get the numeric value of a binary number */
 int getNumericValue(int binaryNumber)
@@ -121,3 +177,6 @@ int getNumericValue(int binaryNumber)
 
 //     return decimalValue;
 // }
+=======
+ 
+>>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9

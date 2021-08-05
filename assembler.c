@@ -27,7 +27,7 @@ int assemble(char *fname) {
         sw_func, lh_func, sh_func, jmp_func,
         la_func, call_func, stop_func};
 
-    char *directions[NUM_OF_DIR] = {".dh", ".dw", ".db", "asciz", ".extern", ".entry"};
+    char *directions[NUM_OF_DIR] = {".dh", ".dw", ".db", ".asciz", ".extern", ".entry"};
 
     unsigned int DC = 0, IC = 100, ICF, DCF;
     int funcNum, i, j = 0;

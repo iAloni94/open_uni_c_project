@@ -48,10 +48,16 @@ void nor_func(R *instruction)
     unsigned int rd = ~(rs | rt);
     regArray[instruction->rd]->val = rd;
 }
+
+/* This function copies the value from rs to rd */
+
 void move_func(R *instruction)
 {
     regArray[instruction->rd]->val = (regArray[instruction->rs]->val);
 }
+
+/* This function copies the bits 16-31 from rs to rd */
+
 void mvhi_func(R *instruction)
 {
     /* copy bits 16-31 from rs to rd */
@@ -65,6 +71,9 @@ void mvhi_func(R *instruction)
     }
     regArray[instruction->rd]->val = rd;
 }
+
+/* This function copies the bits 0-15 from rs to rd */
+
 void mvlo_func(R *instruction)
 {
     /* copy bits 0-15 from rs to rd */

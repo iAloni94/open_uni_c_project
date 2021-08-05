@@ -2,20 +2,19 @@
 #define __UTILS_H
 
 #define IS_LETTER(c) (c >= 65 && c <= 122) ? true : false /* 65 = 'A', 122 = 'z' */
-#define IS_NUM(c) (c >= 48 && c <= 57) ? true : false     /* 45 = '0', 57 = '9' */
+#define IS_NUM(c) (c >= 48 && c <= 57) ? true : false     /* 48 = '0', 57 = '9' */
 
 #include <stdio.h>
 
 enum {
     false = 0,
     true = 1,
-    undef_address = 666 /* 100 + 4X = 666 => X is not an integer, hence this address cannot be naturally created by the assembler. i.e IC != 666 */
 };
 
 typedef enum functions {
     add = 0,
     sub = 1,
-        and = 2,
+    and = 2,
     or = 3,
     nor = 4,
     move = 5,
@@ -42,6 +41,29 @@ typedef enum functions {
     stop = 26
 } functions;
 
+typedef enum function_opcode {
+    mv_opcode = 1,
+    addi_opcode = 10,
+    subi_opcode = 11,
+    andi_opcode = 12,
+    ori_opcode = 13,
+    nori_opcode = 14,
+    bne_opcode = 15,
+    beq_opcode = 16,
+    blt_opcode = 17,
+    bgt_opcode = 18,
+    lb_opcode = 19,
+    sb_opcode = 20,
+    lw_opcode = 21,
+    sw_opcode = 22,
+    lh_opcode = 23,
+    sh_opcode = 24,
+    jmp_opcode = 30,
+    la_opcode = 31,
+    call_opcode = 32,
+    stop_opcode = 63
+};
+
 typedef struct flag { /* this struct contains all the differnt flags and indicators for the assembly operation */
     char label;
     char firstPass;
@@ -60,6 +82,8 @@ typedef struct node { /* input nodes */
 FILE *createFile();
 node_t *initList();
 node_t *addNode();
+
+unsigned int getSymbolAddress();
 
 char isAlphaNumeric();
 char isReserved();

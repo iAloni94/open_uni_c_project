@@ -78,11 +78,13 @@ int assemble(char *fname) {
             } else {
                 node = head;
                 if (isColon(node, flag)) {
-                    flag->label = isLabel(node, flag, symbol_list_head); /* raise flag for label. */
+                    if ((flag->label = isLabel(node, flag, symbol_list_head))) { /* raise flag for label. */
+                        if (isDeclared(node->val, symbol, flag)) flag->label = false; /* check if label was already declared*/
+                    }
                     node = node->next;
                 }
 
-                for (i = 0; i < NUM_OF_DIR + 1; i++) {
+                for (i = 0; i < NUM_OF_DIR; i++) {
                     if (!strcmp(node->val, directions[i])) {
                         flag->direction = true;
                         /* handle directions - directions.c */
@@ -147,10 +149,10 @@ int assemble(char *fname) {
                     memcpy(symbol->name, head->val, strlen(head->val));
                     if (flag->direction) {
                         symbol->address = DC;
-                        symbol->attribute = "code";
+                        symbol->attribute = "data";
                     } else {
                         symbol->address = IC;
-                        symbol->attribute = "data";
+                        symbol->attribute = "code";
                     }
                     symbol->next = calloc(sizeof(sym_t), 1);
                     symbol = symbol->next;

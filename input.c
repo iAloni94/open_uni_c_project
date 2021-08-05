@@ -91,8 +91,7 @@ char isLabel(node_t* input, flags* flag, sym_t* symbol) {
     input->val[strlen(input->val) - 1] = '\0';
     if ((strlen(input->val) <= LABEL_MAX_LENGTH) &&
         (isAlphaNumeric(input->val)) &&
-        (!isReserved(input->val, flag)) &&
-        (!isDeclared(input->val, symbol, flag)))
+        (!isReserved(input->val, flag)))
         return true;
     else {
         flag->firstPass = false;

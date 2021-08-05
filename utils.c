@@ -54,7 +54,11 @@ void freeSymbolTable(sym_t* node) {
 char isAlphaNumeric(char* str) {
     int i;
     for (i = 0; i < strlen(str); i++) {
-        if (!IS_LETTER(*(str + i)) && !IS_NUM(*(str + i))) return false;
+        if (IS_LETTER(*(str + i)) || IS_NUM(*(str + i))) {
+            continue;
+        } else {
+            return false;
+        }
     }
     return true;
 }
@@ -73,8 +77,19 @@ char isReserved(char* str, flags* flag) { /* checks if label is a reseved word *
 char isDeclared(char* str, sym_t* symbol, flags* flag) { /* this functions check if a label was already decalred*/
     while (symbol != NULL && symbol->name != NULL) {
         if (!strcmp(str, symbol->name)) {
+            printf("\nLine: %d - Label name already in use", flag->line);
             flag->firstPass = false;
             return true; /* label was declared */
+        }
+        symbol = symbol->next;
+    }
+    return false;
+}
+
+unsigned int getSymbolAddress(char* name, sym_t* symbol) {
+    while (symbol != NULL && symbol->name != NULL) {
+        if (!strcmp(name, symbol->name)) {
+            return symbol->address;
         }
         symbol = symbol->next;
     }

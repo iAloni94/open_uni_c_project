@@ -31,8 +31,9 @@ int assemble(char *fname) {
 
     unsigned int DC = 0, IC = 100, ICF, DCF;
     int funcNum, i, j = 0;
-    long data_img[1000];
-    long code_img[1000];
+    unsigned int data_img[1000];
+    unsigned int code_img[1000];
+    unsigned int code_address[1000];
     sym_t *symbol, *symbol_list_head = calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
     node_t *head, *node;
@@ -72,7 +73,6 @@ int assemble(char *fname) {
 
             if (head == NULL) {
                 flag->line += 1;
-                IC += 4;
             } else {
                 node = head;
                 if (isColon(node, flag)) {
@@ -89,6 +89,7 @@ int assemble(char *fname) {
                         break;
                     }
                 }
+               
                 funcNum = NUM_OF_FUNC;
                 for (i = 0; i < NUM_OF_FUNC; i++) {
                     if (!strcmp(node->val, functionName[i])) {
@@ -148,6 +149,10 @@ int assemble(char *fname) {
                     if (flag->direction) {
                         symbol->address = DC;
                         symbol->attribute = "data";
+                        symbol->next = calloc(sizeof(sym_t), 1);
+                        symbol = symbol->next;
+                        flag->label = false;
+                        continue;
                     } else {
                         symbol->address = IC;
                         symbol->attribute = "code";
@@ -158,6 +163,7 @@ int assemble(char *fname) {
                 }
 
                 code_img[j] = first_pass_32bit; /* insert binary instruction to memory image */
+                code_address[j] = IC;
                 freeInputList(head);
                 flag->line += 1;
                 flag->direction = false;
@@ -179,6 +185,7 @@ int assemble(char *fname) {
 
         /* creating oputput files */
         f_obj = createFile(fname, ".ob"); /* hex machine code */
+        printObj(f_obj, code_img, code_address, ICF, DCF);
         if (flag->external) {
             f_ext = createFile(fname, ".ext");
         }

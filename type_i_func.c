@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /* 
 *I type Instructions.
 * Math and Logic Instructions: addi, subi, andi, ori, nori.
@@ -12,9 +11,7 @@
 #include "assembler.h"
 #include "param.h"
 #include "func.h"
-=======
 #include "global.h"
->>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9
 
 /* Here are 4 Math and Logic Instructions: addi, subi, andi, ori, nori. */
 
@@ -29,14 +26,10 @@ void addi_func(I *instruction)
     (regArray[instruction->rt]->val) = res;
 }
 
-<<<<<<< HEAD
 /*  This function subtrac the value of the immediate value from the value in 'rs' */
 
 void subi_func(I *instruction)
 {
-=======
-void subi_func(I* instruction) { 
->>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9
     unsigned int rs_index = instruction->rs;
     unsigned int immed = instruction->immed;
     unsigned int rs_val = (regArray[rs_index]->val);
@@ -197,14 +190,9 @@ void sw_func(I *instruction)
 void lh_func(I *instruction)
 {
 }
-<<<<<<< HEAD
 
 /* */
 
 void sh_func(I *instruction)
 {
 }
-=======
-void sh_func(I* instruction) {
-}  
->>>>>>> 99ac7ac2b874236f40965832fa926c167cca8de9

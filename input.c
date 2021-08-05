@@ -70,6 +70,10 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                 prevChar = temp;
                 i++;
                 temp = tempLine[i];
+                node->next = addNode();
+                node = node->next;
+                currVal = node->val;
+                j = 0;
                 continue;
             } else {
                 comma = false;

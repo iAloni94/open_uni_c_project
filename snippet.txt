@@ -1,4 +1,4 @@
-  valgrind --leak-check=yes ./assembler text.as
+valgrind --leak-check=yes ./assembler text.as
 
-  git ls-files | xargs wc -l
+git ls-files | xargs wc -l
 

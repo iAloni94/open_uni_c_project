@@ -219,20 +219,21 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
     if (instruction->opcode != stop_opcode) {
         input = input->next;
         if (instruction->opcode == jmp_opcode) { /* if jmp function, check for register as parameter */
-            for (i = 0; i < NUM_OF_REG; i++) {
-                if (strchr(input->val, '$')) {
+            if (strchr(input->val, '$')) {
+                for (i = 0; i < NUM_OF_REG; i++) {
                     if (!strcmp(input->val, registerList[i])) {
                         instruction->reg = true;
                         instruction->address = i;
                         break;
                     }
                 }
+                if (i == NUM_OF_REG) {
+                    flag->firstPass = false;
+                    printf("\nLine: %d - Register out of range (0-31)", flag->line);
+                    return NULL;
+                }
             }
-            if (i == NUM_OF_REG) {
-                flag->firstPass = false;
-                printf("\nLine: %d - Register out of range (0-31)", flag->line);
-                return NULL;
-            }
+            return instruction;
         }
         strcpy(temp, input->val);
         strcat(temp, ":");

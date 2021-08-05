@@ -95,7 +95,7 @@ char isLabel(node_t* input, flags* flag, sym_t* symbol) {
         return true;
     else {
         flag->firstPass = false;
-        printf("\nLine: %d - Illigal label name", flag->line);
+        printf("\nLine: %d - Illegal label name", flag->line);
     }
     return false;
 }

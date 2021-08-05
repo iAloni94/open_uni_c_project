@@ -45,8 +45,8 @@ int assemble(char *fname) {
     flag->direction = false; /* if its a direction line */
     flag->firstPass = true;  /* if the 1st pass was successful */
     flag->lastLine = false;  /* marks last line in input file */
-    flag->external = false;  /* this marks the second pass whether to create the .ext fie */
-    flag->entry = false;     /* this marks wheter we need the .ent file */
+    flag->external = false;  /* this marks whether to create the .ext fie */
+    flag->entry = false;     /* this marks whether we need the .ent file */
     flag->line = 1;          /* indicates which line is being proccessed */
 
     symbol = symbol_list_head;
@@ -71,14 +71,12 @@ int assemble(char *fname) {
             head = getLine(fp, flag); /* each node in input list contains a single word */
 
             if (head == NULL) {
-                freeInputList(head);
                 flag->line += 1;
-                flag->direction = false;
                 IC += 4;
             } else {
                 node = head;
                 if (isColon(node, flag)) {
-                    if ((flag->label = isLabel(node, flag, symbol_list_head))) { /* raise flag for label. */
+                    if ((flag->label = isLabel(node, flag, symbol_list_head))) {      /* raise flag for label. */
                         if (isDeclared(node->val, symbol, flag)) flag->label = false; /* check if label was already declared*/
                     }
                     node = node->next;
@@ -197,6 +195,7 @@ int assemble(char *fname) {
         if (flag->entry) {
             fclose(f_ent);
         }
+        printf("\nAssembly completed without errors.\n");
     }
     fclose(fp);
     freeSymbolTable(symbol_list_head);
@@ -204,19 +203,16 @@ int assemble(char *fname) {
     for (i = 0; i < NUM_OF_REG; i++) {
         free(regArray[i]);
     }
-    printf("\n");
     return true;
 }
 
 int main(int argc, char *argv[]) {
     int i;
-    char assembled = true;
     char *ext;
     for (i = 1; i < argc; ++i) {
-        if (!assembled) printf("\n");
         ext = strchr(argv[i], '.');
         if (!strcmp(ext, FILE_EXT)) {
-            assembled = assemble(argv[i]);
+            assemble(argv[i]);
         } else {
             printf("\nError! File: %s - Input file extentions should only be \".as\"\n", argv[i]);
         }

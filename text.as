@@ -1,6 +1,6 @@
-ido: add $2, $3, $4
+ido:a add $0, $1, $31
 
-call asciz
+call ascizasd
 idoA: mvlo $2, $5
 
 stop

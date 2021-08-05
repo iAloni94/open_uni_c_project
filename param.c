@@ -57,50 +57,72 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
 
     if (funcNum <= nor) { /* arithmatics functions - 3 parameters */
         for (i = 0; i < NUM_OF_REG && input; i++) {
-            if (rs == false && !strcmp(input->val, registerList[i])) {
-                instruction->rs = i;
-                rs = true;
-                input = input->next;
-                i = 0;
-                continue;
-            }
-            if (rt == false && !strcmp(input->val, registerList[i])) {
-                instruction->rt = i;
-                rt = true;
-                input = input->next;
-                i = 0;
-                continue;
-            }
+            if (strchr(input->val, '$')) {
+                if (rs == false && !strcmp(input->val, registerList[i])) {
+                    instruction->rs = i;
+                    rs = true;
+                    input = input->next;
+                    i = 0;
+                    continue;
+                }
+                if (rt == false && !strcmp(input->val, registerList[i])) {
+                    instruction->rt = i;
+                    rt = true;
+                    input = input->next;
+                    i = 0;
+                    continue;
+                }
 
-            if (rd == false && !strcmp(input->val, registerList[i])) {
-                instruction->rd = i;
-                rd = true;
-                input = input->next;
-                i = 0;
-                continue;
+                if (rd == false && !strcmp(input->val, registerList[i])) {
+                    instruction->rd = i;
+                    rd = true;
+                    input = input->next;
+                    i = 0;
+                    continue;
+                }
+            } else {
+                flag->firstPass = false;
+                printf("\nLine: %d - Illegal parameter name", flag->line);
+                return NULL;
             }
+        }
+        if (i == NUM_OF_REG) {
+            flag->firstPass = false;
+            printf("\nLine: %d - Register out of range (0-31)", flag->line);
+            return NULL;
         }
     } else { /* copy functions - 2 parameters rs + rd */
         for (i = 0; i < NUM_OF_REG && input; i++) {
-            if (rs == false && !strcmp(input->val, registerList[i])) {
-                instruction->rs = i;
-                rs = true;
-                input = input->next;
-                i = 0;
-                continue;
+            if (strchr(input->val, '$')) {
+                if (rs == false && !strcmp(input->val, registerList[i])) {
+                    instruction->rs = i;
+                    rs = true;
+                    input = input->next;
+                    i = 0;
+                    continue;
+                }
+                if (rd == false && !strcmp(input->val, registerList[i])) {
+                    instruction->rd = i;
+                    rd = true;
+                    input = input->next;
+                    i = 0;
+                    continue;
+                }
+            } else {
+                flag->firstPass = false;
+                printf("\nLine: %d - Illegal parameter name", flag->line);
+                return NULL;
             }
-            if (rd == false && !strcmp(input->val, registerList[i])) {
-                instruction->rd = i;
-                rd = true;
-                input = input->next;
-                i = 0;
-                continue;
-            }
+        }
+        if (i == NUM_OF_REG) {
+            flag->firstPass = false;
+            printf("\nLine: %d - Register out of range", flag->line);
+            return NULL;
         }
     }
     if (input != NULL) {
         flag->firstPass = false;
-        printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
+        printf("\nLine: %d - extraneous operand", flag->line);
         return NULL;
     }
 
@@ -110,7 +132,6 @@ R* check_r_param(int funcNum, node_t* input, R* instruction, flags* flag) {
         return instruction;
     } else {
         flag->firstPass = false;
-        printf("\nLine: %d - Illigal parameter", flag->line);
         return NULL;
     }
 }
@@ -124,7 +145,7 @@ I* check_i_param(int funcNum, node_t* input, I* instruction, flags* flag) {
     while (i < strlen(input->next->val)) {
         if (!IS_NUM(*(input->next->val + i))) {
             flag->firstPass = false;
-            printf("\nLine: %d - Illigal parameter. Immed value should only be an integer", flag->line);
+            printf("\nLine: %d - Illegal parameter. Immed value should only be an integer", flag->line);
             return NULL;
         }
         i++;
@@ -182,12 +203,14 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
         case stop:
             if (input->next != NULL) {
                 flag->firstPass = false;
-                printf("\nLine: %d - Illigal parameter. extraneous operand", flag->line);
+                printf("\nLine: %d - Illegal parameter. extraneous operand", flag->line);
+                free(tempNode);
                 return NULL;
             }
             instruction->opcode = stop_opcode;
             instruction->reg = 0;
             instruction->address = 0;
+            free(tempNode);
             return instruction;
         default:
             break;
@@ -197,16 +220,17 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
         input = input->next;
         if (instruction->opcode == jmp_opcode) { /* if jmp function, check for register as parameter */
             for (i = 0; i < NUM_OF_REG; i++) {
-                if (!strcmp(input->val, registerList[i])) {
-                    instruction->reg = true;
-                    instruction->address = i;
-                    break;
+                if (strchr(input->val, '$')) {
+                    if (!strcmp(input->val, registerList[i])) {
+                        instruction->reg = true;
+                        instruction->address = i;
+                        break;
+                    }
                 }
             }
             if (i == NUM_OF_REG) {
                 flag->firstPass = false;
-                printf("\nLine: %d - Register not in range", flag->line);
-                free(tempNode);
+                printf("\nLine: %d - Register out of range (0-31)", flag->line);
                 return NULL;
             }
         }
@@ -224,7 +248,7 @@ J* check_j_param(int funcNum, node_t* input, J* instruction, flags* flag, sym_t*
             return instruction;
         } else {
             flag->firstPass = false;
-            printf("\nLine: %d - Illigal parameter name", flag->line);
+            printf("\nLine: %d - Illegal parameter name", flag->line);
             free(tempNode);
             return NULL;
         }

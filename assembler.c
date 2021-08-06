@@ -178,8 +178,8 @@ int assemble(char *fname) {
     ICF = IC;
     DCF = DC;
 
+        /* second pass */
     if (flag->firstPass) {
-        /* second pass things - updating symbol list, printing file, freeing memory, closing file*/
         FILE *f_obj, *f_ent, *f_ext;
 
         /* creating oputput files */

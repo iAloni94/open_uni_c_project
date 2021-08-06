@@ -1,2 +1,1 @@
-MAIN: add	$3,$5,$9
-la	MAIN
+ori	$9,-5,$2

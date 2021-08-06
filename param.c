@@ -220,6 +220,12 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
 
     if (instruction->opcode != stop_opcode) {
         input = input->next;
+        if (input->next != NULL) {
+            printf("\nLine: %d - Illegal parameter", flag->line);
+            flag->firstPass = false;
+            free(tempNode);
+            return NULL;
+        }
         if (instruction->opcode == jmp_opcode) { /* if jmp function, check for register as parameter */
             if (strchr(input->val, '$')) {
                 for (i = 0; i < NUM_OF_REG; i++) {

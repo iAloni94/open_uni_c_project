@@ -27,8 +27,8 @@ void printObj(FILE* fp, unsigned int* codeImg, unsigned int* codeAddress, unsign
 
     /* shift mask to desired byte location and then shift the result to the rightmost byte for printing */
     for (i = 0; *(codeImg + i) != 0; i++) {
-        a = *(codeImg + i) & MASK;                 /* instruction: bytes 0-8; mask: 00000000 00000000 00000000 11111111 */
-        b = (*(codeImg + i) & (MASK << 8)) >> 8;   /* instruction: bytes 9-16; mask: 00000000 00000000 11111111 00000000 */
+        a = *(codeImg + i) & MASK;                 /* instruction: bytes 0-8; mask:   00000000 00000000 00000000 11111111 */
+        b = (*(codeImg + i) & (MASK << 8)) >> 8;   /* instruction: bytes 9-16; mask:  00000000 00000000 11111111 00000000 */
         c = (*(codeImg + i) & (MASK << 16)) >> 16; /* instruction: bytes 17-24; mask: 00000000 11111111 00000000 00000000 */
         d = (*(codeImg + i) & (MASK << 24)) >> 24; /* instruction: bytes 25-32; mask: 11111111 00000000 00000000 00000000 */
 

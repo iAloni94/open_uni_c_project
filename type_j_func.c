@@ -6,8 +6,8 @@ void jmp_func(J *instruction) {
 void la_func(J *instruction) {
     regArray[0]->val = instruction->address;
 }
-void call_func(J *instruction, unsigned int IC) {
-    regArray[0]->val = IC + 4;
+void call_func(J *instruction) {
+    regArray[0]->val = instruction->address;
 }
 void stop_func(J *instruction) { 
     return;

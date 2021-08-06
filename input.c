@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
- 
+
 #include "global.h"
 
 node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
@@ -11,19 +11,19 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     node_t* node = head;
     char temp, prevChar, comma = false;
     char* currVal = node->val;
-    char tempLine[MAX_LINE_LENGTH] = {0};
+    char tempLine[MAX_LINE_LENGTH + 2] = {0};
     if (head) {
-        fgets(tempLine, MAX_LINE_LENGTH, fp);
+        fgets(tempLine, MAX_LINE_LENGTH + 2, fp);
 
-        if (strchr(tempLine, '\n') == NULL) { /* Check if line exceeds allowed length or last line in file */
-            if (feof(fp)) {
-                flag->lastLine = true;
-                freeInputList(head);
-                return NULL;
-            } else {
+        if (strchr(tempLine, '\n') == NULL) { 
+            if (strlen(tempLine) > MAX_LINE_LENGTH) { /* Check if line exceeds allowed length or last line in file */
                 printf("\nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
                 freeInputList(head);
                 flag->firstPass = false;
+                return NULL;
+            } else if (feof(fp) && tempLine[0] == '\0') { /* check if last line is empty */
+                flag->lastLine = true;
+                freeInputList(head);
                 return NULL;
             }
         }
@@ -36,6 +36,10 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         }
 
         while (temp != '\n') {
+            if(temp == '\0'){
+                flag->lastLine = true;
+                break;
+            }
             if (temp == ';') {
                 freeInputList(head);
                 return NULL;

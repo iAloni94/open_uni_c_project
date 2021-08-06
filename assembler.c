@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "global.h" 
+#include "global.h"
 
 int assemble(char *fname) {
     char *functionName[NUM_OF_FUNC] = {
@@ -127,16 +127,16 @@ int assemble(char *fname) {
                     }
                     if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
                         first_pass_32bit = j_binary_instruction(instruction);
-                        if (instruction->opcode == 32) {
-                            functions[funcNum](instruction, IC);
-                        } else {
-                            functions[funcNum](instruction);
-                        }
+                        functions[funcNum](instruction);
                         free(instruction);
                     }
                 } else if (funcNum == NUM_OF_FUNC && flag->direction == false) { /* undefined function */
                     flag->firstPass = false;
                     printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
+                    freeInputList(head);
+                    flag->line += 1;
+                    IC += 4;
+                    continue;
                 }
 
                 if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
@@ -181,32 +181,22 @@ int assemble(char *fname) {
         FILE *f_obj, *f_ent, *f_ext;
 
         /* creating oputput files */
-        f_obj = createFile(fname, ".ob"); /* hex machine code */
+        f_obj = createFile(fname, ".ob"); /* .obj file */
         printObj(f_obj, code_img, code_address, ICF, DCF);
-        if (flag->external) {
+
+        if (flag->external) { /* .ext file */
             f_ext = createFile(fname, ".ext");
+            printExt();
         }
-        if (flag->entry) {
+        if (flag->entry) { /* .ent file */
             f_ent = createFile(fname, ".ent");
+            printEnt();
         }
 
-        /* Closing files and clearing memory before ending assembly proccess */
-        fclose(f_obj);
-
-        if (flag->external) {
-            fclose(f_ext);
-        }
-        if (flag->entry) {
-            fclose(f_ent);
-        }
+        freeMemory(flag, symbol, regArray, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly proccess */
         printf("\nAssembly completed.\n");
     }
-    fclose(fp);
-    freeSymbolTable(symbol_list_head);
-    free(flag);
-    for (i = 0; i < NUM_OF_REG; i++) {
-        free(regArray[i]);
-    }
+
     printf("\n");
     return true;
 }

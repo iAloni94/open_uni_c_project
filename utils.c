@@ -16,27 +16,23 @@ char *savedWords[] = {
     "sw", "lh", "sh", "jmp",
     "la", "call", "stop"};
 
-node_t *initList()
-{
+node_t *initList() {
     node_t *head = malloc(sizeof(node_t));
     head->val = calloc(1, 100);
     head->next = NULL;
     return head;
 }
 
-node_t *addNode()
-{
+node_t *addNode() {
     node_t *newNode = malloc(sizeof(node_t));
     newNode->val = calloc(1, 100);
     newNode->next = NULL;
     return newNode;
 }
 
-void freeInputList(node_t *node)
-{
+void freeInputList(node_t *node) {
     node_t *currNode;
-    while (node != NULL)
-    {
+    while (node != NULL) {
         currNode = node;
         node = node->next;
         free(currNode->val);
@@ -44,11 +40,9 @@ void freeInputList(node_t *node)
     }
 }
 
-void freeSymbolTable(sym_t *node)
-{
+void freeSymbolTable(sym_t *node) {
     sym_t *currNode = node;
-    while (node != NULL)
-    {
+    while (node != NULL) {
         currNode = node;
         node = node->next;
         free(currNode->name);
@@ -57,30 +51,22 @@ void freeSymbolTable(sym_t *node)
     free(node);
 }
 
-char isAlphaNumeric(char *str)
-{
+char isAlphaNumeric(char *str) {
     int i;
-    for (i = 0; i < strlen(str); i++)
-    {
-        if (IS_LETTER(*(str + i)) || IS_NUM(*(str + i)))
-        {
+    for (i = 0; i < strlen(str); i++) {
+        if (IS_LETTER(*(str + i)) || IS_NUM(*(str + i))) {
             continue;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
     return true;
 }
 
-char isReserved(char *str, flags *flag)
-{ /* checks if label is a reseved word */
+char isReserved(char *str, flags *flag) { /* checks if label is a reseved word */
     int i;
-    for (i = 0; i < 33; i++)
-    { /* 33 is number of reserved words*/
-        if (!strcmp(savedWords[i], str))
-        {
+    for (i = 0; i < 33; i++) { /* 33 is number of reserved words*/
+        if (!strcmp(savedWords[i], str)) {
             flag->firstPass = false;
             return true;
         }
@@ -88,12 +74,9 @@ char isReserved(char *str, flags *flag)
     return false;
 }
 
-char isDeclared(char *str, sym_t *symbol, flags *flag)
-{ /* this functions check if a label was already decalred*/
-    while (symbol != NULL && symbol->name != NULL)
-    {
-        if (!strcmp(str, symbol->name))
-        {
+char isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check if a label was already decalred*/
+    while (symbol != NULL && symbol->name != NULL) {
+        if (!strcmp(str, symbol->name)) {
             printf("\nLine: %d - Label name already in use", flag->line);
             flag->firstPass = false;
             return true; /* label was declared */
@@ -103,12 +86,9 @@ char isDeclared(char *str, sym_t *symbol, flags *flag)
     return false;
 }
 
-unsigned int getSymbolAddress(char *name, sym_t *symbol)
-{
-    while (symbol != NULL && symbol->name != NULL)
-    {
-        if (!strcmp(name, symbol->name))
-        {
+unsigned int getSymbolAddress(char *name, sym_t *symbol) {
+    while (symbol != NULL && symbol->name != NULL) {
+        if (!strcmp(name, symbol->name)) {
             return symbol->address;
         }
         symbol = symbol->next;
@@ -117,16 +97,14 @@ unsigned int getSymbolAddress(char *name, sym_t *symbol)
 }
 
 /* This function get the numeric value of a binary number */
-int getNumericValue(int binaryNumber)
-{
+int getNumericValue(int binaryNumber) {
     int tempBinary, tempRes;
     int decimalNumber = 0;
     int base = 1;
 
     tempBinary = binaryNumber;
 
-    while (tempBinary > 0)
-    {
+    while (tempBinary > 0) {
         tempRes = tempBinary % 10;
         decimalNumber = decimalNumber + tempRes * base;
         tempBinary = tempBinary / 10;
@@ -160,3 +138,17 @@ int getNumericValueCompTwo(int binaryNumber, int significantBits)
     return decimalValue;
 }
 */
+
+void freeMemory(flags *flag, sym_t *symbol, reg_ptr *regArray, FILE *fp, FILE *fp_obj, FILE *fp_ext, FILE *fp_ent) {
+    int i;
+
+    if (flag->external) fclose(fp_ext);
+    if (flag->entry) fclose(fp_ent);
+    fclose(fp_obj);
+    fclose(fp);
+    freeSymbolTable(symbol);
+    free(flag);
+    for (i = 0; i < NUM_OF_REG; i++) {
+        free(regArray[i]);
+    }
+}

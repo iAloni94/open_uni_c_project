@@ -9,7 +9,7 @@
 
 #include "assembler.h"
 #include "instruction.h"
-#include "utils.h" 
+#include "utils.h"
 
 /* assembler.c */
 unsigned int r_binary_instruction(R *);
@@ -46,7 +46,7 @@ void sh_func(I *);
 /* type_j_param.c */
 void jmp_func(J *);
 void la_func(J *);
-void call_func(J *, unsigned int);
+void call_func(J *);
 void stop_func(J *);
 
 /* param.c */
@@ -63,6 +63,7 @@ char isReserved(char *, flags *);
 char isDeclared(char *, sym_t *, flags *);
 void freeSymbolTable(sym_t *);
 void freeInputList(node_t *);
+void freeMemory(flags *, sym_t *, reg_ptr *, FILE *, FILE *, FILE *, FILE *);
 
 /* input.c */
 node_t *getLine(FILE *, flags *);
@@ -72,5 +73,7 @@ char isColon(char *, flags *);
 /* write_files.c */
 FILE *createFile(char *, char *);
 void printObj(FILE *, unsigned int *, unsigned int *, unsigned int, unsigned int);
+void printExt();
+void printEnt();
 
 #endif

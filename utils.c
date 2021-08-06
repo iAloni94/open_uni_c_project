@@ -141,16 +141,11 @@ int getNumericValueCompTwo(int binaryNumber, int significantBits)
 
 
 
-void freeMemory(flags *flag, sym_t *symbol, reg_ptr *regArray, FILE *fp, FILE *fp_obj, FILE *fp_ext, FILE *fp_ent) {
-    int i;
-
+void freeMemory(flags *flag, sym_t *symbol, FILE *fp, FILE *fp_obj, FILE *fp_ext, FILE *fp_ent) {
     if (flag->external) fclose(fp_ext);
     if (flag->entry) fclose(fp_ent);
     fclose(fp_obj);
     fclose(fp);
     freeSymbolTable(symbol);
     free(flag);
-    for (i = 0; i < NUM_OF_REG; i++) {
-        free(regArray[i]);
-    }
 }

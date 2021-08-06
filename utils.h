@@ -8,9 +8,6 @@
 #define IS_LETTER(c) (c >= 65 && c <= 122) ? true : false /* 65 = 'A', 122 = 'z' */
 #define IS_NUM(c) (c >= 48 && c <= 57) ? true : false     /* 48 = '0', 57 = '9' */
 
-#define CHECK_BIT(reg, n) ((reg)&1 << n) ? true : false         /* checks if bit in nth place from right is true or false */
-#define CHANGE_BIT(reg, v, n) (reg) ^= (-v ^ reg) & (1UL << n); /* chnage nth bit in reg to v (0 or 1) */
-
 #include "assembler.h" 
 
 enum {

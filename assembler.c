@@ -14,15 +14,6 @@ int assemble(char *fname) {
         "sw", "lh", "sh", "jmp",
         "la", "call", "stop"};
 
-    void (*functions[NUM_OF_FUNC])() = {
-        add_func, sub_func, and_func, or_func,
-        nor_func, move_func, mvhi_func, mvlo_func,
-        addi_func, subi_func, andi_func, ori_func,
-        nori_func, bne_func, beq_func, blt_func,
-        bgt_func, lb_func, sb_func, lw_func,
-        sw_func, lh_func, sh_func, jmp_func,
-        la_func, call_func, stop_func};
-
     char *directions[NUM_OF_DIR] = {".dh", ".dw", ".db", ".asciz", ".extern", ".entry"};
 
     unsigned int DC = 0, IC = 100, ICF, DCF;
@@ -53,14 +44,6 @@ int assemble(char *fname) {
     if (symbol_list_head == NULL || flag == NULL) {
         printf("Memory allocation error");
         exit(0);
-    }
-
-    for (i = 0; i < NUM_OF_REG; i++) { /* registers init - regArray contains pointers to all registers 0-31 */
-        regArray[i] = (reg_ptr)calloc(sizeof(reg_t), 1);
-        if (regArray[i] == NULL) {
-            printf("Memory allocation error");
-            exit(0);
-        }
     }
 
     if (fp) {
@@ -104,7 +87,6 @@ int assemble(char *fname) {
                     }
                     if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = r_binary_instruction(instruction);
-                        functions[funcNum](instruction);
                         free(instruction);
                     }
                 } else if (funcNum <= sh) { /* I type function */
@@ -116,7 +98,6 @@ int assemble(char *fname) {
                     }
                     if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
                         first_pass_32bit = i_binary_instruction(instruction);
-                        functions[funcNum](instruction);
                         free(instruction);
                     }
                 } else if (funcNum <= stop) { /* J type function */
@@ -128,7 +109,6 @@ int assemble(char *fname) {
                     }
                     if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
                         first_pass_32bit = j_binary_instruction(instruction);
-                        functions[funcNum](instruction);
                         free(instruction);
                     }
                 } else if (funcNum == NUM_OF_FUNC && flag->direction == false) { /* undefined function */
@@ -195,7 +175,7 @@ int assemble(char *fname) {
             printEnt();
         }
 
-        freeMemory(flag, symbol_list_head, regArray, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly proccess */
+        freeMemory(flag, symbol_list_head, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly proccess */
         printf("\nAssembly completed.\n");
     }
 

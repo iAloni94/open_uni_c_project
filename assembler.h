@@ -19,14 +19,5 @@ typedef struct symbol {
     struct symbol *next;
 } sym_t;
 
-typedef struct REG {
-    unsigned int val : 32;
-} reg_t;
-
-typedef struct REG *reg_ptr;
-
-reg_ptr regArray[NUM_OF_REG];
-
-
 
 #endif

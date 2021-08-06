@@ -225,9 +225,11 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
                 if (i == NUM_OF_REG) {
                     flag->firstPass = false;
                     printf("\nLine: %d - Register out of range (0-31)", flag->line);
+                    free(tempNode);
                     return NULL;
                 }
             }
+            free(tempNode);
             return instruction;
         }
         strcpy(temp, input->val);
@@ -245,5 +247,4 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
         free(tempNode);
         return NULL;
     }
-    return instruction;
 }

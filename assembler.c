@@ -143,6 +143,7 @@ int assemble(char *fname) {
                     symbol->name = calloc(sizeof(char), strlen(head->val));
                     memcpy(symbol->name, head->val, strlen(head->val));
                     if (flag->direction) {
+                        freeInputList(head);
                         symbol->address = DC;
                         symbol->attribute = "data";
                         symbol->next = calloc(sizeof(sym_t), 1);
@@ -159,9 +160,9 @@ int assemble(char *fname) {
                     flag->label = false;
                 }
 
+                freeInputList(head);
                 code_img[j] = first_pass_32bit; /* insert binary instruction to memory image */
                 code_address[j] = IC;
-                freeInputList(head);
                 flag->line += 1;
                 flag->direction = false;
                 IC += 4;
@@ -193,7 +194,7 @@ int assemble(char *fname) {
             printEnt();
         }
 
-        freeMemory(flag, symbol, regArray, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly proccess */
+        freeMemory(flag, symbol_list_head, regArray, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly proccess */
         printf("\nAssembly completed.\n");
     }
 

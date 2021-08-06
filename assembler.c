@@ -82,6 +82,7 @@ int assemble(char *fname) {
                     if (!strcmp(node->val, directions[i])) {
                         flag->direction = true;
                         /* handle directions - directions.c */
+                        /* check directive param...*/
                         break;
                     }
                 }

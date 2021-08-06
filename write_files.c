@@ -1,17 +1,14 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define MASK_1 0xFF        /* 00000000 00000000 00000000 11111111 */
-#define MASK_2 0xFF00      /* 00000000 00000000 11111111 00000000 */
-#define MASK_3 0xFF0000   /* 00000000 11111111 00000000 00000000 */
-#define MASK_4 0xFF000000 /* 11111111 00000000 00000000 00000000 */
+#define MASK 0xFF /* 00000000 00000000 00000000 11111111 */
 
 FILE* createFile(char* fname, char* extention) {
     int i;
     char ext_diff = strlen(fname) - 3; /* length of ".as" = 3 */
-    char* fname_no_extention = calloc(sizeof(char), ext_diff); 
-    FILE* output_file_ptr; 
+    char* fname_no_extention = calloc(sizeof(char), ext_diff);
+    FILE* output_file_ptr;
 
     for (i = 0; i < (ext_diff); i++) {
         *(fname_no_extention + i) = *(fname + i);
@@ -28,15 +25,16 @@ void printObj(FILE* fp, unsigned int* codeImg, unsigned int* codeAddress, unsign
 
     fprintf(fp, "%d\t%d\n", ICF - 100, DCF);
 
+    /* shift mask to desired byte location and then shift the result to the rightmost byte for printing */
     for (i = 0; *(codeImg + i) != 0; i++) {
-        a = *(codeImg + i) & MASK_1;
-        b = (*(codeImg + i) & MASK_2) >> 8;
-        c = (*(codeImg + i) & MASK_3) >> 16;
-        d = (*(codeImg + i) & MASK_4) >> 24;
+        a = *(codeImg + i) & MASK;                 /* instruction: bytes 0-8; mask: 00000000 00000000 00000000 11111111 */
+        b = (*(codeImg + i) & (MASK << 8)) >> 8;   /* instruction: bytes 9-16; mask: 00000000 00000000 11111111 00000000 */
+        c = (*(codeImg + i) & (MASK << 16)) >> 16; /* instruction: bytes 17-24; mask: 00000000 11111111 00000000 00000000 */
+        d = (*(codeImg + i) & (MASK << 24)) >> 24; /* instruction: bytes 25-32; mask: 11111111 00000000 00000000 00000000 */
 
         fprintf(fp, "%04d %02x %02x %02x %02x\n", *(codeAddress + i), a, b, c, d);
     }
 }
 
-void printExt(){}
-void printEnt(){}
+void printExt() {}
+void printEnt() {}

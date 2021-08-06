@@ -1,3 +1,10 @@
+/*
+* Here we check if the operands for each function are correct.
+* Functions are devided into 3 types: R, I and J.
+* Each type is devided into sub categories, each demands a different number and type of operands.
+* In this file, operands are parsed and if all goes well, an instruction coded in 32 bits is created.
+*/
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>

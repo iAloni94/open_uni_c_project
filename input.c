@@ -65,27 +65,32 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                     i++;
                     temp = tempLine[i];
                 }
-                if (!comma && (label || instruction)) {
-                    if (label) {
-                        label = false;
-                        instruction = true;
-                    } else if (instruction) {
-                        instruction = false;
+                if (temp == '\0') {
+                    return head;
+                }
+                if (!comma) {
+                    if (label || instruction) {
+                        if (label) {
+                            label = false;
+                            instruction = true;
+                        } else if (instruction) {
+                            instruction = false;
+                        }
+                        node->next = addNode();
+                        if (node->next != NULL) {
+                            node = node->next;
+                            currVal = node->val;
+                            *(currVal) = -1;
+                            j = 0;
+                        }
+                    } else {
+                        printf("\nLine: %d - Missing comma", flag->line);
+                        freeInputList(head);
+                        flag->firstPass = false;
+                        return NULL;
                     }
-                    node->next = addNode();
-                    if (node->next != NULL) {
-                        node = node->next;
-                        currVal = node->val;
-                        *(currVal) = -1;
-                        j = 0;
-                    }
-                }/* else if (temp != ',' && temp != '\n' && temp != EOF && temp != '\0') {
-                    printf("\nLine: %d - Missing comma", flag->line);
-                    freeInputList(head);
-                    flag->firstPass = false;
-                    return NULL;
-                }*/
-                continue;
+                    continue;
+                }
             } else if (temp == ',') {
                 comma = true;
                 i++;
@@ -104,6 +109,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
             }
         }
         return head;
+
     } else {
         printf("Memory allocation error");
         exit(0);

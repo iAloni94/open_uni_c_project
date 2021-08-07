@@ -125,7 +125,9 @@ int assemble(char *fname) {
                     flag->line += 1;
                     IC += 4;
                     codeCounter++;
-                } else {               /* if directive */
+                }
+
+                else {                 /* if directive */
                     if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
                         insertLabel(symbol_list_head, head, flag, IC, DC);
                     }
@@ -141,7 +143,9 @@ int assemble(char *fname) {
         } /* while loop */
         ICF = IC;
         DCF = DC;
-        updateSymbolAddress(symbol_list_head, ICF);
+        if (symbol_list_head->name != NULL) {
+            updateSymbolAddress(symbol_list_head, ICF);
+        }
         updateDataAddress(data_img, ICF);
     } else {
         printf("Failed to open file. Trying next file.");

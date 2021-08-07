@@ -11,12 +11,13 @@ typedef enum directive {
 } dir;
 
 /* directive structs*/
-typedef union DIRECTIVE {
-    unsigned byte : 8;
+typedef struct DIRECTIVE {
+    unsigned int address;
+    unsigned int byte : 8;
     unsigned int half_word : 16;
     unsigned int word : 32;
 } dir_t;
 
-typedef union DIRECTIVE *data_ptr;
+typedef struct DIRECTIVE *data_ptr;
 
 #endif

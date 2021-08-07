@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "global.h"
 node_t *initList() {
     node_t *head = malloc(sizeof(node_t));
@@ -72,10 +71,10 @@ int getNumericValueCompTwo(int binaryNumber, int significantBits)
 }
 */
 
-void updateDataAddress(data_ptr *data, unsigned int ICF) {
+void updateDataAddress(data_ptr data[], unsigned int ICF) {
     int i;
-    for (i = 0; *(data + i) != 0; i++) {
-        *(data + i) += ICF;
+    for (i = 0; data[i] != NULL; i++) {
+        data[i]->address += ICF;
     }
 }
 

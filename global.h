@@ -26,7 +26,7 @@ J *check_j_param(int, node_t *, J *, flags *, sym_t *);
 node_t *initList();
 node_t *addNode();
 void freeInputList(node_t *);
-void updateDataAddress(data_ptr *, unsigned int);
+void updateDataAddress(data_ptr[], unsigned int);
 void freeMemory(flags *, sym_t *, FILE *, FILE *, FILE *, FILE *);
 
 /* input.c */

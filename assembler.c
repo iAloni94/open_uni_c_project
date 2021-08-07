@@ -17,7 +17,7 @@ int assemble(char *fname) {
     char *directions[NUM_OF_DIR] = {".db", ".dh", ".dw", ".asciz", ".extern", ".entry"};
 
     unsigned int currDC, DC = 0, IC = 100, ICF, DCF;
-    int funcNum, dirNum, i, j = 0;
+    int funcNum, dirNum, i, codeCounter = 0;
     unsigned int data_img[1000] = {0};
     unsigned int code_img[1000] = {0};
     unsigned int code_address[1000];
@@ -114,29 +114,28 @@ int assemble(char *fname) {
                         IC += 4;
                         continue;
                     }
+
+                    if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
+                        insertLabel(symbol_list_head, head, flag, IC, currDC);
+                    }
+                    freeInputList(head);
+                    code_img[codeCounter] = first_pass_32bit; /* insert binary instruction to memory image */
+                    code_address[codeCounter] = IC;
+                    flag->line += 1;
+                    IC += 4;
+                    codeCounter++;
                 } else {
-                    currDC = DC;
+                    if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
+                        insertLabel(symbol_list_head, head, flag, IC, DC);
+                    }
                     /* handle directions - directive.c and directive.h */
                     /* check directive param...*/
-                    /* update DC */
-                }
+                    /* update DC and data_img*/
 
-                if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
-                    insertLabel(symbol_list_head, head, flag, IC, currDC);
-                    if (flag->direction) {
-                        flag->direction = false;
-                        freeInputList(head);
-                        continue;
-                    }
+                    freeInputList(head);
+                    flag->direction = false;
+                    flag->line += 1;
                 }
-
-                freeInputList(head);
-                code_img[j] = first_pass_32bit; /* insert binary instruction to memory image */
-                code_address[j] = IC;
-                flag->line += 1;
-                if (!(flag->direction)) IC += 4;
-                flag->direction = false;
-                j++;
             }
         } /* while loop */
         ICF = IC;
@@ -210,7 +209,7 @@ int assemble(char *fname) {
         if (flag->secondPass) { /* step 9 */
             /* creating oputput files          step 10  */
             f_obj = createFile(fname, ".ob"); /* .obj file */
-            printObj(f_obj, code_img, code_address, ICF, DCF);
+            printObj(f_obj, code_img, data_img, code_address, ICF, DCF);
 
             if (flag->external) { /* .ext file */
                 f_ext = createFile(fname, ".ext");

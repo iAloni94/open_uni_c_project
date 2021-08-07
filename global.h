@@ -33,7 +33,7 @@ node_t *getLine(FILE *, flags *);
 
 /* write_files.c */
 FILE *createFile(char *, char *);
-void printObj(FILE *, unsigned int *, unsigned int *, unsigned int, unsigned int);
+void printObj(FILE *, unsigned int *, unsigned int *, unsigned int *, unsigned int, unsigned int);
 void printExt();
 void printEnt();
 

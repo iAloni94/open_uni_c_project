@@ -19,7 +19,7 @@ FILE* createFile(char* fname, char* extention) {
     return output_file_ptr;
 }
 
-void printObj(FILE* fp, unsigned int* codeImg, unsigned int* codeAddress, unsigned int ICF, unsigned int DCF) {
+void printObj(FILE* fp, unsigned int* codeImg, unsigned int* dataImg, unsigned int* codeAddress, unsigned int ICF, unsigned int DCF) {
     unsigned int i = 0;
     unsigned int a, b, c, d;
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "directive.h"
 #include "global.h"
 
 int assemble(char *fname) {
@@ -17,12 +18,11 @@ int assemble(char *fname) {
     char *directions[NUM_OF_DIR] = {".db", ".dh", ".dw", ".asciz", ".extern", ".entry"};
 
     unsigned int DC = 0, IC = 100, ICF, DCF;
-    int funcNum, dirNum, i, codeCounter = 0;
-    /*unsigned int data_img[1000] = {0};*/ 
+    int funcNum, dirNum, i, codeCounter = 0, dirCounter = 0;
     unsigned int code_img[1000] = {0};
     unsigned int code_address[1000];
     data_ptr data_img[1000]; /* each cell in this array contains a pointer to a DIRECTIVE union that contains either a byte, half word or word */
-    sym_t *symbol, *symbol_list_head = calloc(sizeof(sym_t), 1);
+    sym_t *symbol_list_head = calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
     node_t *head, *node;
     unsigned int first_pass_32bit = 0;
@@ -52,8 +52,8 @@ int assemble(char *fname) {
                 flag->line += 1;
             } else {
                 node = head;
-                if ((flag->label = isLabel(node, flag, symbol_list_head))) {      /* raise flag for label. */
-                    if (isDeclared(node->val, symbol, flag)) flag->label = false; /* check if label was already declared*/
+                if ((flag->label = isLabel(node, flag, symbol_list_head))) {                /* raise flag for label. */
+                    if (isDeclared(node->val, symbol_list_head, flag)) flag->label = false; /* check if label was already declared*/
                     node = node->next;
                 }
 
@@ -65,7 +65,7 @@ int assemble(char *fname) {
                         break;
                     }
                 }
-                if (!flag->direction) {
+                if (!flag->direction) { /* if instruction */
                     funcNum = NUM_OF_FUNC;
                     for (i = 0; i < NUM_OF_FUNC; i++) {
                         if (!strcmp(node->val, functionName[i])) {
@@ -125,13 +125,13 @@ int assemble(char *fname) {
                     flag->line += 1;
                     IC += 4;
                     codeCounter++;
-                } else {
+                } else {               /* if directive */
                     if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
                         insertLabel(symbol_list_head, head, flag, IC, DC);
                     }
                     /* handle directions - directive.c and directive.h */
                     /* check directive param...*/
-                    /* update DC and data_img*/
+                    /* update DC and data_img[dirCounter]*/
 
                     freeInputList(head);
                     flag->direction = false;
@@ -178,15 +178,15 @@ int assemble(char *fname) {
                 if (!strcmp(node->val, ".entry")) { /* step 5 */
                     node = node->next;
                     if (isDeclared(node->val, symbol_list_head, flag)) { /* step 6 */
-                        symbol = symbol_list_head;
-                        while (symbol != NULL) {
-                            if (!strcmp(node->val, symbol->name)) {
-                                symbol->attribute = "entry";
+                        sym_t *tempSym = symbol_list_head;
+                        while (tempSym != NULL) {
+                            if (!strcmp(node->val, tempSym->name)) {
+                                tempSym->attribute = "entry";
                                 flag->entry = true;
                                 flag->line += 1;
                                 break;
                             }
-                            symbol = symbol->next;
+                            tempSym = tempSym->next;
                         }
                     } else {
                         printf("\nLine: %d - Label was not declared", flag->line);
@@ -223,7 +223,8 @@ int assemble(char *fname) {
             printf("\nAssembly completed.\n");
         }
 
-    }                                                            /* second pass end */
+    } /* second pass end */
+
     freeMemory(flag, symbol_list_head, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly proccess */
     printf("\n");
     return (flag->firstPass && flag->secondPass) ? true : false;

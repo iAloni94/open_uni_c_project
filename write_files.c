@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "directive.h"
 #define MASK 0xFF /* 00000000 00000000 00000000 11111111 */
 
 FILE* createFile(char* fname, char* extention) {
@@ -19,7 +19,7 @@ FILE* createFile(char* fname, char* extention) {
     return output_file_ptr;
 }
 
-void printObj(FILE* fp, unsigned int* codeImg, unsigned int* dataImg, unsigned int* codeAddress, unsigned int ICF, unsigned int DCF) {
+void printObj(FILE* fp, unsigned int* codeImg, data_ptr* dataImg, unsigned int* codeAddress, unsigned int ICF, unsigned int DCF) {
     unsigned int i = 0;
     unsigned int a, b, c, d;
 

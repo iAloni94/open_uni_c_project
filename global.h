@@ -8,11 +8,11 @@
 #include <stdio.h>
 
 #include "assembler.h"
+#include "directive.h"
 #include "instruction.h"
 #include "utils.h"
-#include "directive.h"
 
-/* assembler.c */
+/* to_binary.c */
 unsigned int r_binary_instruction(R *);
 unsigned int i_binary_instruction(I *);
 unsigned int j_binary_instruction(J *);
@@ -26,7 +26,7 @@ J *check_j_param(int, node_t *, J *, flags *, sym_t *);
 node_t *initList();
 node_t *addNode();
 void freeInputList(node_t *);
-void updateDataAddress(unsigned int *, unsigned int);
+void updateDataAddress(data_ptr *, unsigned int);
 void freeMemory(flags *, sym_t *, FILE *, FILE *, FILE *, FILE *);
 
 /* input.c */
@@ -34,7 +34,7 @@ node_t *getLine(FILE *, flags *);
 
 /* write_files.c */
 FILE *createFile(char *, char *);
-void printObj(FILE *, unsigned int *, unsigned int *, unsigned int *, unsigned int, unsigned int);
+void printObj(FILE *, unsigned int *, data_ptr *, unsigned int *, unsigned int, unsigned int);
 void printExt();
 void printEnt();
 

@@ -1,11 +1,10 @@
-#include "utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "assembler.h"
 
+#include "global.h"
 node_t *initList() {
     node_t *head = malloc(sizeof(node_t));
     head->val = calloc(1, 100);
@@ -73,7 +72,7 @@ int getNumericValueCompTwo(int binaryNumber, int significantBits)
 }
 */
 
-void updateDataAddress(unsigned int* data, unsigned int ICF) {
+void updateDataAddress(data_ptr *data, unsigned int ICF) {
     int i;
     for (i = 0; *(data + i) != 0; i++) {
         *(data + i) += ICF;

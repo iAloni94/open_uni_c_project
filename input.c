@@ -85,20 +85,6 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                     flag->firstPass = false;
                     return NULL;
                 }
-                /* else if ((isspace(prevChar) || temp == ',') && *currVal != -1) {
-                    node->next = addNode();
-                    if (node->next != NULL) {
-                        node = node->next;
-                        currVal = node->val;
-                        *(currVal) = -1;
-                        j = 0;
-                        prevChar = temp;
-                    } else {
-                        printf("Memory allocation error");
-                        exit(0);
-                    } 
-                }
-                 */
                 continue;
             } else if (temp == ',') {
                 comma = true;
@@ -122,22 +108,4 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         printf("Memory allocation error");
         exit(0);
     }
-}
-
-char isLabel(node_t* input, flags* flag, sym_t* symbol) {
-    input->val[strlen(input->val) - 1] = '\0';
-    if ((strlen(input->val) <= LABEL_MAX_LENGTH) &&
-        (isAlphaNumeric(input->val)) &&
-        (!isReserved(input->val, flag)))
-        return true;
-    else {
-        flag->firstPass = false;
-        printf("\nLine: %d - Illegal label name", flag->line);
-    }
-    return false;
-}
-
-char isColon(char* input, flags* flag) {
-    if (strchr(input, ':') != NULL) return true;
-    return false;
 }

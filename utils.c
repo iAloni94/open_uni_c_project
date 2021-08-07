@@ -6,16 +6,6 @@
 
 #include "assembler.h"
 
-char *savedWords[] = {
-    "dd", "dw", "db", "asciz", "entry", "extern",
-    "add", "sub", "and", "or",
-    "nor", "move", "mvhi", "mvlo",
-    "addi", "subi", "andi", "ori",
-    "nori", "bne", "beq", "blt",
-    "bgt", "lb", "sb", "lw",
-    "sw", "lh", "sh", "jmp",
-    "la", "call", "stop"};
-
 node_t *initList() {
     node_t *head = malloc(sizeof(node_t));
     head->val = calloc(1, 100);
@@ -38,62 +28,6 @@ void freeInputList(node_t *node) {
         free(currNode->val);
         free(currNode);
     }
-}
-
-void freeSymbolTable(sym_t *node) {
-    sym_t *currNode = node;
-    while (node != NULL) {
-        currNode = node;
-        node = node->next;
-        free(currNode->name);
-        free(currNode);
-    }
-    free(node);
-}
-
-char isAlphaNumeric(char *str) {
-    int i;
-    for (i = 0; i < strlen(str); i++) {
-        if (IS_LETTER(*(str + i)) || IS_NUM(*(str + i))) {
-            continue;
-        } else {
-            return false;
-        }
-    }
-    return true;
-}
-
-char isReserved(char *str, flags *flag) { /* checks if label is a reseved word */
-    int i;
-    for (i = 0; i < 33; i++) { /* 33 is number of reserved words*/
-        if (!strcmp(savedWords[i], str)) {
-            flag->firstPass = false;
-            return true;
-        }
-    }
-    return false;
-}
-
-char isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check if a label was already decalred*/
-    while (symbol != NULL && symbol->name != NULL) {
-        if (!strcmp(str, symbol->name)) {
-            printf("\nLine: %d - Label name already in use", flag->line);
-            flag->firstPass = false;
-            return true; /* label was declared */
-        }
-        symbol = symbol->next;
-    }
-    return false;
-}
-
-unsigned int getSymbolAddress(char *name, sym_t *symbol) {
-    while (symbol != NULL && symbol->name != NULL) {
-        if (!strcmp(name, symbol->name)) {
-            return symbol->address;
-        }
-        symbol = symbol->next;
-    }
-    return false;
 }
 
 /* This function get the numeric value of a binary number */
@@ -139,12 +73,17 @@ int getNumericValueCompTwo(int binaryNumber, int significantBits)
 }
 */
 
-
+void updateDataAddress(unsigned int* data, unsigned int ICF) {
+    int i;
+    for (i = 0; *(data + i) != 0; i++) {
+        *(data + i) += ICF;
+    }
+}
 
 void freeMemory(flags *flag, sym_t *symbol, FILE *fp, FILE *fp_obj, FILE *fp_ext, FILE *fp_ent) {
     if (flag->external) fclose(fp_ext);
     if (flag->entry) fclose(fp_ent);
-    fclose(fp_obj);
+    if (flag->secondPass) fclose(fp_obj);
     fclose(fp);
     freeSymbolTable(symbol);
     free(flag);

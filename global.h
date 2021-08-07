@@ -24,18 +24,12 @@ J *check_j_param(int, node_t *, J *, flags *, sym_t *);
 /* utils.c */
 node_t *initList();
 node_t *addNode();
-unsigned int getSymbolAddress(char *, sym_t *);
-char isAlphaNumeric(char *);
-char isReserved(char *, flags *);
-char isDeclared(char *, sym_t *, flags *);
-void freeSymbolTable(sym_t *);
 void freeInputList(node_t *);
+void updateDataAddress(unsigned int *, unsigned int);
 void freeMemory(flags *, sym_t *, FILE *, FILE *, FILE *, FILE *);
 
 /* input.c */
 node_t *getLine(FILE *, flags *);
-char isLabel(node_t *, flags *, sym_t *);
-char isColon(char *, flags *);
 
 /* write_files.c */
 FILE *createFile(char *, char *);
@@ -43,4 +37,13 @@ void printObj(FILE *, unsigned int *, unsigned int *, unsigned int, unsigned int
 void printExt();
 void printEnt();
 
+/* label.c */
+void freeSymbolTable(sym_t *);
+unsigned int getSymbolAddress(char *, sym_t *);
+char isLabel(node_t *, flags *, sym_t *);
+char isAlphaNumeric(char *);
+char isReserved(char *, flags *);
+char isDeclared(char *, sym_t *, flags *);
+void insertLabel(sym_t *, node_t *, flags *, unsigned int, unsigned int);
+void updateSymbolAddress(sym_t *, unsigned int);
 #endif

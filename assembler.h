@@ -19,5 +19,4 @@ typedef struct symbol {
     struct symbol *next;
 } sym_t;
 
-
 #endif

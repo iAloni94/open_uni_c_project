@@ -37,7 +37,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         while (temp != '\n') {
             if (temp == '\0') {
                 flag->lastLine = true;
-                break;
+                return head;
             }
             if (temp == ';') {
                 if (i != 0) {

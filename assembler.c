@@ -34,7 +34,6 @@ int assemble(char *fname) {
     flag->firstPass = true;  /* if the 1st pass was successful */
     flag->lastLine = false;  /* marks last line in input file */
     flag->external = false;  /* this marks whether to create the .ext fie */
-    flag->entry = false;     /* this marks whether we need the .ent file */
     flag->line = 1;          /* indicates which line is being proccessed */
 
     symbol = symbol_list_head;
@@ -130,6 +129,7 @@ int assemble(char *fname) {
                         symbol->next = calloc(sizeof(sym_t), 1);
                         symbol = symbol->next;
                         flag->label = false;
+                        flag->direction = false;
                         flag->line += 1;
                         continue;
                     } else {
@@ -158,21 +158,70 @@ int assemble(char *fname) {
     ICF = IC;
     DCF = DC;
 
-        /* second pass */
+    /* second pass */
     if (flag->firstPass) {
+
         FILE *f_obj, *f_ent, *f_ext;
+        rewind(fp);
 
-        /* creating oputput files */
-        f_obj = createFile(fname, ".ob"); /* .obj file */
-        printObj(f_obj, code_img, code_address, ICF, DCF);
+        flag->entry = false; /* this marks whether we need the .ent file */
+        flag->lastLine = false;
+        flag->secondPass = true;
+        flag->line = 1;
 
-        if (flag->external) { /* .ext file */
-            f_ext = createFile(fname, ".ext");
-            printExt();
+        while (!(flag->lastLine)) {
+            head = getLine(fp, flag);
+            if (head == NULL)
+                continue;
+            else {
+                node = head;
+                if (isColon(node->val, flag)) {
+                    if (isLabel(node, flag, symbol_list_head)) { /* skip if label is found */
+                        node = node->next;
+                    }
+                }
+                if (!strcmp(node->val, ".entry")) {
+                    node = node->next;
+                    if (isDeclared(node->val, symbol_list_head, flag)) {
+                        symbol = symbol_list_head;
+                        while (symbol != NULL) {
+                            if (!strcmp(node->val, symbol->name)) {
+                                symbol->attribute = "entry";
+                                flag->entry = true;
+                                break;
+                            }
+                            symbol = symbol->next;
+                        }
+                    } else {
+                        printf("Line: %d - Label was not declared", flag->line);
+                        flag->secondPass = false;
+                        continue;
+                    }
+                }
+
+                funcNum = NUM_OF_FUNC;
+                for (i = 0; i < NUM_OF_FUNC; i++) {
+                    if (!strcmp(node->val, functionName[i])) {
+                        funcNum = i;
+                        break;
+                    }
+                }
+            }
         }
-        if (flag->entry) { /* .ent file */
-            f_ent = createFile(fname, ".ent");
-            printEnt();
+
+        if (flag->secondPass) {
+            /* creating oputput files */
+            f_obj = createFile(fname, ".ob"); /* .obj file */
+            printObj(f_obj, code_img, code_address, ICF, DCF);
+
+            if (flag->external) { /* .ext file */
+                f_ext = createFile(fname, ".ext");
+                printExt();
+            }
+            if (flag->entry) { /* .ent file */
+                f_ent = createFile(fname, ".ent");
+                printEnt();
+            }
         }
 
         freeMemory(flag, symbol_list_head, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly proccess */

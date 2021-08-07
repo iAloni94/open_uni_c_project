@@ -18,6 +18,7 @@ enum {
 typedef struct flag { /* this struct contains all the differnt flags and indicators for the assembly operation */
     char label;
     char firstPass;
+    char secondPass;
     char direction;
     char lastLine;
     char external;

@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "directive.h"
+
 #define MASK 0xFF /* 00000000 00000000 00000000 11111111 */
 
 FILE* createFile(char* fname, char* extention) {
@@ -25,7 +27,7 @@ void printObj(FILE* fp, unsigned int* codeImg, char dataImg[], unsigned int* cod
 
     fprintf(fp, "%d\t%d\n", ICF - 100, DCF);
 
-/*  print code image*/
+    /*  print code image*/
     /* shift mask to desired byte location and then shift the result to the rightmost byte for printing */
     for (i = 0; *(codeImg + i) != 0; i++) {
         a = *(codeImg + i) & MASK;                 /* instruction: bytes 0-8; mask:   00000000 00000000 00000000 11111111 */

@@ -8,7 +8,7 @@
 #define IS_LETTER(c) (c >= 65 && c <= 122) ? true : false /* 65 = 'A', 122 = 'z' */
 #define IS_NUM(c) (c >= 48 && c <= 57) ? true : false     /* 48 = '0', 57 = '9' */
 
-#include "assembler.h" 
+#include "assembler.h"
 
 enum {
     false = 0,
@@ -30,7 +30,5 @@ typedef struct node { /* input nodes */
     char *val;
     struct node *next;
 } node_t;
-
-
 
 #endif

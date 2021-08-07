@@ -1,7 +1,6 @@
 #include "instruction.h"
 
-unsigned int r_binary_instruction(R *instruction)
-{
+unsigned int r_binary_instruction(R *instruction) {
     unsigned int my_32bit = 0;
     unsigned int temp;
 
@@ -25,8 +24,7 @@ unsigned int r_binary_instruction(R *instruction)
     return my_32bit;
 }
 
-unsigned int i_binary_instruction(I *instruction)
-{
+unsigned int i_binary_instruction(I *instruction) {
     unsigned int my_32bit = 0;
     unsigned int temp;
 
@@ -44,8 +42,7 @@ unsigned int i_binary_instruction(I *instruction)
 
     return my_32bit;
 }
-unsigned int j_binary_instruction(J *instruction)
-{
+unsigned int j_binary_instruction(J *instruction) {
     unsigned int my_32bit = 0;
     unsigned int temp;
 

@@ -36,6 +36,7 @@ int assemble(char *fname) {
     flag->firstPass = true;  /* if the 1st pass was successful */
     flag->lastLine = false;  /* marks last line in input file */
     flag->external = false;  /* this marks whether to create the .ext fie */
+    flag->external = false;  /* this marks whether to create the .ext fie */
     flag->line = 1;          /* indicates which line is being proccessed */
 
     printf("Assembling file: %s", fname);
@@ -52,7 +53,7 @@ int assemble(char *fname) {
                 flag->line += 1;
             } else {
                 node = head;
-                if ((flag->label = isLabel(node, flag, symbol_list_head))) { /* raise flag for label. */
+                if ((flag->label = isLabel(node, flag, symbol_list_head))) { /* raise flag if label found */
                     if (isDeclared(node->val, symbol_list_head, flag))
                         flag->label = false; /* check if label was already declared*/
                     node = node->next;
@@ -134,7 +135,7 @@ int assemble(char *fname) {
                     }
                     /* handle directions - directive.c and directive.h */
                     /* check directive param...*/
-                    /* update DC and data_img[dirCounter]*/
+                    /* update DC and data_img[]*/
 
                     freeInputList(head);
                     flag->direction = false;
@@ -157,7 +158,6 @@ int assemble(char *fname) {
 
         rewind(fp);
 
-        flag->entry = false; /* this marks whether we need the .ent file */
         flag->lastLine = false;
         flag->secondPass = true;
         flag->line = 1;

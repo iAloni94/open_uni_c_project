@@ -5,11 +5,12 @@
 #ifndef __INSTRUCTION_H
 #define __INSTRUCTION_H
 
-typedef enum functions {
+typedef enum functions
+{
     /* logical instructions */
     add = 0,
     sub = 1,
-    and = 2,
+        and = 2,
     or = 3,
     nor = 4,
     /* copy instructions */
@@ -22,9 +23,9 @@ typedef enum functions {
     andi = 10,
     ori = 11,
     nori = 12,
-    /* branch instructions */
-    bne = 13,
-    beq = 14,
+    /* conditional branch instructions */
+    beq = 13,
+    bne = 14,
     blt = 15,
     bgt = 16,
     /* load and save instructions */
@@ -41,7 +42,8 @@ typedef enum functions {
     stop = 26
 } functions;
 
-typedef enum function_opcode {
+typedef enum function_opcode
+{
     mv_opcode = 1,
     addi_opcode = 10,
     subi_opcode = 11,
@@ -64,7 +66,8 @@ typedef enum function_opcode {
     stop_opcode = 63
 } opcode;
 
-typedef struct R {
+typedef struct R
+{
     unsigned int opcode : 6;
     unsigned int rs : 5;
     unsigned int rt : 5;
@@ -72,20 +75,20 @@ typedef struct R {
     unsigned int funct : 5;
     unsigned int notused : 6;
 } R;
- 
-typedef struct I {
+
+typedef struct I
+{
     unsigned int opcode : 6;
     unsigned int rs : 5;
     unsigned int rt : 5;
     unsigned int immed : 16;
 } I;
 
-typedef struct J {
+typedef struct J
+{
     unsigned int opcode : 6;
     unsigned int reg : 1;
     unsigned int address : 25;
 } J;
-
-
 
 #endif

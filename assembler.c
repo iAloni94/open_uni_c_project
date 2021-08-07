@@ -5,7 +5,10 @@
 #include "directive.h"
 #include "global.h"
 
-int assemble(char *fname) {
+// add constant of 2 ^ 25 for the data_img
+
+int assemble(char *fname)
+{
     char *functionName[NUM_OF_FUNC] = {
         "add", "sub", "and", "or",
         "nor", "move", "mvhi", "mvlo",
@@ -40,74 +43,100 @@ int assemble(char *fname) {
 
     printf("Assembling file: %s", fname);
 
-    if (flag == NULL) {
+    if (flag == NULL)
+    {
         printf("Memory allocation error");
         exit(0);
     }
 
-    if (fp) {
-        while (!(flag->lastLine)) {   /* first pass */
+    if (fp)
+    {
+        while (!(flag->lastLine))
+        {                             /* first pass */
             head = getLine(fp, flag); /* each node in input list contains a single word */
-            if (head == NULL) {
+            if (head == NULL)
+            {
                 flag->line += 1;
-            } else {
+            }
+            else
+            {
                 node = head;
-                if ((flag->label = isLabel(node, flag, symbol_list_head))) {                /* raise flag for label. */
-                    if (isDeclared(node->val, symbol_list_head, flag)) flag->label = false; /* check if label was already declared*/
+                if ((flag->label = isLabel(node, flag, symbol_list_head)))
+                { /* raise flag for label. */
+                    if (isDeclared(node->val, symbol_list_head, flag))
+                        flag->label = false; /* check if label was already declared*/
                     node = node->next;
                 }
 
                 dirNum = NUM_OF_DIR;
-                for (i = 0; i < NUM_OF_DIR; i++) {
-                    if (!strcmp(node->val, directions[i])) {
+                for (i = 0; i < NUM_OF_DIR; i++)
+                {
+                    if (!strcmp(node->val, directions[i]))
+                    {
                         dirNum = i;
                         flag->direction = true;
                         break;
                     }
                 }
-                if (!flag->direction) { /* if instruction */
+                if (!flag->direction)
+                { /* if instruction */
                     funcNum = NUM_OF_FUNC;
-                    for (i = 0; i < NUM_OF_FUNC; i++) {
-                        if (!strcmp(node->val, functionName[i])) {
+                    for (i = 0; i < NUM_OF_FUNC; i++)
+                    {
+                        if (!strcmp(node->val, functionName[i]))
+                        {
                             funcNum = i;
                             break;
                         }
                     }
 
-                    if (funcNum <= mvlo) { /* R type function */
+                    if (funcNum <= mvlo)
+                    { /* R type function */
                         R *instruction = (R *)calloc(sizeof(R), sizeof(char));
-                        if (instruction == NULL) {
+                        if (instruction == NULL)
+                        {
                             flag->firstPass = false;
                             printf("\nMemory allocation error");
                             exit(0);
                         }
-                        if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
+                        if ((instruction = check_r_param(funcNum, node->next, instruction, flag)))
+                        {
                             first_pass_32bit = r_binary_instruction(instruction);
                             free(instruction);
                         }
-                    } else if (funcNum <= sh) { /* I type function */
+                    }
+                    else if (funcNum <= sh)
+                    { /* I type function */
                         I *instruction = (I *)calloc(sizeof(I), sizeof(char));
-                        if (instruction == NULL) {
+                        if (instruction == NULL)
+                        {
                             flag->firstPass = false;
                             printf("\nMemory allocation error");
                             exit(0);
                         }
-                        if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
+                        if ((instruction = check_i_param(funcNum, node->next, instruction, flag)))
+                        {
                             first_pass_32bit = i_binary_instruction(instruction);
                             free(instruction);
                         }
-                    } else if (funcNum <= stop) { /* J type function */
+                    }
+                    else if (funcNum <= stop)
+                    { /* J type function */
                         J *instruction = (J *)calloc(sizeof(J), sizeof(char));
-                        if (instruction == NULL) {
+                        if (instruction == NULL)
+                        {
                             flag->firstPass = false;
                             printf("\nMemory allocation error");
                             exit(0);
                         }
-                        if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
+                        if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head)))
+                        {
                             first_pass_32bit = j_binary_instruction(instruction);
                             free(instruction);
                         }
-                    } else if (funcNum == NUM_OF_FUNC) { /* undefined function */
+                    }
+                    else if (funcNum == NUM_OF_FUNC)
+                    { /* undefined function */
                         flag->firstPass = false;
                         printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
                         freeInputList(head);
@@ -116,7 +145,8 @@ int assemble(char *fname) {
                         continue;
                     }
 
-                    if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
+                    if (flag->label)
+                    { /* if found, inserts label into symbol table. each node is a label */
                         insertLabel(symbol_list_head, head, flag, IC, DC);
                     }
                     freeInputList(head);
@@ -127,8 +157,10 @@ int assemble(char *fname) {
                     codeCounter++;
                 }
 
-                else {                 /* if directive */
-                    if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
+                else
+                { /* if directive */
+                    if (flag->label)
+                    { /* if found, inserts label into symbol table. each node is a label */
                         insertLabel(symbol_list_head, head, flag, IC, DC);
                     }
                     /* handle directions - directive.c and directive.h */
@@ -143,16 +175,20 @@ int assemble(char *fname) {
         } /* while loop */
         ICF = IC;
         DCF = DC;
-        if (symbol_list_head->name != NULL) {
+        if (symbol_list_head->name != NULL)
+        {
             updateSymbolAddress(symbol_list_head, ICF);
         }
         updateDataAddress(data_img, ICF);
-    } else {
+    }
+    else
+    {
         printf("Failed to open file. Trying next file.");
         return false;
     } /* first pass end*/
 
-    if (flag->firstPass) { /* second pass */
+    if (flag->firstPass)
+    { /* second pass */
 
         rewind(fp);
 
@@ -161,30 +197,39 @@ int assemble(char *fname) {
         flag->secondPass = true;
         flag->line = 1;
 
-        while (!(flag->lastLine)) {
+        while (!(flag->lastLine))
+        {
             head = getLine(fp, flag);
             if (head == NULL)
                 continue;
-            else {
+            else
+            {
                 node = head;
                 /* step 3 in second pass algorithem  */
-                if (isLabel(node, flag, symbol_list_head)) { /* skip if label is found */
+                if (isLabel(node, flag, symbol_list_head))
+                { /* skip if label is found */
                     node = node->next;
                 }
 
-                for (i = 0; i < NUM_OF_DIR - 1; i++) { /* step 4  */
-                    if (!strcmp(node->val, directions[i])) {
+                for (i = 0; i < NUM_OF_DIR - 1; i++)
+                { /* step 4  */
+                    if (!strcmp(node->val, directions[i]))
+                    {
                         flag->line += 1;
                         continue;
                     }
                 }
 
-                if (!strcmp(node->val, ".entry")) { /* step 5 */
+                if (!strcmp(node->val, ".entry"))
+                { /* step 5 */
                     node = node->next;
-                    if (isDeclared(node->val, symbol_list_head, flag)) { /* step 6 */
+                    if (isDeclared(node->val, symbol_list_head, flag))
+                    { /* step 6 */
                         sym_t *tempSym = symbol_list_head;
-                        while (tempSym != NULL) {
-                            if (!strcmp(node->val, tempSym->name)) {
+                        while (tempSym != NULL)
+                        {
+                            if (!strcmp(node->val, tempSym->name))
+                            {
                                 tempSym->attribute = "entry";
                                 flag->entry = true;
                                 flag->line += 1;
@@ -192,7 +237,9 @@ int assemble(char *fname) {
                             }
                             tempSym = tempSym->next;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         printf("\nLine: %d - Label was not declared", flag->line);
                         flag->secondPass = false;
                         flag->line += 1;
@@ -201,8 +248,10 @@ int assemble(char *fname) {
                 }
 
                 funcNum = NUM_OF_FUNC;
-                for (i = 0; i < NUM_OF_FUNC; i++) { /* step 7 */
-                    if (!strcmp(node->val, functionName[i])) {
+                for (i = 0; i < NUM_OF_FUNC; i++)
+                { /* step 7 */
+                    if (!strcmp(node->val, functionName[i]))
+                    {
                         funcNum = i;
                         break;
                     }
@@ -211,16 +260,19 @@ int assemble(char *fname) {
             flag->line += 1;
         }
 
-        if (flag->secondPass) { /* step 9 */
+        if (flag->secondPass)
+        { /* step 9 */
             /* creating oputput files          step 10  */
             f_obj = createFile(fname, ".ob"); /* .obj file */
             printObj(f_obj, code_img, data_img, code_address, ICF, DCF);
 
-            if (flag->external) { /* .ext file */
+            if (flag->external)
+            { /* .ext file */
                 f_ext = createFile(fname, ".ext");
                 printExt();
             }
-            if (flag->entry) { /* .ent file */
+            if (flag->entry)
+            { /* .ent file */
                 f_ent = createFile(fname, ".ent");
                 printEnt();
             }
@@ -234,14 +286,19 @@ int assemble(char *fname) {
     return (flag->firstPass && flag->secondPass) ? true : false;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     int i;
     char *ext;
-    for (i = 1; i < argc; ++i) {
+    for (i = 1; i < argc; ++i)
+    {
         ext = strchr(argv[i], '.');
-        if (!strcmp(ext, FILE_EXT)) {
+        if (!strcmp(ext, FILE_EXT))
+        {
             assemble(argv[i]);
-        } else {
+        }
+        else
+        {
             printf("\nError! File: %s - Input file extentions should only be \".as\"\n", argv[i]);
         }
     }

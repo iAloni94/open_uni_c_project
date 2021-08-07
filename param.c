@@ -116,7 +116,7 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
         instruction->rs = getReg(input->val, flag);
         if (instruction->rs != NUM_OF_REG) {
             param1 = true;
-            input = input->next;
+            input = input->next->next;
         }
 
         instruction->rt = getReg(input->val, flag);
@@ -213,11 +213,12 @@ unsigned int getReg(char *val, flags *flag) {
         "$20", "$21", "$22", "$23",
         "$24", "$25", "$26", "$27",
         "$28", "$29", "$30", "$31"};
+    int i;
+    
     /*
     * if i=0, registerList[i] = $0. if i=1, registerList[i] = $1. if i=28, registerList[i] = $28. if i=n, registerList[i] = $n
     * this way, as soon as our input value == registerList[i], we know which register it is by looking at i
     */
-    int i;
     if (strchr(val, '$')) {
         for (i = 0; i < NUM_OF_REG; i++) {
             if (!strcmp(val, registerList[i])) {

@@ -151,6 +151,10 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag)
     else if (funcNum <= beq)
     {
         /* beq bne to bgt */
+        /* beq - check if the value in register "rs" is -- Equals -- to the value in register "rt" */
+        /* bne - check if the value in register "rs" is -- Not Equals-- to the value in register "rt" */
+        /* blt - check if the value in register "rs" is -- Lower Than -- the value in register "rt" */
+        /* bgt - check if the value in register "rs" is -- Greater Than -- to the value in register "rt" */
     }
     else
     { /* lb to sh */

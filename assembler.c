@@ -16,11 +16,12 @@ int assemble(char *fname) {
 
     char *directions[NUM_OF_DIR] = {".db", ".dh", ".dw", ".asciz", ".extern", ".entry"};
 
-    unsigned int currDC, DC = 0, IC = 100, ICF, DCF;
+    unsigned int DC = 0, IC = 100, ICF, DCF;
     int funcNum, dirNum, i, codeCounter = 0;
-    unsigned int data_img[1000] = {0};
+    /*unsigned int data_img[1000] = {0};*/ 
     unsigned int code_img[1000] = {0};
     unsigned int code_address[1000];
+    data_ptr data_img[1000]; /* each cell in this array contains a pointer to a DIRECTIVE union that contains either a byte, half word or word */
     sym_t *symbol, *symbol_list_head = calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
     node_t *head, *node;
@@ -116,7 +117,7 @@ int assemble(char *fname) {
                     }
 
                     if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
-                        insertLabel(symbol_list_head, head, flag, IC, currDC);
+                        insertLabel(symbol_list_head, head, flag, IC, DC);
                     }
                     freeInputList(head);
                     code_img[codeCounter] = first_pass_32bit; /* insert binary instruction to memory image */

@@ -10,6 +10,7 @@
 #include "assembler.h"
 #include "instruction.h"
 #include "utils.h"
+#include "directive.h"
 
 /* assembler.c */
 unsigned int r_binary_instruction(R *);

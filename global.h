@@ -21,12 +21,13 @@ unsigned int j_binary_instruction(J *);
 R *check_r_param(int, node_t *, R *, flags *);
 I *check_i_param(int, node_t *, I *, flags *);
 J *check_j_param(int, node_t *, J *, flags *, sym_t *);
+unsigned int getReg(char *, flags *);
 
 /* utils.c */
 node_t *initList();
 node_t *addNode();
 void freeInputList(node_t *);
-void updateDataAddress(data_ptr[], unsigned int);
+void updateDataAddress(char[], unsigned int);
 void freeMemory(flags *, sym_t *, FILE *, FILE *, FILE *, FILE *);
 
 /* input.c */
@@ -34,7 +35,7 @@ node_t *getLine(FILE *, flags *);
 
 /* write_files.c */
 FILE *createFile(char *, char *);
-void printObj(FILE *, unsigned int *, data_ptr *, unsigned int *, unsigned int, unsigned int);
+void printObj(FILE *, unsigned int *, char[], unsigned int *, unsigned int, unsigned int);
 void printExt();
 void printEnt();
 

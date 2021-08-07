@@ -19,9 +19,9 @@ int assemble(char *fname) {
 
     unsigned int DC = 0, IC = 100, ICF, DCF;
     int funcNum, dirNum, i, codeCounter = 0, dirCounter = 0;
+    char data_img[1000] = {0};
     unsigned int code_img[1000] = {0};
     unsigned int code_address[1000];
-    data_ptr data_img[1000]; /* each cell in this array contains a pointer to a DIRECTIVE union that contains either a byte, half word or word */
     sym_t *symbol_list_head = calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
     node_t *head, *node;

@@ -71,10 +71,10 @@ int getNumericValueCompTwo(int binaryNumber, int significantBits)
 }
 */
 
-void updateDataAddress(data_ptr data[], unsigned int ICF) {
+void updateDataAddress(char data[], unsigned int ICF) {
     int i;
     for (i = 0; data[i] != NULL; i++) {
-        data[i]->address += ICF;
+        data[i] += ICF;
     }
 }
 

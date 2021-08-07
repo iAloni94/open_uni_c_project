@@ -11,6 +11,7 @@
 #define MAX_LINE_LENGTH 81 /* Limit is 80 + Null terminator*/
 #define LABEL_MAX_LENGTH 31
 #define FILE_EXT ".as"
+#define MEM_SIZE 33554432
 
 typedef struct symbol {
     char *name;

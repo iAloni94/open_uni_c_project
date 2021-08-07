@@ -79,12 +79,12 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                         *(currVal) = -1;
                         j = 0;
                     }
-                } else if (temp != ',' && temp != '\n' && temp != EOF && temp != '\0') {
+                }/* else if (temp != ',' && temp != '\n' && temp != EOF && temp != '\0') {
                     printf("\nLine: %d - Missing comma", flag->line);
                     freeInputList(head);
                     flag->firstPass = false;
                     return NULL;
-                }
+                }*/
                 continue;
             } else if (temp == ',') {
                 comma = true;

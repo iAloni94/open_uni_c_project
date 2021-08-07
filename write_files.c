@@ -19,12 +19,13 @@ FILE* createFile(char* fname, char* extention) {
     return output_file_ptr;
 }
 
-void printObj(FILE* fp, unsigned int* codeImg, data_ptr* dataImg, unsigned int* codeAddress, unsigned int ICF, unsigned int DCF) {
+void printObj(FILE* fp, unsigned int* codeImg, char dataImg[], unsigned int* codeAddress, unsigned int ICF, unsigned int DCF) {
     unsigned int i = 0;
     unsigned int a, b, c, d;
 
     fprintf(fp, "%d\t%d\n", ICF - 100, DCF);
 
+/*  print code image*/
     /* shift mask to desired byte location and then shift the result to the rightmost byte for printing */
     for (i = 0; *(codeImg + i) != 0; i++) {
         a = *(codeImg + i) & MASK;                 /* instruction: bytes 0-8; mask:   00000000 00000000 00000000 11111111 */
@@ -34,6 +35,8 @@ void printObj(FILE* fp, unsigned int* codeImg, data_ptr* dataImg, unsigned int* 
 
         fprintf(fp, "%04d %02x %02x %02x %02x\n", *(codeAddress + i), a, b, c, d);
     }
+
+    /* print data image: */
 }
 
 void printExt() {}

@@ -181,6 +181,7 @@ int assemble(char *fname) {
                 }
 
                 if (!strcmp(node->val, ".entry")) { /* step 5 */
+                    flag->entry = true;
                     node = node->next;
                     if (isDeclared(node->val, symbol_list_head, flag)) { /* step 6 */
                         sym_t *tempSym = symbol_list_head;
@@ -195,6 +196,7 @@ int assemble(char *fname) {
                         }
                     } else {
                         printf("\nLine: %d - Label was not declared", flag->line);
+                        flag->entry = false;
                         flag->secondPass = false;
                         flag->line += 1;
                         continue;
@@ -225,7 +227,7 @@ int assemble(char *fname) {
                 f_ent = createFile(fname, ".ent");
                 printEnt();
             }
-            printf("\nAssembly completed.\n"); 
+            printf("\nAssembly completed.\n");
         }
 
     } /* second pass end */

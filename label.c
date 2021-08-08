@@ -76,9 +76,12 @@ char isReserved(char *str, flags *flag) { /* checks if label is a reseved word *
 char isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check if a label was already decalred*/
     while (symbol != NULL && symbol->name != NULL) {
         if (!strcmp(str, symbol->name)) {
-            printf("\nLine: %d - Label name <%s> already in use", flag->line, str);
-            flag->firstPass = false;
-            return true; /* label was declared */
+            if (!flag->entry) {
+                printf("\nLine: %d - Label name <%s> already in use", flag->line, str);
+                flag->firstPass = false;
+                return true; /* label was declared */
+            }
+            return true;
         }
         symbol = symbol->next;
     }

@@ -21,7 +21,6 @@ int assemble(char *fname) {
     int funcNum, dirNum, i, codeCounter = 0, dirCounter = 0;
     char data_img[1000] = {0};
     unsigned int code_img[1000] = {0};
-    unsigned int code_address[1000];
     sym_t *symbol_list_head = calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
     node_t *head, *node;
@@ -123,14 +122,13 @@ int assemble(char *fname) {
                     }
                     freeInputList(head);
                     code_img[codeCounter] = first_pass_32bit; /* insert binary instruction to memory image */
-                    code_address[codeCounter] = IC;
+                    codeCounter++;
                     flag->line += 1;
                     IC += 4;
-                    codeCounter++;
                 }
 
                 else {                 /* if directive */
-                    if (flag->label) { /* if found, inserts label into symbol table. each node is a label */
+                    if (flag->label) { /* if label is found, inserts label into symbol table. each node is a label */
                         insertLabel(symbol_list_head, head, flag, IC, DC);
                     }
                     /* handle directions - directive.c and directive.h */
@@ -143,7 +141,7 @@ int assemble(char *fname) {
                 }
             }
         } /* while loop */
-        ICF = IC;
+        ICF = IC - 4;
         DCF = DC;
         if (symbol_list_head->name != NULL) {
             updateSymbolAddress(symbol_list_head, ICF);
@@ -217,7 +215,7 @@ int assemble(char *fname) {
         if (flag->secondPass) { /* step 9 */
             /* creating oputput files          step 10  */
             f_obj = createFile(fname, ".ob"); /* .obj file */
-            printObj(f_obj, code_img, data_img, code_address, ICF, DCF);
+            printObj(f_obj, code_img, data_img, ICF, DCF);
 
             if (flag->external) { /* .ext file */
                 f_ext = createFile(fname, ".ext");

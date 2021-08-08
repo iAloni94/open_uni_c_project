@@ -21,9 +21,10 @@ FILE* createFile(char* fname, char* extention) {
     return output_file_ptr;
 }
 
-void printObj(FILE* fp, unsigned int* codeImg, char dataImg[], unsigned int* codeAddress, unsigned int ICF, unsigned int DCF) {
+void printObj(FILE* fp, unsigned int* codeImg, char dataImg[], unsigned int ICF, unsigned int DCF) {
     unsigned int i = 0;
     unsigned int a, b, c, d;
+    unsigned int IC = 100;
 
     fprintf(fp, "%d\t%d\n", ICF - 100, DCF);
 
@@ -35,7 +36,8 @@ void printObj(FILE* fp, unsigned int* codeImg, char dataImg[], unsigned int* cod
         c = (*(codeImg + i) & (MASK << 16)) >> 16; /* instruction: bytes 17-24; mask: 00000000 11111111 00000000 00000000 */
         d = (*(codeImg + i) & (MASK << 24)) >> 24; /* instruction: bytes 25-32; mask: 11111111 00000000 00000000 00000000 */
 
-        fprintf(fp, "%04d %02x %02x %02x %02x\n", *(codeAddress + i), a, b, c, d);
+        fprintf(fp, "%04d %02x %02x %02x %02x\n", IC, a, b, c, d);
+        IC += 4;
     }
 
     /* print data image: */

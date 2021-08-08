@@ -109,6 +109,7 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
         }
         i++;
     }
+    /* immed is a 16bit signed integer. its range is -32,768 to +32,767 */
     instruction->immed = atoi(input->next->val);
 
     if (funcNum <= nori) { /* addi to nori  - 3 parameters */

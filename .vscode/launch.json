@@ -5,7 +5,7 @@
     "version": "0.2.0", 
     "configurations": [
         {
-            "name": "WSL - GCC",
+            "name": "WSL - GCC", 
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/assembler",

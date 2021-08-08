@@ -225,10 +225,13 @@ int assemble(char *fname) {
                 f_ent = createFile(fname, ".ent");
                 printEnt();
             }
-            printf("\nAssembly completed.\n");
+            printf("\nAssembly completed.\n"); 
         }
 
     } /* second pass end */
+    else {
+        printf("\nErrors were detected. aborting assembly proccess");
+    }
 
     freeMemory(flag, symbol_list_head, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly proccess */
     printf("\n");

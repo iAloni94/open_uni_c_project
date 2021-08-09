@@ -5,7 +5,7 @@
 #include "directive.h"
 #include "global.h"
 
-int assemble(char *fname) {
+void assemble(char *fname) {
     char *functionName[NUM_OF_FUNC] = {
         "add", "sub", "and", "or",
         "nor", "move", "mvhi", "mvlo",
@@ -36,7 +36,7 @@ int assemble(char *fname) {
     flag->lastLine = false;  /* marks last line in input file */
     flag->external = false;  /* this marks whether to create the .ext fie */
     flag->external = false;  /* this marks whether to create the .ext fie */
-    flag->line = 1;          /* indicates which line is being proccessed */
+    flag->line = 1;          /* indicates which line is being processed */
 
     printf("Assembling file: %s", fname);
 
@@ -110,7 +110,7 @@ int assemble(char *fname) {
                         }
                     } else if (funcNum == NUM_OF_FUNC) { /* undefined function */
                         flag->firstPass = false;
-                        printf("\nLine: %d - Unrecognized instruction <%s>", flag->line, node->val);
+                        printf("\nLine: %d - Unrecognized instruction \"%s\"", flag->line, node->val);
                         freeInputList(head);
                         flag->line += 1;
                         IC += 4;
@@ -123,11 +123,9 @@ int assemble(char *fname) {
                     freeInputList(head);
                     code_img[codeCounter] = first_pass_32bit; /* insert binary instruction to memory image */
                     codeCounter++;
-                    flag->line += 1;
                     IC += 4;
-                }
-
-                else {                 /* if directive */
+                    flag->line++;
+                } else {               /* if directive */
                     if (flag->label) { /* if label is found, inserts label into symbol table. each node is a label */
                         insertLabel(symbol_list_head, head, flag, IC, DC);
                     }
@@ -141,7 +139,7 @@ int assemble(char *fname) {
                 }
             }
         } /* while loop */
-        ICF = IC - 4;
+        ICF = IC;
         DCF = DC;
         if (symbol_list_head->name != NULL) {
             updateSymbolAddress(symbol_list_head, ICF);
@@ -149,7 +147,7 @@ int assemble(char *fname) {
         updateDataAddress(data_img, ICF);
     } else {
         printf("Failed to open file. Trying next file.");
-        return false;
+        return;
     } /* first pass end*/
 
     if (flag->firstPass) { /* second pass */
@@ -225,29 +223,33 @@ int assemble(char *fname) {
                 f_ent = createFile(fname, ".ent");
                 printEnt();
             }
-            printf("\nAssembly completed.\n");
+            printf("\nAssembly completed.");
         }
 
     } /* second pass end */
     else {
-        printf("\nErrors were detected. aborting assembly proccess");
+        printf("\nErrors were detected. aborting assembly process.");
     }
 
-    freeMemory(flag, symbol_list_head, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly proccess */
+    freeMemory(flag, symbol_list_head, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly process */
     printf("\n");
-    return (flag->firstPass && flag->secondPass) ? true : false;
+    return;
 }
 
 int main(int argc, char *argv[]) {
     int i;
     char *ext;
-    for (i = 1; i < argc; ++i) {
-        ext = strchr(argv[i], '.');
-        if (!strcmp(ext, FILE_EXT)) {
-            assemble(argv[i]);
-        } else {
-            printf("\nError! File: %s - Input file extentions should only be \".as\"\n", argv[i]);
+    if (argc > 1) {
+        for (i = 1; i < argc; ++i) {
+            ext = strchr(argv[i], '.');
+            if (!strcmp(ext, FILE_EXT)) {
+                assemble(argv[i]);
+            } else {
+                printf("Error! File: %s - Input file extentions should only be \".as\"\n", argv[i]);
+            }
         }
+    } else {
+        printf("No files were set for processing\n");
     }
-    return 0;
+    return true;
 }

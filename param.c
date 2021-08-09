@@ -12,8 +12,9 @@
 
 #include "global.h"
 
+
 R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
-    char rs = false, rt = false, rd = false;
+    char rs = false, rt = false, rd = false, temp;
 
     switch (funcNum) { /* opcode */
         case 5:
@@ -49,54 +50,69 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
     }
 
     if (funcNum <= nor) { /* arithmatics functions - 3 parameters */
-        instruction->rs = getReg(input->val, flag);
-        if (instruction->rs != NUM_OF_REG) {
+        temp = getReg(input, flag);
+        if (temp != NUM_OF_REG) {
+            instruction->rs = temp;
             rs = true;
             input = input->next;
+
+            temp = getReg(input, flag);
+            if (temp != NUM_OF_REG) {
+                instruction->rt = temp;
+                rt = true;
+                input = input->next;
+
+                temp = getReg(input, flag);
+                if (temp != NUM_OF_REG) {
+                    instruction->rd = temp;
+                    rd = true;
+                    input = input->next;
+                }
+            }
         }
 
-        instruction->rt = getReg(input->val, flag);
-        if (instruction->rt != NUM_OF_REG) {
-            rt = true;
-            input = input->next;
-        }
-
-        instruction->rd = getReg(input->val, flag);
-        if (instruction->rd != NUM_OF_REG) {
-            rd = true;
-            input = input->next;
+        if (!rs || !rs || !rt) {
+            printf("\nLine: %d - Missing operands", flag->line);
+            flag->firstPass = false;
+            return NULL;
+        } else if (input != NULL) {
+            flag->firstPass = false;
+            printf("\nLine: %d - extraneous operand", flag->line);
+            return NULL;
+        } else {
+            return instruction;
         }
     } else { /* copy functions - 2 parameters rs + rd */
-        instruction->rs = getReg(input->val, flag);
-        if (instruction->rs != NUM_OF_REG) {
+        temp = getReg(input, flag);
+        if (temp != NUM_OF_REG) {
+            instruction->rs = temp;
             rs = true;
             input = input->next;
+
+            temp = getReg(input, flag);
+            if (temp != NUM_OF_REG) {
+                instruction->rd = temp;
+                rd = true;
+                input = input->next;
+            }
         }
 
-        instruction->rd = getReg(input->val, flag);
-        if (instruction->rd != NUM_OF_REG) {
-            rd = true;
-            input = input->next;
+        if (!rs || !rd) {
+            printf("Line: %d - Missing operand", flag->line);
+            flag->firstPass = false;
+            return NULL;
+        } else if (input != NULL) {
+            flag->firstPass = false;
+            printf("\nLine: %d - extraneous operand", flag->line);
+            return NULL;
+        } else {
+            return instruction;
         }
-    }
-    if (input != NULL) {
-        flag->firstPass = false;
-        printf("\nLine: %d - extraneous operand", flag->line);
-        return NULL;
-    }
-
-    if (funcNum <= nor && (rs && rt && rd)) {
-        return instruction;
-    } else if (rs && rd) {
-        return instruction;
-    } else {
-        flag->firstPass = false;
-        return NULL;
     }
 }
 
 I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
-    char param1 = false, param2 = false;
+    char param1 = false, param2 = false, temp;
     int i = 0;
 
     instruction->opcode = funcNum + 2;
@@ -113,16 +129,18 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
     instruction->immed = atoi(input->next->val);
 
     if (funcNum <= nori) { /* addi to nori  - 3 parameters */
-        instruction->rs = getReg(input->val, flag);
-        if (instruction->rs != NUM_OF_REG) {
+        temp = getReg(input, flag);
+        if (temp != NUM_OF_REG) {
+            instruction->rs = temp;
             param1 = true;
             input = input->next->next;
-        }
 
-        instruction->rt = getReg(input->val, flag);
-        if (instruction->rt != NUM_OF_REG) {
-            param2 = true;
-            input = input->next;
+            temp = getReg(input, flag);
+            if (temp != NUM_OF_REG) {
+                instruction->rt = temp;
+                param2 = true;
+                input = input->next;
+            }
         }
     } else if (funcNum <= beq) {
         /* beq bne to bgt */
@@ -185,7 +203,7 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
     if (instruction->opcode == jmp_opcode) { /* if jmp function, check for register as parameter */
         if (strchr(input->val, '$')) {
             instruction->reg = true;
-            instruction->address = getReg(input->val, flag);
+            instruction->address = getReg(input, flag);
             if (instruction->address != NUM_OF_REG) {
                 free(tempNode);
                 return instruction;
@@ -207,7 +225,7 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
     return instruction;
 }
 
-unsigned int getReg(char *val, flags *flag) {
+unsigned int getReg(node_t *node, flags *flag) {
     char *registerList[NUM_OF_REG] = {
         "$0", "$1", "$2", "$3",
         "$4", "$5", "$6", "$7",
@@ -223,15 +241,19 @@ unsigned int getReg(char *val, flags *flag) {
     * if i=0, registerList[i] = $0. if i=1, registerList[i] = $1. if i=28, registerList[i] = $28. if i=n, registerList[i] = $n
     * this way, as soon as our input value == registerList[i], we know which register it is by looking at i
     */
-    if (strchr(val, '$')) {
-        for (i = 0; i < NUM_OF_REG; i++) {
-            if (!strcmp(val, registerList[i])) {
-                return i;
+    if (node != NULL) {
+        if (strchr(node->val, '$')) {
+            for (i = 0; i < NUM_OF_REG; i++) {
+                if (!strcmp(node->val, registerList[i])) {
+                    return i;
+                }
             }
+            printf("\nLine: %d - Regsiter \"%s\" out of range", flag->line, node->val);
+            flag->firstPass = false;
+        } else {
+            flag->firstPass = false;
+            printf("\nLine: %d - Illegal parameter", flag->line);
         }
-    } else {
-        flag->firstPass = false;
-        printf("\nLine: %d - Register out of range", flag->line);
     }
-    return NUM_OF_REG;
+    return 32;
 }

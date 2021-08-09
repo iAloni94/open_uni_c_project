@@ -16,6 +16,7 @@ typedef struct DIRECTIVE {
     unsigned int byte : 8;
     unsigned int half_word : 16;
     unsigned int word : 32;
+    struct DIRECTIVE *next;
 } dir_t;
 
 typedef struct DIRECTIVE *data_ptr;

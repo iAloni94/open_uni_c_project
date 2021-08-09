@@ -19,9 +19,10 @@ void assemble(char *fname) {
 
     unsigned int DC = 0, IC = 100, ICF, DCF;
     int funcNum, dirNum, i, codeCounter = 0, dirCounter = 0;
-    char data_img[1000] = {0};
+    /* char data_img[1000] = {0}; */
     unsigned int code_img[1000] = {0};
-    sym_t *symbol_list_head = calloc(sizeof(sym_t), 1);
+    dir_t *this_data, *data_img = calloc(sizeof(dir_t), 1);
+    sym_t *symbol_list_head = (sym_t *)calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
     node_t *head, *node;
     unsigned int first_pass_32bit = 0;
@@ -40,18 +41,20 @@ void assemble(char *fname) {
 
     printf("Assembling file: %s", fname);
 
-    if (flag == NULL) {
+    if (flag == NULL || symbol_list_head == NULL || data_img == NULL) {
         printf("Memory allocation error");
         exit(0);
     }
 
     if (fp) {
+        this_data = data_img;
         while (!(flag->lastLine)) {   /* first pass */
             head = getLine(fp, flag); /* each node in input list contains a single word */
             if (head == NULL) {
                 flag->line += 1;
             } else {
                 node = head;
+
                 if ((flag->label = isLabel(node, flag, symbol_list_head))) { /* raise flag if label found */
                     if (isDeclared(node->val, symbol_list_head, flag))
                         flag->label = false; /* check if label was already declared*/
@@ -129,10 +132,19 @@ void assemble(char *fname) {
                     if (flag->label) { /* if label is found, inserts label into symbol table. each node is a label */
                         insertLabel(symbol_list_head, head, flag, IC, DC);
                     }
-                    /* handle directions - directive.c and directive.h */
-                    /* check directive param...*/
-                    /* update DC and data_img[]*/
-
+                    switch (dirNum) {
+                        case db:
+                            this_data = save_byte(node->next, this_data, &DC, flag);
+                            break;
+                        case dh:
+                            this_data = save_half_word(node->next, this_data, &DC, flag);
+                            break;
+                        case dw:
+                            this_data = save_word(node->next, this_data, &DC, flag);
+                            break;
+                        default:
+                            break;
+                    }
                     freeInputList(head);
                     flag->direction = false;
                     flag->line += 1;

@@ -27,7 +27,7 @@ unsigned int getReg(node_t *, flags *);
 node_t *initList();
 node_t *addNode();
 void freeInputList(node_t *);
-void updateDataAddress(char[], unsigned int);
+void updateDataAddress(dir_t *, unsigned int);
 void freeMemory(flags *, sym_t *, FILE *, FILE *, FILE *, FILE *);
 
 /* input.c */
@@ -35,7 +35,7 @@ node_t *getLine(FILE *, flags *);
 
 /* write_files.c */
 FILE *createFile(char *, char *);
-void printObj(FILE *, unsigned int *, char[], unsigned int, unsigned int);
+void printObj(FILE *, unsigned int *, dir_t *, unsigned int, unsigned int);
 void printExt();
 void printEnt();
 
@@ -48,4 +48,9 @@ char isReserved(char *, flags *);
 char isDeclared(char *, sym_t *, flags *);
 void insertLabel(sym_t *, node_t *, flags *, unsigned int, unsigned int);
 void updateSymbolAddress(sym_t *, unsigned int);
+
+/* directive.c */
+dir_t *save_byte(node_t *, dir_t *, unsigned int *, flags *);
+dir_t *save_half_word(node_t *, dir_t *, unsigned int *, flags *);
+dir_t *save_word(node_t *, dir_t *, unsigned int *, flags *);
 #endif

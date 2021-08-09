@@ -255,5 +255,5 @@ unsigned int getReg(node_t *node, flags *flag) {
             printf("\nLine: %d - Illegal parameter", flag->line);
         }
     }
-    return 32;
+    return NUM_OF_REG;
 }

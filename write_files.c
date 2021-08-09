@@ -21,7 +21,7 @@ FILE* createFile(char* fname, char* extention) {
     return output_file_ptr;
 }
 
-void printObj(FILE* fp, unsigned int* codeImg, char dataImg[], unsigned int ICF, unsigned int DCF) {
+void printObj(FILE* fp, unsigned int* codeImg, dir_t *dataImg, unsigned int ICF, unsigned int DCF) {
     unsigned int i = 0;
     unsigned int a, b, c, d;
     unsigned int IC = 100;

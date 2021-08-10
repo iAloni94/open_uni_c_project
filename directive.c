@@ -27,7 +27,7 @@ char *checkStr(node_t *node, flags *flag) { /*  this funtion checks if the strin
 
 dir_t *save_byte(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
     char c;
-    int temp, i;
+    int temp, i = 0;
     while (node != NULL) {
         while ((c = *(node->val + i)) != '\0') {
             if (!IS_NUM(c) && c != '-') {
@@ -55,7 +55,7 @@ dir_t *save_byte(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
 
 dir_t *save_half_word(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
     char c;
-    int temp, i;
+    int temp, i = 0;
     while (node != NULL) {
         while ((c = *(node->val + i)) != '\0') {
             if (!IS_NUM(c) && c != '-') {
@@ -86,7 +86,7 @@ dir_t *save_word(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
     char c;
     while (node != NULL) {
         while ((c = *(node->val + i)) != '\0') {
-            if ( c != '-' && !IS_NUM(c)) {
+            if (c != '-' && !IS_NUM(c)) {
                 printf("Line: %d - Operand should be an integer", flag->line);
                 flag->firstPass = false;
                 return dataImg;

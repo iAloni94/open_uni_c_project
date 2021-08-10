@@ -18,7 +18,7 @@ void assemble(char *fname) {
     char *directions[NUM_OF_DIR] = {".db", ".dh", ".dw", ".asciz", ".extern", ".entry"};
 
     unsigned int DC = 0, IC = 100, ICF, DCF;
-    int funcNum, dirNum, i, codeCounter = 0, dirCounter = 0;
+    int funcNum, dirNum, i, codeCounter = 0;
     /* char data_img[1000] = {0}; */
     unsigned int code_img[1000] = {0};
     dir_t *this_data, *data_img = calloc(sizeof(dir_t), 1);
@@ -143,7 +143,7 @@ void assemble(char *fname) {
                             this_data = save_word(node->next, this_data, &DC, flag);
                             break;
                         case asciz:
-                            this_data = save_char(node->next, this_data, &DC, flag);
+                            this_data = save_str(node->next, this_data, &DC, flag);
                             break;
                         default:
                             break;
@@ -159,7 +159,6 @@ void assemble(char *fname) {
         if (symbol_list_head->name != NULL) {
             updateSymbolAddress(symbol_list_head, ICF);
         }
-        updateDataAddress(data_img, ICF);
     } else {
         printf("Failed to open file. Trying next file.");
         return;
@@ -210,6 +209,7 @@ void assemble(char *fname) {
                         flag->entry = false;
                         flag->secondPass = false;
                         flag->line += 1;
+                        freeInputList(head);
                         continue;
                     }
                 }
@@ -222,6 +222,7 @@ void assemble(char *fname) {
                     }
                 }
             }
+            freeInputList(head);
             flag->line += 1;
         }
 
@@ -246,7 +247,7 @@ void assemble(char *fname) {
         printf("\nErrors were detected. aborting assembly process.");
     }
 
-    freeMemory(flag, symbol_list_head, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly process */
+    freeMemory(flag, symbol_list_head, data_img, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly process */
     printf("\n");
     return;
 }

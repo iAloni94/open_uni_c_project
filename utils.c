@@ -71,18 +71,20 @@ int getNumericValueCompTwo(int binaryNumber, int significantBits)
 }
 */
 
-void updateDataAddress(dir_t *data, unsigned int ICF) {
-    while (data != NULL) {
-        data->address += ICF;
+void freeDataImg(dir_t *data){
+    while(data!=NULL){
+        dir_t *temp = data;
         data = data->next;
+        free(temp);
     }
 }
 
-void freeMemory(flags *flag, sym_t *symbol, FILE *fp, FILE *fp_obj, FILE *fp_ext, FILE *fp_ent) {
+void freeMemory(flags *flag, sym_t *symbol, dir_t *data_img, FILE *fp, FILE *fp_obj, FILE *fp_ext, FILE *fp_ent) {
     if (flag->external) fclose(fp_ext);
     if (flag->entry) fclose(fp_ent);
     if (flag->secondPass) fclose(fp_obj);
     fclose(fp);
+    freeDataImg(data_img);
     freeSymbolTable(symbol);
     free(flag);
 }

@@ -23,10 +23,10 @@ FILE* createFile(char* fname, char* extention) {
 }
 
 void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF, unsigned int DCF) {
-    unsigned int i = 0;
+    unsigned int i = 0, j = 0;
     unsigned int a, b, c, d;
     unsigned int IC = 100;
-    
+    unsigned char* data = calloc(DCF, 1);
 
     fprintf(fp, "%d\t%d", ICF - 100, DCF);
 
@@ -43,31 +43,23 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
     }
 
     /* print data image */
-    unsigned char *data = calloc(DCF, 1);
+    /* fills data array with data for printing */
     i = 0;
     while (dataImg->next != NULL) {
         switch (dataImg->flag) {
             case asci:
             case byte:
                 *(data + i) = dataImg->byte;
-                /*data[i] = dataImg->byte; */
                 break;
             case half_word:
-               *(data + i++) = dataImg->half_word;
+                *(data + i++) = dataImg->half_word;
                 *(data + i) = (dataImg->half_word) >> 8;
-                /* data[i++] = dataImg->half_word;*/
-                /* data[i] = (dataImg->half_word) >> 8;*/
                 break;
             case word:
-                /* 31 = 0000 0000 0000 0000 0000 0000 0001 1111  */
                 *(data + i++) = dataImg->word;
                 *(data + i++) = (dataImg->word) >> 8;
                 *(data + i++) = (dataImg->word) >> 16;
                 *(data + i) = (dataImg->word) >> 24;
-                /* data[i++] = dataImg->word; */
-                /* data[i++] = (dataImg->word) >> 8; */
-                /* data[i++] = (dataImg->word) >> 16; */
-                /* data[i] = (dataImg->word) >> 24; */
                 break;
             default:
                 break;
@@ -75,12 +67,13 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
         dataImg = dataImg->next;
         i++;
     }
-    int j = 0;
+
     for (i = 0; i < DCF; i += 4) {
         fprintf(fp, "\n%04d ", ICF + j);
         fprintf(fp, "%02x %02x %02x %02x", data[i], data[i + 1], data[i + 2], data[i + 3]);
         j += 4;
     }
+    free(data);
 }
 
 void printExt() {}

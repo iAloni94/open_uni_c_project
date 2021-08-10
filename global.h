@@ -27,8 +27,7 @@ unsigned int getReg(node_t *, flags *);
 node_t *initList();
 node_t *addNode();
 void freeInputList(node_t *);
-void updateDataAddress(dir_t *, unsigned int);
-void freeMemory(flags *, sym_t *, FILE *, FILE *, FILE *, FILE *);
+void freeMemory(flags *, sym_t *,dir_t *, FILE *, FILE *, FILE *, FILE *);
 
 /* input.c */
 node_t *getLine(FILE *, flags *);
@@ -53,4 +52,6 @@ void updateSymbolAddress(sym_t *, unsigned int);
 dir_t *save_byte(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_half_word(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_word(node_t *, dir_t *, unsigned int *, flags *);
+dir_t *save_str(node_t *, dir_t *, unsigned int *, flags *);
+char *checkStr(node_t *, flags *); 
 #endif

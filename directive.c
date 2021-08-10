@@ -8,7 +8,7 @@
 #define IN_RANGE_WORD(n) n >= -2147483648 && n <= 2147483647 ? true : false /* -2,147,483,648 to 2,147,483,647	 */
 #define TWO_COMP(n) (~n) + 1
 
-char *checkStr(node_t *node, flags *flag) { /*  this funtion checks if the string is valid ie start and ends with " */
+char *checkStr(node_t *node, flags *flag) { /*  this funtion checks if the string is valid i.e starts and ends with a " */
     char *diff;
     if (node->next != NULL) {
         printf("Line: %d - extraneous operand", flag->line);
@@ -31,7 +31,6 @@ dir_t *save_byte(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
         int temp = atoi(node->val);
         if (IN_RANGE_BYTE(temp)) {
             dataImg->byte = temp;
-            dataImg->address = *DC;
             dataImg->flag = byte;
             dataImg->next = calloc(sizeof(dir_t), 1);
             dataImg = dataImg->next;
@@ -50,7 +49,6 @@ dir_t *save_half_word(node_t *node, dir_t *dataImg, unsigned int *DC, flags *fla
         int temp = atoi(node->val);
         if (IN_RANGE_H_WORD(temp)) {
             dataImg->half_word = temp;
-            dataImg->address = *DC;
             dataImg->flag = half_word;
             dataImg->next = calloc(sizeof(dir_t), 1);
             dataImg = dataImg->next;
@@ -69,7 +67,6 @@ dir_t *save_word(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
         int temp = atoi(node->val);
         if (IN_RANGE_WORD(temp)) {
             dataImg->word = temp;
-            dataImg->address = *DC;
             dataImg->flag = word;
             dataImg->next = calloc(sizeof(dir_t), 1);
             dataImg = dataImg->next;
@@ -83,13 +80,12 @@ dir_t *save_word(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
     return dataImg;
 }
 
-dir_t *save_char(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
+dir_t *save_str(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
     char *str = checkStr(node, flag);
     int i = 1;
     if (str != NULL) {
         while (str - (node->val + i) != 0) {
             dataImg->byte = *(node->val + i);
-            dataImg->address = *DC;
             dataImg->flag = asci;
             dataImg->next = calloc(sizeof(dir_t), 1);
             dataImg = dataImg->next;
@@ -97,7 +93,6 @@ dir_t *save_char(node_t *node, dir_t *dataImg, unsigned int *DC, flags *flag) {
             i++;
         }
         dataImg->byte = 0; /* Null terminator */
-        dataImg->address = *DC;
         dataImg->flag = asci;
         *DC += 1;
         dataImg->next = calloc(sizeof(dir_t), 1);

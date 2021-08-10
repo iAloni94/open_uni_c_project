@@ -23,15 +23,13 @@ FILE* createFile(char* fname, char* extention) {
 }
 
 void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF, unsigned int DCF) {
-    unsigned int i = 0, j = 0;
-    unsigned int a, b, c, d;
-    unsigned int IC = 100;
+    unsigned int a, b, c, d, i = 0, j = 0, IC = 100;
     unsigned char* data = calloc(DCF, 1);
 
     fprintf(fp, "%d\t%d", ICF - 100, DCF);
 
     /*  print code image*/
-    /* shift mask to desired byte location and then shift the result to the rightmost byte for printing */
+    /* shift mask to desired 4 bits location and then shift the result to the rightmost 4 bits for printing */
     for (i = 0; *(codeImg + i) != 0; i++) {
         a = *(codeImg + i) & MASK;                 /* instruction: bytes 0-8; mask:   00000000 00000000 00000000 11111111 */
         b = (*(codeImg + i) & (MASK << 8)) >> 8;   /* instruction: bytes 9-16; mask:  00000000 00000000 11111111 00000000 */
@@ -43,7 +41,7 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
     }
 
     /* print data image */
-    /* fills data array with data for printing */
+    /* fills data array with data for printing, each cell is 4 bits for easier printing */
     i = 0;
     while (dataImg->next != NULL) {
         switch (dataImg->flag) {

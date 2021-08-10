@@ -19,9 +19,9 @@ typedef enum mem_size{
 
 /* directive structs*/
 typedef struct DIRECTIVE {
-    unsigned int byte : 8;
-    unsigned int half_word : 16;
-    unsigned int word : 32;
+    int byte : 8;
+    int half_word : 16;
+    int word : 32;
     char flag; /* indicates which size memory is in use */
     struct DIRECTIVE *next;
 } dir_t;

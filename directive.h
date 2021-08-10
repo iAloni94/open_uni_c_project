@@ -10,12 +10,20 @@ typedef enum directive {
     ent = 5
 } dir;
 
+typedef enum mem_size{
+    byte = 0,
+    half_word = 1,
+    word = 2,
+    asci = 3
+} mem;
+
 /* directive structs*/
 typedef struct DIRECTIVE {
     unsigned int address;
     unsigned int byte : 8;
     unsigned int half_word : 16;
     unsigned int word : 32;
+    char flag; /* indicates which size memory is in use */
     struct DIRECTIVE *next;
 } dir_t;
 

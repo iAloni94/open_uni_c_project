@@ -142,6 +142,9 @@ void assemble(char *fname) {
                         case dw:
                             this_data = save_word(node->next, this_data, &DC, flag);
                             break;
+                        case asciz:
+                            this_data = save_char(node->next, this_data, &DC, flag);
+                            break;
                         default:
                             break;
                     }

@@ -26,7 +26,7 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
     unsigned int i = 0;
     unsigned int a, b, c, d;
     unsigned int IC = 100;
-    long val[1200];
+    
 
     fprintf(fp, "%d\t%d", ICF - 100, DCF);
 
@@ -43,24 +43,31 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
     }
 
     /* print data image */
-    unsigned char data[1000] = {0};
+    unsigned char *data = calloc(DCF, 1);
     i = 0;
     while (dataImg->next != NULL) {
         switch (dataImg->flag) {
             case asci:
             case byte:
-                data[i] = dataImg->byte;
+                *(data + i) = dataImg->byte;
+                /*data[i] = dataImg->byte; */
                 break;
             case half_word:
-                data[i++] = dataImg->half_word;
-                data[i] = (dataImg->half_word) >> 8;
+               *(data + i++) = dataImg->half_word;
+                *(data + i) = (dataImg->half_word) >> 8;
+                /* data[i++] = dataImg->half_word;*/
+                /* data[i] = (dataImg->half_word) >> 8;*/
                 break;
             case word:
                 /* 31 = 0000 0000 0000 0000 0000 0000 0001 1111  */
-                data[i++] = dataImg->word;
-                data[i++] = (dataImg->word) >> 8;
-                data[i++] = (dataImg->word) >> 16;
-                data[i] = (dataImg->word) >> 24;
+                *(data + i++) = dataImg->word;
+                *(data + i++) = (dataImg->word) >> 8;
+                *(data + i++) = (dataImg->word) >> 16;
+                *(data + i) = (dataImg->word) >> 24;
+                /* data[i++] = dataImg->word; */
+                /* data[i++] = (dataImg->word) >> 8; */
+                /* data[i++] = (dataImg->word) >> 16; */
+                /* data[i] = (dataImg->word) >> 24; */
                 break;
             default:
                 break;
@@ -69,9 +76,9 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
         i++;
     }
     int j = 0;
-    for (i = 0; i < 100; i += 4) {
+    for (i = 0; i < DCF; i += 4) {
         fprintf(fp, "\n%04d ", ICF + j);
-        fprintf(fp, " %02x %02x %02x %02x", data[i], data[i + 1], data[i + 2], data[i + 3]);
+        fprintf(fp, "%02x %02x %02x %02x", data[i], data[i + 1], data[i + 2], data[i + 3]);
         j += 4;
     }
 }

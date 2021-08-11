@@ -80,11 +80,21 @@ char isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check
                 printf("\nLine: %d - Label name <%s> already in use", flag->line, str);
                 flag->firstPass = false;
                 return true; /* label was declared */
+            } else if (!strcmp(symbol->attribute, "external")) {
+                printf("\nLine: %d - Label was already declared as external", flag->line);
+                flag->secondPass = false;
+                return false;
             }
             return true;
         }
         symbol = symbol->next;
     }
+    if (flag->entry) {
+        printf("\nLine: %d - Label was not declared", flag->line);
+        flag->entry = false;
+        flag->secondPass = false;
+    }
+
     return false;
 }
 
@@ -99,7 +109,11 @@ void insertLabel(sym_t *symbol, node_t *head, flags *flag, unsigned int IC, unsi
     symbol->name = calloc(sizeof(char), strlen(head->val));
     memcpy(symbol->name, head->val, strlen(head->val));
     if (flag->direction) {
-        symbol->attribute = "data";
+        if (flag->external) {
+            symbol->attribute = "external";
+        } else {
+            symbol->attribute = "data";
+        }
         symbol->address = DC;
         flag->line += 1;
     } else {

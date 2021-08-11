@@ -214,7 +214,7 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
         }
     }
 
-    strcpy(temp, input->val);
+    strcpy(temp, input->val); /* getting the label ready for parsing (adding ':') */
     strcat(temp, ":");
     tempNode->val = temp;
     if (isLabel(tempNode, flag, symbol)) { /* if operand is label */

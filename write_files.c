@@ -3,9 +3,9 @@
 #include <string.h>
 
 #include "directive.h"
+#include "label.h"
 
 #define MASK 0xFF /* 00000000 00000000 00000000 11111111 */
-#define KEEP_ONLY_24_LSB(value) ((value)&0xFFFFFF)
 
 FILE* createFile(char* fname, char* extention) {
     int i;
@@ -75,4 +75,12 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
 }
 
 void printExt() {}
-void printEnt() {}
+
+void printEnt(FILE* fp, sym_t* symbol) {
+    while (symbol != NULL) {
+        if (strstr(symbol->attribute, "entry")) {
+            fprintf(fp, "%s %04d", symbol->name, symbol->address);
+        }
+        symbol = symbol->next;
+    }
+}

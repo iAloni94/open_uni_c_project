@@ -13,11 +13,4 @@
 #define FILE_EXT ".as"
 #define MEM_SIZE 33554432 /* 2^25 */
 
-typedef struct symbol {
-    char *name;
-    char *attribute; /* code, data, external, entry */
-    unsigned int address;
-    struct symbol *next;
-} sym_t;
-
 #endif

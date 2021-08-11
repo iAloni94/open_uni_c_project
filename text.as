@@ -1,1 +1,4 @@
-LIST: .db 6, 6
+.entry	Next
+STR:	.asciz	"aBcd"
+MAIN: add	$3,$5,$9
+Next:	move $20,$4

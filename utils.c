@@ -71,8 +71,8 @@ int getNumericValueCompTwo(int binaryNumber, int significantBits)
 }
 */
 
-void freeDataImg(dir_t *data){
-    while(data!=NULL){
+void freeDataImg(dir_t *data) {
+    while (data != NULL) {
         dir_t *temp = data;
         data = data->next;
         free(temp);
@@ -80,9 +80,11 @@ void freeDataImg(dir_t *data){
 }
 
 void freeMemory(flags *flag, sym_t *symbol, dir_t *data_img, FILE *fp, FILE *fp_obj, FILE *fp_ext, FILE *fp_ent) {
-    if (flag->external) fclose(fp_ext);
-    if (flag->entry) fclose(fp_ent);
-    if (flag->secondPass) fclose(fp_obj);
+    if (flag->secondPass) {
+        fclose(fp_obj);
+        if (flag->external) fclose(fp_ext);
+        if (flag->entry) fclose(fp_ent);
+    }
     fclose(fp);
     freeDataImg(data_img);
     freeSymbolTable(symbol);

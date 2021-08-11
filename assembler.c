@@ -15,7 +15,7 @@ void assemble(char *fname) {
         "sw", "lh", "sh", "jmp",
         "la", "call", "stop"};
 
-    char *directions[NUM_OF_DIR] = {".db", ".dh", ".dw", ".asciz", ".extern", ".entry"};
+    char *directives[NUM_OF_DIR] = {".db", ".dh", ".dw", ".asciz", ".extern", ".entry"};
 
     unsigned int DC = 0, IC = 100, ICF, DCF;
     int funcNum, dirNum, i, codeCounter = 0;
@@ -63,7 +63,7 @@ void assemble(char *fname) {
 
                 dirNum = NUM_OF_DIR;
                 for (i = 0; i < NUM_OF_DIR; i++) {
-                    if (!strcmp(node->val, directions[i])) {
+                    if (!strcmp(node->val, directives[i])) {
                         dirNum = i;
                         flag->direction = true;
                         break;
@@ -145,6 +145,9 @@ void assemble(char *fname) {
                         case asciz:
                             this_data = save_str(node->next, this_data, &DC, flag);
                             break;
+                        case ext:
+                            ext_handler(symbol_list_head, node->next, flag, IC, DC);
+                            break;
                         default:
                             break;
                     }
@@ -160,7 +163,7 @@ void assemble(char *fname) {
             updateSymbolAddress(symbol_list_head, ICF);
         }
     } else {
-        printf("Failed to open file. Trying next file.");
+        printf("\nFailed to open file. Trying next file.");
         return;
     } /* first pass end*/
 
@@ -183,10 +186,10 @@ void assemble(char *fname) {
                     node = node->next;
                 }
 
-                for (i = 0; i < NUM_OF_DIR - 1; i++) { /* step 4  */
-                    if (!strcmp(node->val, directions[i])) {
+                for (i = 0; i < NUM_OF_DIR - 1; i++) {
+                    if (!strcmp(node->val, directives[i])) {
                         flag->line += 1;
-                        continue;
+                        break;
                     }
                 }
 
@@ -197,21 +200,19 @@ void assemble(char *fname) {
                         sym_t *tempSym = symbol_list_head;
                         while (tempSym != NULL) {
                             if (!strcmp(node->val, tempSym->name)) {
-                                tempSym->attribute = "entry";
+                                char temp[LABEL_MAX_LENGTH] = {0};
+                                strcpy(temp, tempSym->attribute); /* getting the label ready for parsing (adding ':') */
+                                strcat(temp, ", entry");
+                                tempSym->attribute = temp;
                                 flag->entry = true;
-                                flag->line += 1;
                                 break;
                             }
                             tempSym = tempSym->next;
                         }
-                    } else {
-                        printf("\nLine: %d - Label was not declared", flag->line);
-                        flag->entry = false;
-                        flag->secondPass = false;
-                        flag->line += 1;
-                        freeInputList(head);
-                        continue;
                     }
+                    freeInputList(head);
+                    flag->line += 1;
+                    continue;
                 }
 
                 funcNum = NUM_OF_FUNC;
@@ -228,23 +229,26 @@ void assemble(char *fname) {
 
         if (flag->secondPass) { /* step 9 */
             /* creating oputput files          step 10  */
-            f_obj = createFile(fname, ".ob"); /* .obj file */
-            printObj(f_obj, code_img, data_img, ICF, DCF);
+            if ((f_obj = createFile(fname, ".ob")) != NULL) {
+                printObj(f_obj, code_img, data_img, ICF, DCF);
+            }
 
             if (flag->external) { /* .ext file */
-                f_ext = createFile(fname, ".ext");
-                printExt();
+                if ((f_ext = createFile(fname, ".ext")) != NULL) {
+                    printExt();
+                }
             }
             if (flag->entry) { /* .ent file */
-                f_ent = createFile(fname, ".ent");
-                printEnt();
+                if ((f_ent = createFile(fname, ".ent")) != NULL) {
+                    printEnt(f_ent, symbol_list_head);
+                }
             }
             printf("\nAssembly completed.");
         }
 
     } /* second pass end */
-    else {
-        printf("\nErrors were detected. aborting assembly process.");
+    if (!flag->firstPass || !flag->secondPass) {
+        printf("\nErrors were detected. No output files were created.");
     }
 
     freeMemory(flag, symbol_list_head, data_img, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly process */
@@ -261,7 +265,7 @@ int main(int argc, char *argv[]) {
             if (!strcmp(ext, FILE_EXT)) {
                 assemble(argv[i]);
             } else {
-                printf("Error! File: %s - Input file extentions should only be \".as\"\n", argv[i]);
+                printf("Illegal file name or wrong file extention. file extentions should only be \".as\"\n");
             }
         }
     } else {

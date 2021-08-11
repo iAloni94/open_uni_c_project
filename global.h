@@ -11,6 +11,7 @@
 #include "directive.h"
 #include "instruction.h"
 #include "utils.h"
+#include "label.h"
 
 /* to_binary.c */
 unsigned int r_binary_instruction(R *);
@@ -27,7 +28,7 @@ unsigned int getReg(node_t *, flags *);
 node_t *initList();
 node_t *addNode();
 void freeInputList(node_t *);
-void freeMemory(flags *, sym_t *,dir_t *, FILE *, FILE *, FILE *, FILE *);
+void freeMemory(flags *, sym_t *, dir_t *, FILE *, FILE *, FILE *, FILE *);
 
 /* input.c */
 node_t *getLine(FILE *, flags *);
@@ -53,5 +54,6 @@ dir_t *save_byte(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_half_word(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_word(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_str(node_t *, dir_t *, unsigned int *, flags *);
-char *checkStr(node_t *, flags *); 
+char *checkStr(node_t *, flags *);
+void ext_handler(sym_t *, node_t *, flags *, unsigned int, unsigned int);
 #endif

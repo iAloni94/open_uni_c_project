@@ -10,8 +10,8 @@
 #include "assembler.h"
 #include "directive.h"
 #include "instruction.h"
-#include "utils.h"
 #include "label.h"
+#include "utils.h"
 
 /* to_binary.c */
 unsigned int r_binary_instruction(R *);
@@ -56,4 +56,5 @@ dir_t *save_word(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_str(node_t *, dir_t *, unsigned int *, flags *);
 char *checkStr(node_t *, flags *);
 void ext_handler(sym_t *, node_t *, flags *, unsigned int, unsigned int);
+void ent_handler(sym_t *, node_t *, flags *);
 #endif

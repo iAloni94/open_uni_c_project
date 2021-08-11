@@ -23,6 +23,7 @@ typedef struct flag { /* this struct contains all the differnt flags and indicat
     char lastLine;
     char external;
     char entry;
+    char isExt;
     unsigned int line;
 } flags;
 

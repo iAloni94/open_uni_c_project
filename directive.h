@@ -2,15 +2,15 @@
 #define __DIRECTIVE_H
 
 typedef enum directive {
-    db = 0,
-    dh = 1,
-    dw = 2,
-    asciz = 3,
-    ext = 4,
-    ent = 5
+    db = 0,    /* declare a location in the memory for 1 byte for each of the inputs, seperate by "comma". the label points the first item in the array. */
+    dh = 1,    /* declare a location in the memory for 2 byte for each of the inputs, seperate by "comma". the label points the first item in the array. */
+    dw = 2,    /* declare a location in the memory for 4 byte for each of the inputs, seperate by "comma". the label points the first item in the array. */
+    asciz = 3, /* declare a string. the label points the first item in the array. the string is between "" , in the end \0 */
+    ext = 4,   /* declare external label */
+    ent = 5  /*declare local label */
 } dir;
 
-typedef enum mem_size{
+typedef enum mem_size {
     byte = 0,
     half_word = 1,
     word = 2,

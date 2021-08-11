@@ -12,7 +12,6 @@
 
 #include "global.h"
 
-
 R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
     char rs = false, rt = false, rd = false, temp;
 
@@ -112,50 +111,119 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
 }
 
 I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
-    char param1 = false, param2 = false, temp;
+    char rs = false, rt = false, immed = false;
     int i = 0;
 
-    instruction->opcode = funcNum + 2;
+    if (funcNum >= addi && funcNum <= nori) {
+        /*Set the opcode to the function name + the gap to make is similar to number in the list */
+        instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
 
-    while (i < strlen(input->next->val)) {
-        if (!IS_NUM(*(input->next->val + i))) {
-            flag->firstPass = false;
-            printf("\nLine: %d - Illegal parameter. Immed value should only be an integer", flag->line);
-            return NULL;
+        /* getting the rs value from register */
+        if (instruction->rs >= NUM_OF_REG || instruction->rs >= NUM_OF_REG) {
+            instruction->rs = getReg(input->val, flag);
+            rs = true;
+            input = input->next;
+            char *rtAdress = input;
         }
-        i++;
+        instruction->immed = input->val;
+        input = input->next;
+
+        instruction->rt = getReg(input->val, flag);
+        if (instruction->rt != NUM_OF_REG) {
+            rt = true;
+        }
     }
-    /* immed is a 16bit signed integer. its range is -32,768 to +32,767 */
-    instruction->immed = atoi(input->next->val);
 
-    if (funcNum <= nori) { /* addi to nori  - 3 parameters */
-        temp = getReg(input, flag);
-        if (temp != NUM_OF_REG) {
-            instruction->rs = temp;
-            param1 = true;
-            input = input->next->next;
+    /* while (i < strlen(input->next->val))
+     {
+         if (!IS_NUM(*(input->next->val + i)))
+         {
+             flag->firstPass = false;
+             printf("\nLine: %d - Illegal parameter. Immed value should only be an integer", flag->line);
+             return NULL;
+         }
+         i++;
+     }
+     instruction->immed = atoi(input->next->val);
+*/
+    /*
+    * Check if the funcNum is one of these 5 Arithmatic and Logic function: addi, subi, andi, ori and nori.
+    * Each of them holds 4 fields of data = {opcode, rs, rt, immed} 
+    *  */
 
-            temp = getReg(input, flag);
-            if (temp != NUM_OF_REG) {
-                instruction->rt = temp;
-                param2 = true;
-                input = input->next;
-            }
-        }
-    } else if (funcNum <= beq) {
-        /* beq bne to bgt */
-        /* beq - check if the value in register "rs" is -- Equals -- to the value in register "rt" */
+    else if (funcNum >= beq && funcNum <= bgt) {
+        /*
+        * Check if the funcNum is one of these 4 Conditional Directional function: beq, bne, blt, bgt.  
+        * each function we need to check the value that is inside the register (binary / decimal?) */
+        /* the distance is from the current location of the instruction minus the current value in the loop. 
+        if the loop adress is smaller than the adress of the instruction 
+        (declared before it{in this case I am not sure what is the purpose of minus}) 
+	@@ -162,26 +174,82 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag)
         /* bne - check if the value in register "rs" is -- Not Equals-- to the value in register "rt" */
         /* blt - check if the value in register "rs" is -- Lower Than -- the value in register "rt" */
         /* bgt - check if the value in register "rs" is -- Greater Than -- to the value in register "rt" */
-    } else { /* lb to sh */
+
+        /*Set the opcode to the function name + the gap to make is similar to number in the list */
+
+        instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
+
+        /* getting the rs value from register */
+        instruction->rs = getReg(input->val, flag);
+        if (instruction->rs != NUM_OF_REG) {
+            rs = true;
+            input = input->next;
+            /* char *rtAdress = input; */
+        }
+
+        instruction->rt = getReg(input->val, flag);
+        if (instruction->rt != NUM_OF_REG) {
+            rt = true;
+            input = input->next;
+        }
+
+        instruction->immed = input->val;
     }
 
-    if (param1 && param2) {
+    else if (funcNum >= lb && funcNum <= sh) { /* Type of save and load functions:
+    lb - load byte - load byte from the memory
+    sb - save byte - save byte in the memory
+    lw - load word - load word from the memory
+    sw - save word - save word in the memory
+    lh - load half word - load half word from the memory
+    sh - save half word - save half word in the memory
+    
+    in all of these function, the first register contains the adress in the memory
+    the immediate, is th second operand, and he represent the "offset"
+    opcode is the same, and all the rest change the same
+    in this case we need to swip the locations of the "rt" and the "immediate"
+    the "label" is the adress in the memory
+    */
+
+        instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
+
+        /* getting the rs value from register */
+        instruction->rs = getReg(input->val, flag);
+        if (instruction->rs != NUM_OF_REG) {
+            rs = true;
+            input = input->next;
+            /* char *rtAdress = input; */
+        }
+        instruction->immed = input->val;
+        input = input->next;
+
+        instruction->rt = getReg(input->val, flag);
+        if (instruction->rt != NUM_OF_REG) {
+            rt = true;
+            input = input->next;
+        }
+    }
+
+    if (funcNum <= addi && funcNum <= sh && (rs && rt && immed)) {
+        return instruction;
+    } else if (rs && rt) {
         return instruction;
     } else {
         flag->firstPass = false;
-        printf("\nLine: %d - Register not in range", flag->line);
         return NULL;
     }
 }

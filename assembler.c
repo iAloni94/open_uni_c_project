@@ -37,6 +37,7 @@ void assemble(char *fname) {
     flag->lastLine = false;  /* marks last line in input file */
     flag->external = false;  /* this marks whether to create the .ext fie */
     flag->external = false;  /* this marks whether to create the .ext fie */
+    flag->isExt = false;     /* this marks whether this label is external */
     flag->line = 1;          /* indicates which line is being processed */
 
     printf("Assembling file: %s", fname);

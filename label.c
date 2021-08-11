@@ -111,7 +111,7 @@ void insertLabel(sym_t *symbol, node_t *head, flags *flag, unsigned int IC, unsi
     symbol->attribute = calloc(sizeof(char), 25);
     memcpy(symbol->name, head->val, strlen(head->val));
     if (flag->direction) {
-        if (flag->external) {
+        if (flag->isExt) {
             memcpy(symbol->attribute, "external", strlen("external"));
         } else {
             memcpy(symbol->attribute, "data", strlen("data"));

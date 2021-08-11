@@ -105,9 +105,10 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
                 }
                 i++;
             }
+
             /* 
             * Check for int overflow
-            * Because of int overflow, if and integer value is bigger or smaller than INT_LIMIT, it "circles back" in the opposite direction
+            * Because of int overflow, if an integers value is bigger or smaller than INT_LIMIT, it "circles back" in the opposite direction
             */
             temp = atoi(input->val);
             if (strchr(input->val, '-')) {
@@ -167,7 +168,9 @@ void ext_handler(sym_t *symbol, node_t *input, flags *flag, unsigned int IC, uns
     if (isLabel(tempNode, flag, symbol)) {
         if (!isDeclared(input->val, symbol, flag)) {
             flag->external = true;
+            flag->isExt = true;
             insertLabel(symbol, input, flag, 0, 0);
+            flag->isExt = false;
         }
     }
     free(tempNode);

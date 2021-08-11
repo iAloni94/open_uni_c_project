@@ -70,7 +70,7 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             }
         }
 
-        if (!rs || !rs || !rt) {
+        if (!rs || !rd || !rt) {
             printf("\nLine: %d - Missing operands", flag->line);
             flag->firstPass = false;
             return NULL;
@@ -112,7 +112,7 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
 
 I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
     char rs = false, rt = false, immed = false;
-    int i = 0;
+    int i = 0;  
 
     if (funcNum >= addi && funcNum <= nori) {
         /*Set the opcode to the function name + the gap to make is similar to number in the list */
@@ -286,8 +286,7 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
     strcat(temp, ":");
     tempNode->val = temp;
     if (isLabel(tempNode, flag, symbol)) { /* if operand is label */
-        unsigned int tempAddress = getSymbolAddress(input->val, symbol);
-        instruction->address = tempAddress;
+        instruction->address = 0;
     }
     free(tempNode);
     return instruction;

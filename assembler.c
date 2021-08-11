@@ -13,7 +13,6 @@ void assemble(char *fname) {
     flags *flag = (flags *)malloc(sizeof(flags));
 
     FILE *fp;
-    FILE *f_obj, *f_ent, *f_ext;
 
     flag->label = false;     /* if a label was found */
     flag->direction = false; /* if its a direction line */
@@ -27,24 +26,12 @@ void assemble(char *fname) {
     if ((fp = fopen(fname, "r")) != NULL) {
         printf("Assembling file: %s", fname);
         firstPass(&IC, &ICF, &DC, &DCF, code_img, data_img, symbol_list_head, flag, fp);
-        secondPass(ICF, DCF, symbol_list_head, flag, fp);
+        secondPass(ICF, DCF, code_img, symbol_list_head, flag, fp);
 
         /* creating oputput files */
         if (flag->firstPass && flag->secondPass) {
-            if ((f_obj = createFile(fname, ".ob")) != NULL) {
-                printObj(f_obj, code_img, data_img, ICF, DCF);
-            }
+            writeFiles(fname, code_img, data_img, symbol_list_head, flag, ICF, DCF);
 
-            if (flag->external) { /* .ext file */
-                if ((f_ext = createFile(fname, ".ext")) != NULL) {
-                    printExt();
-                }
-            }
-            if (flag->entry) { /* .ent file */
-                if ((f_ent = createFile(fname, ".ent")) != NULL) {
-                    printEnt(f_ent, symbol_list_head);
-                }
-            }
             printf("\nAssembly completed.");
         }
 
@@ -52,7 +39,7 @@ void assemble(char *fname) {
     if (!flag->firstPass || !flag->secondPass) {
         printf("\nErrors were detected. No output files were created.");
     }
-    freeMemory(flag, symbol_list_head, data_img, fp, f_obj, f_ext, f_ent); /* Closing files and clearing memory before ending assembly process */
+    freeMemory(flag, symbol_list_head, data_img, fp); /* Closing files and clearing memory before ending assembly process */
     printf("\n");
     return;
 }

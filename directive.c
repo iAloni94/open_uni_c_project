@@ -93,7 +93,7 @@ dir_t *save_half_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *fl
 }
 
 dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
-    int temp, diff, i = 0;
+    int temp, i = 0, diff;
     char c;
     if (input != NULL) {
         while (input != NULL) {
@@ -108,12 +108,16 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
 
             /* 
             * Check for int overflow
-            * Because of int overflow, if an integers value is bigger or smaller than INT_LIMIT, it "circles back" in the opposite direction
+            * Because of int overflow, if an integers value exceeds 32 bit capacity, it "wraps around" in the opposite direction
+            * for example:
+            * let INT_MAX = 2147483647, INT_MIN = -2147483648.
+            * INT_MAX + 1 = INT_MIN
+            * INT_MIN - 1 = INT_MAX
             */
             temp = atoi(input->val);
-            if (strchr(input->val, '-')) {
-                diff = (INT_MAX + temp) + 1; /* 2147483647 - 2147483648 = -1 but is in range*/
-            } else {
+            if (strchr(input->val, '-')) { /* if input is a negative number that exceed 32 bits, temp would be positive because of overflow */
+                diff = (INT_MAX + temp) + 1; /* 2147483647 - 2147483648 = -1 but is in range so we add 1 to result */
+            } else {  /* if input is a positive number that exceed 32 bits, temp would be negative because of overflow */
                 diff = INT_MAX - (temp);
             }
             if (diff >= 0) {
@@ -182,7 +186,7 @@ void ent_handler(sym_t *symbol, node_t *input, flags *flag) {
     if (isDeclared(input->val, symbol, flag)) { /* step 6 */
         while (symbol != NULL) {
             if (!strcmp(input->val, symbol->name)) {
-                char *temp = calloc(1, LABEL_MAX_LENGTH);
+                char *temp = malloc(LABEL_MAX_LENGTH);
                 memcpy(temp, symbol->attribute, strlen(symbol->attribute));
                 strcat(temp, ", entry");
                 free(symbol->attribute);

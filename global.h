@@ -14,8 +14,7 @@
 #include "utils.h"
 
 void firstPass(unsigned int *, unsigned int *, unsigned int *, unsigned int *, unsigned int *, dir_t *, sym_t *, flags *, FILE *);
-void secondPass(unsigned int , unsigned int , sym_t *, flags *, FILE *);
-
+void secondPass(unsigned int, unsigned int, unsigned int *, sym_t *, flags *, FILE *);
 
 /* to_binary.c */
 unsigned int r_binary_instruction(R *);
@@ -29,19 +28,21 @@ J *check_j_param(int, node_t *, J *, flags *, sym_t *);
 unsigned int getReg(node_t *, flags *);
 
 /* utils.c */
-node_t *initList();
-node_t *addNode();
-void freeInputList(node_t *);
-void freeMemory(flags *, sym_t *, dir_t *, FILE *, FILE *, FILE *, FILE *);
+void freeMemory(flags *, sym_t *, dir_t *, FILE *);
+void freeDataImg(dir_t *);
 
 /* input.c */
 node_t *getLine(FILE *, flags *);
+node_t *initList();
+node_t *addNode();
+void freeInputList(node_t *);
 
 /* write_files.c */
 FILE *createFile(char *, char *);
 void printObj(FILE *, unsigned int *, dir_t *, unsigned int, unsigned int);
 void printExt();
 void printEnt();
+void writeFiles(char *, unsigned int *, dir_t *, sym_t *, flags *, unsigned int, unsigned int);
 
 /* label.c */
 void freeSymbolTable(sym_t *);

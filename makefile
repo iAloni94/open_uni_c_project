@@ -19,7 +19,7 @@ to_binary.o: to_binary.c instruction.h
 utils.o: utils.c global.h
 	$(CC) $(CFLAGS) -c utils.c
 
-write_files.o: write_files.c directive.h label.h
+write_files.o: write_files.c directive.h label.h utils.h
 	${CC} ${CFLAGS} -c write_files.c
 
 label.o: label.c global.h

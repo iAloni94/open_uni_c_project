@@ -115,3 +115,27 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
         exit(0);
     }
 }
+
+node_t* initList() {
+    node_t* head = malloc(sizeof(node_t));
+    head->val = calloc(1, 100);
+    head->next = NULL;
+    return head;
+}
+
+node_t* addNode() {
+    node_t* newNode = malloc(sizeof(node_t));
+    newNode->val = calloc(1, 100);
+    newNode->next = NULL;
+    return newNode;
+}
+
+void freeInputList(node_t* node) {
+    node_t* currNode;
+    while (node != NULL) {
+        currNode = node;
+        node = node->next;
+        free(currNode->val);
+        free(currNode);
+    }
+}

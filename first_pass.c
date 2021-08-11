@@ -56,7 +56,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                     }
 
                     if (funcNum <= mvlo) { /* R type function */
-                        R *instruction = (R *)calloc(sizeof(R), sizeof(char));
+                        R *instruction = (R *)calloc(sizeof(R), 1);
                         if (instruction == NULL) {
                             flag->firstPass = false;
                             printf("\nMemory allocation error");
@@ -67,7 +67,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                             free(instruction);
                         }
                     } else if (funcNum <= sh) { /* I type function */
-                        I *instruction = (I *)calloc(sizeof(I), sizeof(char));
+                        I *instruction = (I *)calloc(sizeof(I), 1);
                         if (instruction == NULL) {
                             flag->firstPass = false;
                             printf("\nMemory allocation error");
@@ -78,7 +78,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                             free(instruction);
                         }
                     } else if (funcNum <= stop) { /* J type function */
-                        J *instruction = (J *)calloc(sizeof(J), sizeof(char));
+                        J *instruction = (J *)calloc(sizeof(J), 1);
                         if (instruction == NULL) {
                             flag->firstPass = false;
                             printf("\nMemory allocation error");

@@ -100,9 +100,7 @@ char isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check
 }
 
 void insertLabel(sym_t *symbol, node_t *head, flags *flag, unsigned int IC, unsigned int DC) {
-    if (symbol == NULL) { /* create new node */
-        symbol = calloc(sizeof(sym_t), 1);
-    } else if (symbol != NULL && symbol->name != NULL) { /* if first node */
+    if (symbol != NULL && symbol->name != NULL) { /* if first node */
         while (symbol->next != NULL) symbol = symbol->next;
         symbol->next = calloc(sizeof(sym_t), 1);
         symbol = symbol->next;
@@ -119,7 +117,7 @@ void insertLabel(sym_t *symbol, node_t *head, flags *flag, unsigned int IC, unsi
         symbol->address = DC;
     } else {
         symbol->address = IC;
-            memcpy(symbol->attribute, "code", strlen("code"));
+        memcpy(symbol->attribute, "code", strlen("code"));
     }
     flag->label = false;
 }

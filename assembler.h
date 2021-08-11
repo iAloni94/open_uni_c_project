@@ -8,7 +8,7 @@
 #define NUM_OF_FUNC 27
 #define NUM_OF_DIR 6
 #define NUM_OF_REG 32
-#define GAP_BETWEEN_LIST_OPCODE 32
+#define GAP_BETWEEN_LIST_OPCODE 2
 #define MAX_LINE_LENGTH 81 /* Limit is 80 + Null terminator*/
 #define LABEL_MAX_LENGTH 31
 #define FILE_EXT ".as"

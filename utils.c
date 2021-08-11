@@ -4,29 +4,6 @@
 #include <string.h>
 
 #include "global.h"
-node_t *initList() {
-    node_t *head = malloc(sizeof(node_t));
-    head->val = calloc(1, 100);
-    head->next = NULL;
-    return head;
-}
-
-node_t *addNode() {
-    node_t *newNode = malloc(sizeof(node_t));
-    newNode->val = calloc(1, 100);
-    newNode->next = NULL;
-    return newNode;
-}
-
-void freeInputList(node_t *node) {
-    node_t *currNode;
-    while (node != NULL) {
-        currNode = node;
-        node = node->next;
-        free(currNode->val);
-        free(currNode);
-    }
-}
 
 /* This function get the numeric value of a binary number */
 int getNumericValue(int binaryNumber) {
@@ -79,12 +56,7 @@ void freeDataImg(dir_t *data) {
     }
 }
 
-void freeMemory(flags *flag, sym_t *symbol, dir_t *data_img, FILE *fp, FILE *fp_obj, FILE *fp_ext, FILE *fp_ent) {
-    if (flag->secondPass) {
-        fclose(fp_obj);
-        if (flag->external) fclose(fp_ext);
-        if (flag->entry) fclose(fp_ent);
-    }
+void freeMemory(flags *flag, sym_t *symbol, dir_t *data_img, FILE *fp) {
     fclose(fp);
     freeDataImg(data_img);
     freeSymbolTable(symbol);

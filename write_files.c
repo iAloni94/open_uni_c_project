@@ -4,6 +4,7 @@
 
 #include "directive.h"
 #include "label.h"
+#include "utils.h"
 
 #define MASK 0xFF /* 00000000 00000000 00000000 11111111 */
 
@@ -82,5 +83,27 @@ void printEnt(FILE* fp, sym_t* symbol) {
             fprintf(fp, "%s %04d\n", symbol->name, symbol->address);
         }
         symbol = symbol->next;
+    }
+}
+
+void writeFiles(char* fname, unsigned int* code_img, dir_t* data_img, sym_t* symbol_list_head, flags* flag, unsigned int ICF, unsigned int DCF) {
+    FILE *f_obj, *f_ent, *f_ext;
+
+    if ((f_obj = createFile(fname, ".ob")) != NULL) {
+        printObj(f_obj, code_img, data_img, ICF, DCF);
+        fclose(f_obj);
+    }
+
+    if (flag->external) { /* .ext file */
+        if ((f_ext = createFile(fname, ".ext")) != NULL) {
+            printExt();
+            fclose(f_ext);
+        }
+    }
+    if (flag->entry) { /* .ent file */
+        if ((f_ent = createFile(fname, ".ent")) != NULL) {
+            printEnt(f_ent, symbol_list_head);
+            fclose(f_ent);
+        }
     }
 }

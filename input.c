@@ -9,7 +9,8 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     int i = 0, j = 0;
     node_t* head = initList();
     node_t* node = head;
-    char temp, comma = false, label = false, instruction = true;
+    char temp;
+    bool comma = false, label = false, instruction = true, directive = true, quotation_mark = false, firstNode = true;
     char* currVal = node->val;
     char tempLine[MAX_LINE_LENGTH + 2] = {0}; /* +2 because 1 for the 81 char + 1 for null terminator */
     if (head) {
@@ -39,73 +40,103 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                 flag->lastLine = true;
                 return head;
             }
-            if (temp == ';') {
-                if (i != 0) {
-                    printf("\nLine: %d - Illegal character", flag->line);
-                    freeInputList(head);
-                    flag->firstPass = false;
-                    return NULL;
-                } else {
-                    freeInputList(head);
-                    return NULL;
-                }
-            }
-            if (temp == ':') {
-                label = true;
-                instruction = false;
-            }
-            if (comma && temp == ',') {
-                flag->firstPass = false;
-                printf("\nLine: %d - Consecutive commas", flag->line);
-                freeInputList(head);
-                return NULL;
-            }
-            if (isspace(temp)) {
-                while (isspace(temp) && temp != '\n') {
-                    i++;
-                    temp = tempLine[i];
-                }
-                if (temp == '\0' || temp == '\n') {
-                    return head;
-                }
-                if (!comma) {
-                    if (temp == ',') comma = true;
-                    if (label || instruction || comma) {
-                        if (label) {
-                            label = false;
-                            instruction = true;
-                        } else if (instruction) {
-                            instruction = false;
-                        }
-                        node->next = addNode();
-                        if (node->next != NULL) {
-                            node = node->next;
-                            currVal = node->val;
-                            j = 0;
-                            if (comma) {
-                                i++;
-                                temp = tempLine[i];
-                            }
-                        }
-                    } else {
-                        printf("\nLine: %d - Missing comma", flag->line);
+            if (temp == '\"') quotation_mark = true;
+            if (!quotation_mark) { /* if we found quotation marks, enter all folowing text to to the same node */
+                if (temp == ';') {
+                    if (i != 0) {
+                        printf("\nLine: %d - Illegal character", flag->line);
                         freeInputList(head);
                         flag->firstPass = false;
                         return NULL;
+                    } else {
+                        freeInputList(head);
+                        return NULL;
+                    }
+                }
+
+                if (temp == ':') {
+                    label = true;
+                }
+
+                if (comma && temp == ',') {
+                    flag->firstPass = false;
+                    printf("\nLine: %d - Consecutive commas", flag->line);
+                    freeInputList(head);
+                    return NULL;
+                }
+                if (isspace(temp)) {
+                    while (isspace(temp) && temp != '\n') {
+                        i++;
+                        temp = tempLine[i];
+                    }
+                    if (temp == '\0' || temp == '\n') {
+                        return head;
+                    }
+                    if (!comma) { /* if there was no comma before this space */
+                        if (temp == ',') comma = true;
+                        if (!firstNode) {
+                            if ((label || instruction || directive || comma)) {
+                                if (label) {
+                                    if (comma) {
+                                        printf("\nLine: %d - Extraneous character after label name", flag->line);
+                                        flag->firstPass = false;
+                                        freeInputList(head);
+                                        return NULL;
+                                    }
+                                    label = false;
+                                } else if (instruction || directive) {
+                                    instruction = false;
+                                    directive = false;
+                                    if (comma) { /* if its and instrcution or directive, there shold not be a comma after*/
+                                        printf("\nLine: %d - extraneous comma", flag->line);
+                                        flag->firstPass = false;
+                                        freeInputList(head);
+                                        return NULL;
+                                    }
+                                }
+                                node->next = addNode();
+                                if (node->next != NULL) {
+                                    node = node->next;
+                                    currVal = node->val;
+                                    j = 0;
+                                    if (comma) {
+                                        i++;
+                                        temp = tempLine[i];
+                                    }
+                                }
+                            } else { /* if */
+                                printf("\nLine: %d - Missing comma", flag->line);
+                                freeInputList(head);
+                                flag->firstPass = false;
+                                return NULL;
+                            }
+                        }
                     }
                     continue;
+                } else if (temp == ',') {
+                    if (label) {
+                        printf("\nLine: %d - Extraneous character after label name", flag->line);
+                        flag->firstPass = false;
+                        freeInputList(head);
+                        return NULL;
+                    }
+                    comma = true;
+                    i++;
+                    temp = tempLine[i];
+                    node->next = addNode();
+                    node = node->next;
+                    currVal = node->val;
+                    j = 0;
+                    continue;
+                } else {
+                    comma = false;
+                    firstNode = false;
+                    *(currVal + j) = temp;
+                    j++;
+                    i++;
+                    temp = tempLine[i];
                 }
-            } else if (temp == ',') {
-                comma = true;
-                i++;
-                temp = tempLine[i];
-                node->next = addNode();
-                node = node->next;
-                currVal = node->val;
-                j = 0;
-                continue;
             } else {
-                comma = false;
                 *(currVal + j) = temp;
                 j++;
                 i++;

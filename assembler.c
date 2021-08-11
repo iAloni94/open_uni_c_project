@@ -15,7 +15,7 @@ void assemble(char *fname) {
     FILE *fp;
 
     flag->label = false;     /* if a label was found */
-    flag->direction = false; /* if its a direction line */
+    flag->direction = false; /* if its a directive line */
     flag->firstPass = true;  /* if the 1st pass was successful */
     flag->lastLine = false;  /* marks last line in input file */
     flag->external = false;  /* this marks whether to create the .ext fie */

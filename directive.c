@@ -16,7 +16,7 @@ bool checkNum(node_t *input, flags *flag) {
         return false;
     }
     while (c != '\0') { /* check if operand is a number */
-        if (c != '-' && !IS_NUM(c)) {
+        if (c != '-' && c != '+' && !IS_NUM(c)) {
             printf("\nLine: %d - Operand should be an integer", flag->line);
             flag->firstPass = false;
             return false;
@@ -30,7 +30,7 @@ bool checkNum(node_t *input, flags *flag) {
 char *checkStr(node_t *input, flags *flag) { /*  this funtion checks if the string is valid i.e starts and ends with a " */
     char *diff;
     if (input->next != NULL) {
-        printf("Line: %d - extraneous operand", flag->line);
+        printf("\nLine: %d - extraneous operand", flag->line);
         flag->firstPass = false;
         return false;
     } else if (*(input->val) == '\"') {                /* if first char is " */
@@ -63,6 +63,8 @@ dir_t *save_byte(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
                     return dataImg;
                 }
                 input = input->next;
+            } else {
+                return dataImg;
             }
         }
     } else {
@@ -89,6 +91,8 @@ dir_t *save_half_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *fl
                     flag->firstPass = false;
                 }
                 input = input->next;
+            } else {
+                return dataImg;
             }
         }
     } else {
@@ -128,6 +132,8 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
                     flag->firstPass = false;
                 }
                 input = input->next;
+            } else {
+                return dataImg;
             }
         }
     } else {

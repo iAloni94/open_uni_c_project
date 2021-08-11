@@ -25,9 +25,9 @@ FILE* createFile(char* fname, char* extention) {
 
 void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF, unsigned int DCF) {
     unsigned int a, b, c, d, i = 0, j = 0, IC = 100;
-    unsigned char* data = calloc(DCF, 1);
+    unsigned char* data = malloc(DCF);
 
-    fprintf(fp, "%d\t%d", ICF - 100, DCF);
+    fprintf(fp, "\t%d\t%d", ICF - 100, DCF);
 
     /*  print code image*/
     /* shift mask to desired 4 bits location and then shift the result to the rightmost 4 bits for printing */
@@ -37,7 +37,7 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
         c = (*(codeImg + i) & (MASK << 16)) >> 16; /* instruction: bytes 17-24; mask: 00000000 11111111 00000000 00000000 */
         d = (*(codeImg + i) & (MASK << 24)) >> 24; /* instruction: bytes 25-32; mask: 11111111 00000000 00000000 00000000 */
 
-        fprintf(fp, "\n%04d %02x %02x %02x %02x", IC, a, b, c, d);
+        fprintf(fp, "\n%04d  %02X %02X %02X %02X", IC, a, b, c, d);
         IC += 4;
     }
 
@@ -68,8 +68,8 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
     }
 
     for (i = 0; i < DCF; i += 4) {
-        fprintf(fp, "\n%04d ", ICF + j);
-        fprintf(fp, "%02x %02x %02x %02x", data[i], data[i + 1], data[i + 2], data[i + 3]);
+        fprintf(fp, "\n%04d  ", ICF + j);
+        fprintf(fp, "%02X %02X %02X %02X", data[i], data[i + 1], data[i + 2], data[i + 3]);
         j += 4;
     }
     free(data);

@@ -10,10 +10,10 @@
 
 #include "assembler.h"
 
-enum {
+typedef enum bool{
     false = 0,
     true = 1
-};
+}bool;
 
 typedef struct flag { /* this struct contains all the differnt flags and indicators for the assembly operation */
     char label;

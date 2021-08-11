@@ -47,19 +47,20 @@ void writeFiles(char *, unsigned int *, dir_t *, sym_t *, flags *, unsigned int,
 /* label.c */
 void freeSymbolTable(sym_t *);
 unsigned int getSymbolAddress(char *, sym_t *);
-char isLabel(node_t *, flags *, sym_t *);
-char isAlphaNumeric(char *);
-char isReserved(char *, flags *);
-char isDeclared(char *, sym_t *, flags *);
+bool isLabel(node_t *, flags *, sym_t *);
+bool isAlphaNumeric(char *);
+bool isReserved(char *, flags *);
+bool isDeclared(char *, sym_t *, flags *);
 void insertLabel(sym_t *, node_t *, flags *, unsigned int, unsigned int);
 void updateSymbolAddress(sym_t *, unsigned int);
 
 /* directive.c */
+bool checkNum(node_t *, flags *);
+char *checkStr(node_t *, flags *);
 dir_t *save_byte(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_half_word(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_word(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_str(node_t *, dir_t *, unsigned int *, flags *);
-char *checkStr(node_t *, flags *);
 void ext_handler(sym_t *, node_t *, flags *, unsigned int, unsigned int);
 void ent_handler(sym_t *, node_t *, flags *);
 #endif

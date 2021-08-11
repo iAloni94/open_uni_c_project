@@ -75,13 +75,17 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             flag->firstPass = false;
             return NULL;
         } else if (input != NULL) {
+            if (strlen(input->val) != 0) {
+                printf("\nLine: %d - extraneous operand", flag->line);
+            } else {
+                printf("\nLine: %d - extraneous comma", flag->line);
+            }
             flag->firstPass = false;
-            printf("\nLine: %d - extraneous operand", flag->line);
             return NULL;
-        } else {
-            return instruction;
         }
-    } else { /* copy functions - 2 parameters rs + rd */
+        return instruction;
+    }
+    else { /* copy functions - 2 parameters rs + rd */
         temp = getReg(input, flag);
         if (temp != NUM_OF_REG) {
             instruction->rs = temp;
@@ -112,7 +116,7 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
 
 I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
     char rs = false, rt = false, immed = false;
-    int i = 0;  
+    int i = 0;
 
     if (funcNum >= addi && funcNum <= nori) {
         /*Set the opcode to the function name + the gap to make is similar to number in the list */
@@ -158,7 +162,6 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
         /* the distance is from the current location of the instruction minus the current value in the loop. 
         if the loop adress is smaller than the adress of the instruction 
         (declared before it{in this case I am not sure what is the purpose of minus}) 
-	@@ -162,26 +174,82 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag)
         /* bne - check if the value in register "rs" is -- Not Equals-- to the value in register "rt" */
         /* blt - check if the value in register "rs" is -- Lower Than -- the value in register "rt" */
         /* bgt - check if the value in register "rs" is -- Greater Than -- to the value in register "rt" */
@@ -306,9 +309,9 @@ unsigned int getReg(node_t *node, flags *flag) {
 
     /*
     * if i=0, registerList[i] = $0. if i=1, registerList[i] = $1. if i=28, registerList[i] = $28. if i=n, registerList[i] = $n
-    * this way, as soon as our input value == registerList[i], we know which register it is by looking at i
+    * this way, as soon as our input value = registerList[i], we know which register it is by looking at i
     */
-    if (node != NULL) {
+    if (node != NULL && *(node->val) != '\0') {
         if (strchr(node->val, '$')) {
             for (i = 0; i < NUM_OF_REG; i++) {
                 if (!strcmp(node->val, registerList[i])) {

@@ -36,7 +36,7 @@ unsigned int getSymbolAddress(char *name, sym_t *symbol) {
     return false;
 }
 
-char isLabel(node_t *input, flags *flag, sym_t *symbol) {
+bool isLabel(node_t *input, flags *flag, sym_t *symbol) {
     if (strchr(input->val, ':') != NULL) {
         input->val[strlen(input->val) - 1] = '\0';
         if ((strlen(input->val) <= LABEL_MAX_LENGTH) &&
@@ -51,7 +51,7 @@ char isLabel(node_t *input, flags *flag, sym_t *symbol) {
     return false;
 }
 
-char isAlphaNumeric(char *str) {
+bool isAlphaNumeric(char *str) {
     int i;
     for (i = 0; i < strlen(str); i++) {
         if (IS_LETTER(*(str + i)) || IS_NUM(*(str + i))) {
@@ -63,7 +63,7 @@ char isAlphaNumeric(char *str) {
     return true;
 }
 
-char isReserved(char *str, flags *flag) { /* checks if label is a reseved word */
+bool isReserved(char *str, flags *flag) { /* checks if label is a reseved word */
     int i;
     for (i = 0; i < 33; i++) { /* 33 is number of reserved words*/
         if (!strcmp(savedWords[i], str)) {
@@ -74,7 +74,7 @@ char isReserved(char *str, flags *flag) { /* checks if label is a reseved word *
     return false;
 }
 
-char isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check if a label was already decalred*/
+bool isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check if a label was already decalred*/
     while (symbol != NULL && symbol->name != NULL) {
         if (!strcmp(str, symbol->name)) {
             if (!flag->entry) { /* first pass check */

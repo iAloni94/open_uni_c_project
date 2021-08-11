@@ -7,6 +7,26 @@
 #define IN_RANGE_BYTE(n) n >= CHAR_MIN &&n <= CHAR_MAX ? true : false
 #define IN_RANGE_H_WORD(n) n >= SHRT_MIN &&n <= SHRT_MAX ? true : false
 
+bool checkNum(node_t *input, flags *flag) {
+    char c;
+    int i = 0;
+    if ((c = *(input->val)) == '\0') {
+        printf("\nLine: %d - extraneous comma", flag->line);
+        flag->firstPass = false;
+        return false;
+    }
+    while (c != '\0') { /* check if operand is a number */
+        if (c != '-' && !IS_NUM(c)) {
+            printf("\nLine: %d - Operand should be an integer", flag->line);
+            flag->firstPass = false;
+            return false;
+        }
+        i++;
+        c = *(input->val + i);
+    }
+    return true;
+}
+
 char *checkStr(node_t *input, flags *flag) { /*  this funtion checks if the string is valid i.e starts and ends with a " */
     char *diff;
     if (input->next != NULL) {
@@ -26,31 +46,24 @@ char *checkStr(node_t *input, flags *flag) { /*  this funtion checks if the stri
 }
 
 dir_t *save_byte(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
-    char c;
-    int temp, i = 0;
+    int temp;
     if (input != NULL) {
         while (input != NULL) {
-            while ((c = *(input->val + i)) != '\0') { /* check if operand is a number */
-                if (!IS_NUM(c) && c != '-') {
-                    printf("\nLine: %d - Operand should be an integer", flag->line);
+            if ((checkNum(input, flag))) {
+                temp = atoi(input->val);
+                if (IN_RANGE_BYTE(temp)) { /* check if operand in range */
+                    dataImg->byte = temp;
+                    dataImg->flag = byte;
+                    dataImg->next = calloc(sizeof(dir_t), 1);
+                    dataImg = dataImg->next;
+                    *DC += 1;
+                } else {
+                    printf("\nLine: %d - Integer \"%d\" is outside 1 byte capacity range (-128 to 127)", flag->line, temp);
                     flag->firstPass = false;
                     return dataImg;
                 }
-                i++;
+                input = input->next;
             }
-            temp = atoi(input->val);
-            if (IN_RANGE_BYTE(temp)) { /* check if operand in range */
-                dataImg->byte = temp;
-                dataImg->flag = byte;
-                dataImg->next = calloc(sizeof(dir_t), 1);
-                dataImg = dataImg->next;
-                *DC += 1;
-            } else {
-                printf("\nLine: %d - Integer \"%d\" is outside 1 byte capacity range (-128 to 127)", flag->line, temp);
-                flag->firstPass = false;
-                return dataImg;
-            }
-            input = input->next;
         }
     } else {
         printf("\nLine: %d - Missig operand", flag->line);
@@ -60,30 +73,23 @@ dir_t *save_byte(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
 }
 
 dir_t *save_half_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
-    char c;
-    int temp, i = 0;
+    int temp;
     if (input != NULL) {
         while (input != NULL) {
-            while ((c = *(input->val + i)) != '\0') { /* check if operand is a number */
-                if (!IS_NUM(c) && c != '-') {
-                    printf("Line: %d - Operand should be an integer", flag->line);
+            if ((checkNum(input, flag))) {
+                temp = atoi(input->val);
+                if (IN_RANGE_H_WORD(temp)) { /* check if operand in range */
+                    dataImg->half_word = temp;
+                    dataImg->flag = half_word;
+                    dataImg->next = calloc(sizeof(dir_t), 1);
+                    dataImg = dataImg->next;
+                    *DC += 2;
+                } else {
+                    printf("\nLine: %d - Integer \"%d\" is outside 2 byte capacity range (-32768 to 32767)", flag->line, temp);
                     flag->firstPass = false;
-                    return dataImg;
                 }
-                i++;
+                input = input->next;
             }
-            temp = atoi(input->val);
-            if (IN_RANGE_H_WORD(temp)) { /* check if operand in range */
-                dataImg->half_word = temp;
-                dataImg->flag = half_word;
-                dataImg->next = calloc(sizeof(dir_t), 1);
-                dataImg = dataImg->next;
-                *DC += 2;
-            } else {
-                printf("\nLine: %d - Integer \"%d\" is outside 2 byte capacity range (-32768 to 32767)", flag->line, temp);
-                flag->firstPass = false;
-            }
-            input = input->next;
         }
     } else {
         printf("\nLine: %d - Missig operand", flag->line);
@@ -93,20 +99,11 @@ dir_t *save_half_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *fl
 }
 
 dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
-    int temp, i = 0, diff;
-    char c;
+    int temp, diff;
     if (input != NULL) {
         while (input != NULL) {
-            while ((c = *(input->val + i)) != '\0') { /* check if operand is a number */
-                if (c != '-' && !IS_NUM(c)) {
-                    printf("Line: %d - Operand should be an integer", flag->line);
-                    flag->firstPass = false;
-                    return dataImg;
-                }
-                i++;
-            }
-
-            /* 
+            if ((checkNum(input, flag))) {
+                /* 
             * Check for int overflow
             * Because of int overflow, if an integers value exceeds 32 bit capacity, it "wraps around" in the opposite direction
             * for example:
@@ -114,23 +111,24 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
             * INT_MAX + 1 = INT_MIN
             * INT_MIN - 1 = INT_MAX
             */
-            temp = atoi(input->val);
-            if (strchr(input->val, '-')) { /* if input is a negative number that exceed 32 bits, temp would be positive because of overflow */
-                diff = (INT_MAX + temp) + 1; /* 2147483647 - 2147483648 = -1 but is in range so we add 1 to result */
-            } else {  /* if input is a positive number that exceed 32 bits, temp would be negative because of overflow */
-                diff = INT_MAX - (temp);
+                temp = atoi(input->val);
+                if (strchr(input->val, '-')) {   /* if input is a negative number that exceed 32 bits, temp would be positive because of overflow */
+                    diff = (INT_MAX + temp) + 1; /* INT_MAX - INT_MIN = -1 but both in range so we add 1 to result */
+                } else {                         /* if input is a positive number that exceed 32 bits, temp would be negative because of overflow */
+                    diff = INT_MAX - (temp);
+                }
+                if (diff >= 0) {
+                    dataImg->word = temp;
+                    dataImg->flag = word;
+                    dataImg->next = calloc(sizeof(dir_t), 1);
+                    dataImg = dataImg->next;
+                    *DC += 4;
+                } else {
+                    printf("\nLine: %d - Integer \"%d\" is outside 4 byte capacity range (-2,147,483,648 to 2,147,483,647 )", flag->line, temp);
+                    flag->firstPass = false;
+                }
+                input = input->next;
             }
-            if (diff >= 0) {
-                dataImg->word = temp;
-                dataImg->flag = word;
-                dataImg->next = calloc(sizeof(dir_t), 1);
-                dataImg = dataImg->next;
-                *DC += 4;
-            } else {
-                printf("\nLine: %d - Integer \"%d\" is outside 4 byte capacity range (-2,147,483,648 to 2,147,483,647 )", flag->line, temp);
-                flag->firstPass = false;
-            }
-            input = input->next;
         }
     } else {
         printf("\nLine: %d - Missig operand", flag->line);

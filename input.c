@@ -11,13 +11,13 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     node_t* node = head;
     char temp, comma = false, label = false, instruction = true;
     char* currVal = node->val;
-    char tempLine[MAX_LINE_LENGTH + 2] = {0};
+    char tempLine[MAX_LINE_LENGTH + 2] = {0}; /* +2 because 1 for the 81 char + 1 for null terminator */
     if (head) {
         fgets(tempLine, MAX_LINE_LENGTH + 2, fp);
 
         if (strchr(tempLine, '\n') == NULL) {
             if (strlen(tempLine) > MAX_LINE_LENGTH) { /* Check if line exceeds allowed length or last line in file */
-                printf("\nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH - 1);
+                printf("\nLine: %d - Line too long. Max line length is %d", flag->line, MAX_LINE_LENGTH);
                 freeInputList(head);
                 flag->firstPass = false;
                 return NULL;
@@ -69,7 +69,8 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                     return head;
                 }
                 if (!comma) {
-                    if (label || instruction) {
+                    if (temp == ',') comma = true;
+                    if (label || instruction || comma) {
                         if (label) {
                             label = false;
                             instruction = true;
@@ -80,8 +81,11 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                         if (node->next != NULL) {
                             node = node->next;
                             currVal = node->val;
-                            *(currVal) = -1;
                             j = 0;
+                            if (comma) {
+                                i++;
+                                temp = tempLine[i];
+                            }
                         }
                     } else {
                         printf("\nLine: %d - Missing comma", flag->line);

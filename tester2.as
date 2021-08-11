@@ -13,6 +13,11 @@ END:	stop
 STR:	.asciz	"aBcd"
 LIST:   .db	6,9
 .dh	27056
+.entry	STR
 .entry	K
+.entry	END
+.entry	MAIN
+.entry	Next
+.entry	LIST
 K:	.dw	31,-12
 .extern val1

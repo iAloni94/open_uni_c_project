@@ -79,7 +79,7 @@ void printExt() {}
 void printEnt(FILE* fp, sym_t* symbol) {
     while (symbol != NULL) {
         if (strstr(symbol->attribute, "entry")) {
-            fprintf(fp, "%s %04d", symbol->name, symbol->address);
+            fprintf(fp, "%s %04d\n", symbol->name, symbol->address);
         }
         symbol = symbol->next;
     }

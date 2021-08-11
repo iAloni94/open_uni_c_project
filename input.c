@@ -65,7 +65,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                     i++;
                     temp = tempLine[i];
                 }
-                if (temp == '\0') {
+                if (temp == '\0' || temp == '\n') {
                     return head;
                 }
                 if (!comma) {

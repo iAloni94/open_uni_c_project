@@ -13,6 +13,10 @@
 #include "label.h"
 #include "utils.h"
 
+void firstPass(unsigned int *, unsigned int *, unsigned int *, unsigned int *, unsigned int *, dir_t *, sym_t *, flags *, FILE *);
+void secondPass(unsigned int , unsigned int , sym_t *, flags *, FILE *);
+
+
 /* to_binary.c */
 unsigned int r_binary_instruction(R *);
 unsigned int i_binary_instruction(I *);

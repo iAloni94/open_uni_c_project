@@ -20,6 +20,7 @@ void freeSymbolTable(sym_t *node) {
         currNode = node;
         node = node->next;
         free(currNode->name);
+        free(currNode->attribute);
         free(currNode);
     }
     free(node);
@@ -76,11 +77,11 @@ char isReserved(char *str, flags *flag) { /* checks if label is a reseved word *
 char isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check if a label was already decalred*/
     while (symbol != NULL && symbol->name != NULL) {
         if (!strcmp(str, symbol->name)) {
-            if (!flag->entry) {
-                printf("\nLine: %d - Label name <%s> already in use", flag->line, str);
+            if (!flag->entry) { /* first pass check */
+                printf("\nLine: %d - Label name \"%s\" was already declared", flag->line, str);
                 flag->firstPass = false;
-                return true; /* label was declared */
-            } else if (!strcmp(symbol->attribute, "external")) {
+                return true;                                     /* label was declared */
+            } else if (!strcmp(symbol->attribute, "external")) { /* if entry, check if external */
                 printf("\nLine: %d - Label was already declared as external", flag->line);
                 flag->secondPass = false;
                 return false;
@@ -89,7 +90,7 @@ char isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check
         }
         symbol = symbol->next;
     }
-    if (flag->entry) {
+    if (flag->entry) { /* if entry and label was not decalred */
         printf("\nLine: %d - Label was not declared", flag->line);
         flag->entry = false;
         flag->secondPass = false;
@@ -99,26 +100,26 @@ char isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check
 }
 
 void insertLabel(sym_t *symbol, node_t *head, flags *flag, unsigned int IC, unsigned int DC) {
-    if (symbol == NULL) {
+    if (symbol == NULL) { /* create new node */
         symbol = calloc(sizeof(sym_t), 1);
-    } else if (symbol != NULL && symbol->name != NULL) {
+    } else if (symbol != NULL && symbol->name != NULL) { /* if first node */
         while (symbol->next != NULL) symbol = symbol->next;
         symbol->next = calloc(sizeof(sym_t), 1);
         symbol = symbol->next;
     }
     symbol->name = calloc(sizeof(char), strlen(head->val));
+    symbol->attribute = calloc(sizeof(char), 25);
     memcpy(symbol->name, head->val, strlen(head->val));
     if (flag->direction) {
         if (flag->external) {
-            symbol->attribute = "external";
+            memcpy(symbol->attribute, "external", strlen("external"));
         } else {
-            symbol->attribute = "data";
+            memcpy(symbol->attribute, "data", strlen("data"));
         }
         symbol->address = DC;
-        flag->line += 1;
     } else {
         symbol->address = IC;
-        symbol->attribute = "code";
+            memcpy(symbol->attribute, "code", strlen("code"));
     }
     flag->label = false;
 }

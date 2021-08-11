@@ -186,30 +186,19 @@ void assemble(char *fname) {
                     node = node->next;
                 }
 
-                for (i = 0; i < NUM_OF_DIR - 1; i++) {
+                dirNum = NUM_OF_DIR;
+                for (i = 0; i < NUM_OF_DIR; i++) {
                     if (!strcmp(node->val, directives[i])) {
-                        flag->line += 1;
-                        break;
+                        dirNum = i;
                     }
                 }
 
-                if (!strcmp(node->val, ".entry")) { /* step 5 */
-                    flag->entry = true;
-                    node = node->next;
-                    if (isDeclared(node->val, symbol_list_head, flag)) { /* step 6 */
-                        sym_t *tempSym = symbol_list_head;
-                        while (tempSym != NULL) {
-                            if (!strcmp(node->val, tempSym->name)) {
-                                char temp[LABEL_MAX_LENGTH] = {0};
-                                strcpy(temp, tempSym->attribute); /* getting the label ready for parsing (adding ':') */
-                                strcat(temp, ", entry");
-                                tempSym->attribute = temp;
-                                flag->entry = true;
-                                break;
-                            }
-                            tempSym = tempSym->next;
-                        }
-                    }
+                if (dirNum == ent) { /* step 5 */
+                    ent_handler(symbol_list_head, node, flag);
+                    freeInputList(head);
+                    flag->line += 1;
+                    continue;
+                } else {
                     freeInputList(head);
                     flag->line += 1;
                     continue;
@@ -225,7 +214,7 @@ void assemble(char *fname) {
             }
             freeInputList(head);
             flag->line += 1;
-        }
+        } /* end while */
 
         if (flag->secondPass) { /* step 9 */
             /* creating oputput files          step 10  */

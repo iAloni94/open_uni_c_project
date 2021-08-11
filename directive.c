@@ -172,3 +172,21 @@ void ext_handler(sym_t *symbol, node_t *input, flags *flag, unsigned int IC, uns
     }
     free(tempNode);
 }
+
+void ent_handler(sym_t *symbol, node_t *input, flags *flag) {
+    flag->entry = true;
+    input = input->next;
+    if (isDeclared(input->val, symbol, flag)) { /* step 6 */
+        while (symbol != NULL) {
+            if (!strcmp(input->val, symbol->name)) {
+                char *temp = calloc(1, LABEL_MAX_LENGTH);
+                memcpy(temp, symbol->attribute, strlen(symbol->attribute));
+                strcat(temp, ", entry");
+                free(symbol->attribute);
+                symbol->attribute = temp;
+                break;
+            }
+            symbol = symbol->next;
+        }
+    }
+}

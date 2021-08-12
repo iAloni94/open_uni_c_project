@@ -22,9 +22,9 @@ unsigned int i_binary_instruction(I *);
 unsigned int j_binary_instruction(J *);
 
 /* param.c */
-R *check_r_param(int, node_t *, R *, flags *);
-I *check_i_param(int, node_t *, I *, flags *, sym_t *, unsigned int);
-J *check_j_param(int, node_t *, J *, flags *, sym_t *);
+R *get_r_instruction(int, node_t *, R *, flags *);
+I *get_i_instruction(int, node_t *, I *, flags *, sym_t *, unsigned int);
+J *get_j_instruction(int, node_t *, J *, flags *, sym_t *);
 char getReg(node_t *, flags *);
 
 /* utils.c */

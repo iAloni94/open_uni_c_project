@@ -4,6 +4,7 @@
 #include "global.h"
 
 #define CHECK_BIT(v, n) ((v)&1 << n) ? true : false /* checks if nth bit of v from right is true or false */
+#define MASK_1_BTYE 0xFFFF                          /* ..00 0000 1111 1111 1111 1111 */
 
 void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_t *symbol_list_head, flags *flag, FILE *fp) {
     char *functionName[NUM_OF_FUNC] = {
@@ -19,6 +20,7 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
 
     int funcNum, dirNum, i, codeCounter = 0;
     node_t *head, *node;
+    sym_t *temp_sym = symbol_list_head;
 
     if (flag->firstPass) { /* second pass */
 
@@ -66,10 +68,35 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
                     }
                 }
                 if (funcNum >= beq && funcNum <= bgt) {
-                    /* handle i instruction 2nd pass */
+                    unsigned int label_address;
+
+                    while (node->next != NULL) node = node->next; /* go to last node because thats where the label is */
+
+                    label_address = getSymbolAddress(node->val, symbol_list_head);
+                    if (!label_address) {
+                        printf("\nLine: %d -  label was not declared!", flag->line);
+                        flag->secondPass = false;
+                    }
+
+                    while (temp_sym != NULL && temp_sym->name != NULL) { /* check if label is external */
+                        if (temp_sym->address == label_address) {
+                            if (!strcmp(temp_sym->attribute, "external")) {
+                                printf("Line: %d -  Conditional branching does not accept external labels", flag->line);
+                                flag->secondPass = false;
+                            }
+                        }
+                        temp_sym = temp_sym->next;
+                    }
+                    if (flag->secondPass) {
+                        unsigned int this_address = (code_img[codeCounter] & MASK_1_BTYE); /* get the address of the instruction itself (rightmost 16 bits) */
+                        int new_address = label_address - this_address;                    /* new address to be entered to code image */
+                        new_address = new_address & MASK_1_BTYE;                           /* get rightmost 26 bits of new address */
+                        code_img[codeCounter] = code_img[codeCounter] & ~MASK_1_BTYE;      /* turn off bit 0-16 of original machine code */
+                        code_img[codeCounter] = code_img[codeCounter] | new_address;       /* enter new address */
+                    }
                 }
 
-                if (funcNum >= jmp && funcNum <= call) {         /* handle j instruction 2nd pass */
+                if (funcNum >= jmp && funcNum <= call) {
                     if (!CHECK_BIT(code_img[codeCounter], 25)) { /* if reg bit is off - update address field in code image */
                         unsigned int address = getSymbolAddress(node->next->val, symbol_list_head);
                         code_img[codeCounter] = code_img[codeCounter] | address;

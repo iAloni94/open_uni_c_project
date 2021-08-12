@@ -31,7 +31,7 @@ FILE* createFile(char* fname, char* extention) {
 /* This function print the .obj file according to the specifications */
 void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF, unsigned int DCF) {
     unsigned int a, b, c, d, i = 0, j = 0, IC = 100;
-    unsigned char* data = malloc(DCF);
+    unsigned char* data = malloc(DCF+1);
 
     fprintf(fp, "\t%d\t%d", ICF - 100, DCF);
 

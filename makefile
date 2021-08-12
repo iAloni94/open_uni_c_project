@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -pedantic -ansi -Wall -g
 
-assembler: assembler.o input.o param.o to_binary.o utils.o write_files.o label.o directive.o first_pass.o second_pass.o
-	${CC} ${CFLAGS} assembler.o -o assembler input.o param.o to_binary.o utils.o write_files.o label.o directive.o first_pass.o second_pass.o
+assembler: assembler.o input.o instruction.o to_binary.o utils.o write_files.o label.o directive.o first_pass.o second_pass.o
+	${CC} ${CFLAGS} assembler.o -o assembler input.o instruction.o to_binary.o utils.o write_files.o label.o directive.o first_pass.o second_pass.o
 
 assembler.o: assembler.c global.h directive.h
 	${CC} ${CFLAGS} -c assembler.c
@@ -10,8 +10,8 @@ assembler.o: assembler.c global.h directive.h
 input.o: input.c global.h
 	${CC} ${CFLAGS} -c input.c
 
-param.o: param.c global.h
-	${CC} ${CFLAGS} -c param.c
+instruction.o: instruction.c global.h
+	${CC} ${CFLAGS} -c instruction.c
 
 to_binary.o: to_binary.c instruction.h
 	${CC} ${CFLAGS} -c to_binary.c

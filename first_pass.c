@@ -63,7 +63,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                             printf("\nMemory allocation error");
                             exit(0);
                         }
-                        if ((instruction = check_r_param(funcNum, node->next, instruction, flag))) {
+                        if ((instruction = get_r_instruction(funcNum, node->next, instruction, flag))) {
                             first_pass_32bit = r_binary_instruction(instruction);
                             free(instruction);
                         }
@@ -74,7 +74,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                             printf("\nMemory allocation error");
                             exit(0);
                         }
-                        if ((instruction = check_i_param(funcNum, node->next, instruction, flag, symbol_list_head, *IC))) {
+                        if ((instruction = get_i_instruction(funcNum, node->next, instruction, flag, symbol_list_head, *IC))) {
                             first_pass_32bit = i_binary_instruction(instruction);
                             free(instruction);
                         }
@@ -85,7 +85,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                             printf("\nMemory allocation error");
                             exit(0);
                         }
-                        if ((instruction = check_j_param(funcNum, node, instruction, flag, symbol_list_head))) {
+                        if ((instruction = get_j_instruction(funcNum, node, instruction, flag, symbol_list_head))) {
                             first_pass_32bit = j_binary_instruction(instruction);
                             free(instruction);
                         }

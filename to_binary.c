@@ -31,6 +31,7 @@ unsigned int r_binary_instruction(R *instruction) {
 unsigned int i_binary_instruction(I *instruction) {
     unsigned int my_32bit = 0;
     unsigned int temp;
+    int immed;
 
     temp = instruction->opcode; /* shift result to opcode part of instruction (bit 26-31) */
     my_32bit |= (temp << 26);
@@ -41,8 +42,10 @@ unsigned int i_binary_instruction(I *instruction) {
     temp = instruction->rt; /* (16-20) */
     my_32bit |= (temp << 16);
 
-    temp = instruction->immed; /* (0-15) */
-    my_32bit |= (temp);
+    immed = instruction->immed; /* (0-15) */
+    unsigned int mask = 0xFFFF; /* ..00 0000 1111 1111 1111 1111 */
+    immed = immed & mask;
+    my_32bit |= (immed);
 
     return my_32bit;
 }

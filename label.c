@@ -4,6 +4,8 @@
 
 #include "global.h"
 
+#define RES_WORD_NUM 33
+
 char *savedWords[] = {
     "dd", "dw", "db", "asciz", "entry", "extern",
     "add", "sub", "and", "or",
@@ -37,6 +39,12 @@ unsigned int getSymbolAddress(char *name, sym_t *symbol) {
     return false;
 }
 
+/*
+* This function is used to validate a label.
+* It check that all characters are alphanumeric, that its length does not exceeds the limit and that no reserved word are used as labels.
+* it expects a colon to be present at the end of the string, so if there isnt one (when a label is used as an operand), one must be added.
+*/
+
 bool isLabel(node_t *input, flags *flag, sym_t *symbol) {
     if (strchr(input->val, ':') != NULL) {
         input->val[strlen(input->val) - 1] = '\0';
@@ -64,9 +72,10 @@ bool isAlphaNumeric(char *str) {
     return true;
 }
 
-bool isReserved(char *str, flags *flag) { /* checks if label is a reseved word */
+/* checks if label is a reseved word */
+bool isReserved(char *str, flags *flag) {
     int i;
-    for (i = 0; i < 33; i++) { /* 33 is number of reserved words*/
+    for (i = 0; i < RES_WORD_NUM; i++) {
         if (!strcmp(savedWords[i], str)) {
             flag->firstPass = false;
             return true;

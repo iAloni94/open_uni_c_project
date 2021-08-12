@@ -21,7 +21,7 @@
 * It check if all the operands and parameters are valid.
 * if all operands check out, a 32 bit instruction is built based on them
 */
-R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
+R *get_r_instruction(int funcNum, node_t *input, R *instruction, flags *flag) {
     char rs = false, rt = false, rd = false, temp;
 
     switch (funcNum) { /* opcode */
@@ -127,7 +127,7 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
     }
 }
 
-I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag, sym_t *symbol, unsigned int IC) {
+I *get_i_instruction(int funcNum, node_t *input, I *instruction, flags *flag, sym_t *symbol, unsigned int IC) {
     bool rs = false, rt = false, immed = false;
     char temp, imm_temp[MAX_LINE_LENGTH] = {0};
     node_t *tempNode = calloc(sizeof(node_t), 1);
@@ -141,19 +141,24 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag, sym_t 
     /*Set the opcode to the function name + the gap to make is match to number in the list */
     instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
 
-    if (funcNum >= addi && funcNum <= nori) {
-        if (checkNum(input->next, flag)) {
-            instruction->immed = atoi(input->next->val); /* get immed at begining because all 3 type of func use it */
-            immed = true;
+    /*
+    * arithmatics and save/load function accepts the same operands in this order: rs->immed->rt 
+    */
+    if ((funcNum >= addi && funcNum <= nori) || (funcNum >= lb && funcNum <= sh)) {
+        temp = getReg(input, flag); /* check rs is valid*/
+        if (temp <= NUM_OF_REG) {
+            instruction->rs = temp;
+            rs = true;
+            input = input->next;
 
-            temp = getReg(input, flag);
-            if (temp <= NUM_OF_REG) {
-                instruction->rs = temp;
-                rs = true;
-                input = input->next->next; /* skip immed value */
+            if (checkNum(input, flag)) { /* check immed is valid*/
+                instruction->immed = atoi(input->val);
+                immed = true;
+                input = input->next;
 
-                temp = getReg(input, flag);
+                temp = getReg(input, flag); /* check rt is valid*/
                 if (temp <= NUM_OF_REG) {
+                    instruction->rt = temp;
                     rt = true;
                     input = input->next;
                 }
@@ -166,19 +171,11 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag, sym_t 
         */
 
     else if (funcNum >= beq && funcNum <= bgt) {
-        /* -------------------- Need to check with you how to get the memory location of the funct name ------------------ */
-
-        /*int distanceFromDestination = 0, locationOfFunc = 0; */
-
-        /* here - get the adress in the memory of the funcName
-            * and set it to locationOfFunc
-            * locationOfFunc = funcName.adress
-            */
         temp = getReg(input, flag);
         if (temp <= NUM_OF_REG) {
             instruction->rs = temp;
             rs = true;
-            input = input->next; /* skip immed value */
+            input = input->next;
 
             temp = getReg(input, flag);
             if (temp <= NUM_OF_REG) {
@@ -187,7 +184,7 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag, sym_t 
                 input = input->next;
             }
 
-            strcpy(imm_temp, input->val); /* getting the label ready for parsing (adding ':') */
+            strcpy(imm_temp, input->val); /* getting the label ready for parsing (adding ':'). See isLabel() comment for more detail */
             strcat(imm_temp, ":");
             tempNode->val = imm_temp;
             if (isLabel(tempNode, flag, symbol)) { /* if operand is label */
@@ -195,44 +192,11 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag, sym_t 
                 instruction->immed = IC; /* save current instruction address for later */
                 input = input->next;
             }
-            /* distanceFromDestination = atoi(input->val);
-            instruction->immed = distanceFromDestination - locationOfFunc; */
-        }
-    }
-
-    /*
-    * Check if the funcNum is one of these 6 Save and Load function : lt, sb, lw, sw, lh,sh.
-    * Each of them holds 4 fields of data = {opcode, rs, rt, immed} - 3 parameters (rt ,rs, immed)
-    * Type of  functions:  
-    * in all of these function, the first register contains the adress in the memory
-    * the immediate, is th second operand, and he represent the "offset"
-    * opcode is the same, and all the rest change the same
-    * in this case we need to swip the locations of the "rt" and the "immediate"
-    * the "label" is the adress in the memory
-    */
-    else if (funcNum >= lb && funcNum <= sh) {
-        /* -------------------- I think this is also done right? no need to implement further I guess.. ------------------ */
-        if (checkNum(input->next, flag)) {
-            instruction->immed = atoi(input->next->val); /* get immed at begining because all 3 type of func use it */
-            immed = true;
-
-            temp = getReg(input, flag);
-            if (temp <= NUM_OF_REG) {
-                instruction->rs = temp;
-                rs = true;
-
-                input = input->next->next; /* skip immed value */
-
-                instruction->rt = getReg(input, flag);
-                if (instruction->rt != NUM_OF_REG) {
-                    rt = true;
-                    input = input->next;
-                }
-            }
         }
     }
 
     /*  check for errors in the input */
+    free(tempNode);
     if ((!rs || !rt) && temp <= NUM_OF_REG) {
         printf("\nLine: %d - Missing operand", flag->line);
         flag->firstPass = false;
@@ -260,7 +224,7 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag, sym_t 
 * la and call only accept labels as operands. 
 * if all operands check out, a 32 bit instruction is built based on them
 */
-J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t *symbol) {
+J *get_j_instruction(int funcNum, node_t *input, J *instruction, flags *flag, sym_t *symbol) {
     char temp[MAX_LINE_LENGTH] = {0};
     node_t *tempNode = calloc(sizeof(node_t), 1);
 

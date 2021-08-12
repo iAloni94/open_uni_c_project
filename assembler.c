@@ -26,7 +26,7 @@ void assemble(char *fname) {
     if ((fp = fopen(fname, "r")) != NULL) {
         printf("Assembling file: %s", fname);
         firstPass(&IC, &ICF, &DC, &DCF, code_img, data_img, symbol_list_head, flag, fp);
-        secondPass(ICF, DCF, code_img, symbol_list_head, flag, fp);
+       /* if(flag->firstPass) secondPass(ICF, DCF, code_img, symbol_list_head, flag, fp);*/
 
         /* creating oputput files */
         if (flag->firstPass && flag->secondPass) {

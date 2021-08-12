@@ -32,9 +32,10 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
             } else {
                 node = head;
 
-                if ((flag->label = isLabel(node, flag, symbol_list_head))) { /* raise flag if label found */
-                    if (isDeclared(node->val, symbol_list_head, flag))
-                        flag->label = false; /* check if label was already declared*/
+                if (flag->label) {                                                      /* if ':' was found, there is a suspected label */
+                    if (flag->label = isLabel(node, flag, symbol_list_head)) {          /* raise flag if label found */
+                        flag->label = !(isDeclared(node->val, symbol_list_head, flag)); /* check if label was already declared*/
+                    }
                     node = node->next;
                 }
 

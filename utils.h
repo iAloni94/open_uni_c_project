@@ -11,18 +11,18 @@
 typedef enum bool {
     false = 0,
     true = 1
-} bool;
+}bool;
 
 /* this struct contains all the differnt flags and indicators for the assembly operation */
 typedef struct flag {
-    bool label;        /* if a label was found */
-    bool firstPass;    /* if the 1st pass was successful */
-    bool secondPass;   /* if the 2nd pass was successful */
-    bool direction;    /* if its a directive line */
-    bool lastLine;     /* marks last line in input file */
-    bool external;     /* this marks whether to create the .ext fie */
-    bool entry;        /* this marks whether to create the .ent fie */
-    bool isExt;        /* this marks whether current label being processed is external is external */
+    char label;        /* if a label was found */
+    char firstPass;    /* if the 1st pass was successful */
+    char secondPass;   /* if the 2nd pass was successful */
+    char direction;    /* if its a directive line */
+    char lastLine;     /* marks last line in input file */
+    char external;     /* this marks whether to create the .ext fie */
+    char entry;        /* this marks whether to create the .ent fie */
+    char isExt;        /* this marks whether current label being processed is external is external */
     unsigned int line; /* indicates which line is being processed */
 } flags;
 

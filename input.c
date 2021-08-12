@@ -55,7 +55,10 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                 }
 
                 /* this only mark the parser to take into account that a label is being parced */
-                if (temp == ':') label = true;
+                if (temp == ':') {
+                    label = true;
+                    flag->label = true;
+                }
 
                 if (comma && temp == ',') { /* if the last non white char was a comma and we found another one, report error */
                     flag->firstPass = false;

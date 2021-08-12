@@ -11,6 +11,7 @@ void assemble(char *fname) {
     dir_t *data_img = calloc(sizeof(dir_t), 1);
     sym_t *symbol_list_head = (sym_t *)calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
+    ext_t *ext_list_head = calloc(sizeof(ext_t), 1);
 
     FILE *fp;
 
@@ -26,11 +27,11 @@ void assemble(char *fname) {
     if ((fp = fopen(fname, "r")) != NULL) {
         printf("Assembling file: %s", fname);
         firstPass(&IC, &ICF, &DC, &DCF, code_img, data_img, symbol_list_head, flag, fp);
-        if (flag->firstPass) secondPass(ICF, DCF, code_img, symbol_list_head, flag, fp);
+        if (flag->firstPass) secondPass(ICF, DCF, code_img, symbol_list_head, flag, fp, ext_list_head);
 
         /* creating oputput files */
         if (flag->firstPass && flag->secondPass) {
-            writeFiles(fname, code_img, data_img, symbol_list_head, flag, ICF, DCF);
+            writeFiles(fname, code_img, data_img, symbol_list_head, flag, ext_list_head, ICF, DCF);
 
             printf("\nAssembly completed.");
         }

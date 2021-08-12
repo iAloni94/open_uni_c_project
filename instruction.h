@@ -78,7 +78,7 @@ typedef struct I {
     unsigned int opcode : 6;
     unsigned int rs : 5;
     unsigned int rt : 5;
-    int immed : 16;
+    int immed : 16; /* this is signed because it can accept negative integers */
 } I;
 
 typedef struct J {

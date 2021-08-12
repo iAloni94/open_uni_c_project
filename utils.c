@@ -5,6 +5,8 @@
 
 #include "global.h"
 
+#define MASK_1_BTYE 0xFFFF /* ..00 0000 1111 1111 1111 1111 */
+
 /* This function get the numeric value of a binary number */
 int getNumericValue(int binaryNumber) {
     int tempBinary, tempRes;
@@ -61,4 +63,13 @@ void freeMemory(flags *flag, sym_t *symbol, dir_t *data_img, FILE *fp) {
     freeDataImg(data_img);
     freeSymbolTable(symbol);
     free(flag);
+}
+
+void calcDistance(unsigned int *instruction_address, unsigned int label_address) {
+    int dist;
+    unsigned int curr_address = *instruction_address & MASK_1_BTYE; /* get the address of the instruction itself (rightmost 16 bits) */
+    dist = label_address - curr_address;                            /* new address to be entered to code image = the distance between the two */
+    dist = dist & MASK_1_BTYE;                                      /* get rightmost 26 bits of new address */
+    *instruction_address = *instruction_address & ~MASK_1_BTYE;     /* turn off bit 0-16 of original machine code */
+    *instruction_address = *instruction_address | dist;
 }

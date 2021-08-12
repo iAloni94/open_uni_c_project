@@ -8,4 +8,10 @@ typedef struct symbol {
     struct symbol *next;
 } sym_t;
 
+typedef struct external{
+    char *name;
+    unsigned int address;
+    struct external *next;
+} ext_t;
+
 #endif

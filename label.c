@@ -27,16 +27,15 @@ void freeSymbolTable(sym_t *node) {
     }
     free(node);
 }
-
-/* return the address of @name */
-unsigned int getSymbolAddress(char *name, sym_t *symbol) {
+/* returns @name symbol */
+sym_t *getSymbol(char *name, sym_t *symbol) {
     while (symbol != NULL && symbol->name != NULL) {
         if (!strcmp(name, symbol->name)) {
-            return symbol->address;
+            return symbol;
         }
         symbol = symbol->next;
     }
-    return false;
+    return NULL;
 }
 
 /*
@@ -88,7 +87,13 @@ bool isReserved(char *str, flags *flag) {
 bool isDeclared(char *str, sym_t *symbol, flags *flag) {
     while (symbol != NULL && symbol->name != NULL) {
         if (!strcmp(str, symbol->name)) {
-            if (!flag->entry) { /* first pass check */
+            if (flag->isExt) {
+                if (strcmp(symbol->attribute, "external")) {
+                    printf("\nLine: %d - External label \"%s\" was already declared as non external", flag->line, str);
+                    flag->firstPass = false;
+                    return true;
+                }
+            } else if (!flag->entry) { /* first pass check */
                 printf("\nLine: %d - Label name \"%s\" was already declared", flag->line, str);
                 flag->firstPass = false;
                 return true;                                     /* label was declared */

@@ -14,7 +14,7 @@
 #include "utils.h"
 
 void firstPass(unsigned int *, unsigned int *, unsigned int *, unsigned int *, unsigned int *, dir_t *, sym_t *, flags *, FILE *);
-void secondPass(unsigned int, unsigned int, unsigned int *, sym_t *, flags *, FILE *);
+void secondPass(unsigned int, unsigned int, unsigned int *, sym_t *, flags *, FILE *, ext_t *);
 
 /* to_binary.c */
 unsigned int r_binary_instruction(R *);
@@ -30,6 +30,7 @@ char getReg(node_t *, flags *);
 /* utils.c */
 void freeMemory(flags *, sym_t *, dir_t *, FILE *);
 void freeDataImg(dir_t *);
+void calcDistance(unsigned int *, unsigned int);
 
 /* input.c */
 node_t *getLine(FILE *, flags *);
@@ -42,7 +43,7 @@ FILE *createFile(char *, char *);
 void printObj(FILE *, unsigned int *, dir_t *, unsigned int, unsigned int);
 void printExt();
 void printEnt();
-void writeFiles(char *, unsigned int *, dir_t *, sym_t *, flags *, unsigned int, unsigned int);
+void writeFiles(char *, unsigned int *, dir_t *, sym_t *, flags *, ext_t *, unsigned int, unsigned int);
 
 /* label.c */
 void freeSymbolTable(sym_t *);
@@ -63,4 +64,7 @@ dir_t *save_word(node_t *, dir_t *, unsigned int *, flags *);
 dir_t *save_str(node_t *, dir_t *, unsigned int *, flags *);
 void ext_handler(sym_t *, node_t *, flags *, unsigned int, unsigned int);
 void ent_handler(sym_t *, node_t *, flags *);
+
+sym_t *getSymbol(char *, sym_t *);
+
 #endif

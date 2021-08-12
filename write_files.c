@@ -81,7 +81,12 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
     free(data);
 }
 
-void printExt() {}
+void printExt(FILE *fp, ext_t *ext_node) {
+    while(ext_node->next != NULL){
+        fprintf(fp, "%s %04d\n", ext_node->name, ext_node->address);
+        ext_node = ext_node->next;
+    }
+}
 
 void printEnt(FILE* fp, sym_t* symbol) {
     while (symbol != NULL) {
@@ -92,7 +97,7 @@ void printEnt(FILE* fp, sym_t* symbol) {
     }
 }
 
-void writeFiles(char* fname, unsigned int* code_img, dir_t* data_img, sym_t* symbol_list_head, flags* flag, unsigned int ICF, unsigned int DCF) {
+void writeFiles(char* fname, unsigned int* code_img, dir_t* data_img, sym_t* symbol_list_head, flags* flag, ext_t *ext_list_head, unsigned int ICF, unsigned int DCF) {
     FILE *f_obj, *f_ent, *f_ext;
 
     if ((f_obj = createFile(fname, ".ob")) != NULL) {
@@ -102,7 +107,7 @@ void writeFiles(char* fname, unsigned int* code_img, dir_t* data_img, sym_t* sym
 
     if (flag->external) { /* .ext file */
         if ((f_ext = createFile(fname, ".ext")) != NULL) {
-            printExt();
+            printExt(f_ext, ext_list_head);
             fclose(f_ext);
         }
     }

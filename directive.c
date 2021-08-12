@@ -4,7 +4,7 @@
 
 #include "global.h"
 
-#define IN_RANGE_BYTE(n) n >= CHAR_MIN &&n <= CHAR_MAX ? true : false /* check if n is in 8 bits range */
+#define IN_RANGE_BYTE(n) n >= CHAR_MIN &&n <= CHAR_MAX ? true : false   /* check if n is in 8 bits range */
 #define IN_RANGE_H_WORD(n) n >= SHRT_MIN &&n <= SHRT_MAX ? true : false /* chec if n is in 16 bit range */
 
 /* This function chcek whether the directive numeral oprands is valid */
@@ -192,12 +192,12 @@ void ext_handler(sym_t *symbol, node_t *input, flags *flag, unsigned int IC, uns
     tempNode->val = temp;
 
     if (isLabel(tempNode, flag, symbol)) {
+        flag->isExt = true;
         if (!isDeclared(input->val, symbol, flag)) {
             flag->external = true;
-            flag->isExt = true;
             insertLabel(symbol, input, flag, 0, 0);
-            flag->isExt = false;
         }
+        flag->isExt = false;
     }
     free(tempNode);
 }

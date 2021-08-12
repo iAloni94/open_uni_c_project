@@ -6,7 +6,7 @@
 #define CHECK_BIT(v, n) ((v)&1 << n) ? true : false /* checks if nth bit of v from right is true or false */
 #define MASK_1_BTYE 0xFFFF                          /* ..00 0000 1111 1111 1111 1111 */
 
-void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_t *symbol_list_head, flags *flag, FILE *fp) {
+void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_t *symbol_list_head, flags *flag, FILE *fp, ext_t *ext_list_head) {
     char *functionName[NUM_OF_FUNC] = {
         "add", "sub", "and", "or",
         "nor", "move", "mvhi", "mvlo",
@@ -18,9 +18,10 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
 
     char *directives[NUM_OF_DIR] = {".db", ".dh", ".dw", ".asciz", ".extern", ".entry"};
 
-    int funcNum, dirNum, i, codeCounter = 0;
+    int funcNum, dirNum, i, codeCounter = 0, IC = 100;
     node_t *head, *node;
     sym_t *temp_sym = symbol_list_head;
+    ext_t *ext_node = ext_list_head;
 
     if (flag->firstPass) { /* second pass */
 
@@ -72,11 +73,14 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
 
                     while (node->next != NULL) node = node->next; /* go to last node because thats where the label is */
 
-                    label_address = getSymbolAddress(node->val, symbol_list_head);
-                    if (!label_address) {
+                    temp_sym = getSymbol(node->val, symbol_list_head);
+                    label_address = temp_sym->address;
+                    if (!temp_sym) {
                         printf("\nLine: %d -  label was not declared!", flag->line);
                         flag->secondPass = false;
                     }
+
+                    temp_sym = symbol_list_head;
 
                     while (temp_sym != NULL && temp_sym->name != NULL) { /* check if label is external */
                         if (temp_sym->address == label_address) {
@@ -88,26 +92,30 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
                         temp_sym = temp_sym->next;
                     }
                     if (flag->secondPass) {
-                        unsigned int this_address = (code_img[codeCounter] & MASK_1_BTYE); /* get the address of the instruction itself (rightmost 16 bits) */
-                        int new_address = label_address - this_address;                    /* new address to be entered to code image */
-                        new_address = new_address & MASK_1_BTYE;                           /* get rightmost 26 bits of new address */
-                        code_img[codeCounter] = code_img[codeCounter] & ~MASK_1_BTYE;      /* turn off bit 0-16 of original machine code */
-                        code_img[codeCounter] = code_img[codeCounter] | new_address;       /* enter new address */
+                        calcDistance(&(code_img[codeCounter]), label_address);
                     }
                 }
 
                 if (funcNum >= jmp && funcNum <= call) {
                     if (!CHECK_BIT(code_img[codeCounter], 25)) { /* if reg bit is off - update address field in code image */
-                        unsigned int address = getSymbolAddress(node->next->val, symbol_list_head);
-                        code_img[codeCounter] = code_img[codeCounter] | address;
+                        temp_sym = getSymbol(node->next->val, symbol_list_head);
+                        code_img[codeCounter] = code_img[codeCounter] | temp_sym->address;
 
-                        /* if external... step 8 */
+                        if ((temp_sym = getSymbol(node->next->val, symbol_list_head))) {
+                            if (!strcmp(temp_sym->attribute, "external")) {
+                                ext_node->name = temp_sym->name;
+                                ext_node->address = IC;
+                                ext_node->next = calloc(sizeof(ext_t), 1);
+                                ext_node = ext_node->next;
+                            }
+                        }
                     }
                 }
             }
             freeInputList(head);
             codeCounter++;
             flag->line += 1;
+            IC += 4;
         } /* end while */
     }
 }

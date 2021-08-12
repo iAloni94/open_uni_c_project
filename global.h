@@ -25,7 +25,7 @@ unsigned int j_binary_instruction(J *);
 R *check_r_param(int, node_t *, R *, flags *);
 I *check_i_param(int, node_t *, I *, flags *);
 J *check_j_param(int, node_t *, J *, flags *, sym_t *);
-unsigned int getReg(node_t *, flags *);
+char getReg(node_t *, flags *);
 
 /* utils.c */
 void freeMemory(flags *, sym_t *, dir_t *, FILE *);

@@ -55,21 +55,21 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             break;
     }
 
-    if (funcNum <= nor) { /* v functions - 3 operands rs + rd + rt */
+    if (funcNum <= nor) { /* arithmatics functions - 3 operands rs + rd + rt */
         temp = getReg(input, flag);
-        if (temp != NUM_OF_REG) {
+        if (temp <= NUM_OF_REG) {
             instruction->rs = temp;
             rs = true;
             input = input->next;
 
             temp = getReg(input, flag);
-            if (temp != NUM_OF_REG) {
+            if (temp <= NUM_OF_REG) {
                 instruction->rt = temp;
                 rt = true;
                 input = input->next;
 
                 temp = getReg(input, flag);
-                if (temp != NUM_OF_REG) {
+                if (temp <= NUM_OF_REG) {
                     instruction->rd = temp;
                     rd = true;
                     input = input->next;
@@ -77,15 +77,15 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             }
         }
 
-        if (!rs || !rd || !rt) { /* if any of the 3 required operands was not valid */
+        if (!rs || !rd || !rt && temp <= NUM_OF_REG) { /* if any of the 3 required operands is missing */
             printf("\nLine: %d - Missing operands", flag->line);
             flag->firstPass = false;
             return NULL;
         } else if (input != NULL) { /* if all operands were found but there is more input after */
             if (strlen(input->val) != 0) {
-                printf("\nLine: %d - extraneous operand", flag->line);
+                printf("\nLine: %d - Extraneous operand", flag->line);
             } else {
-                printf("\nLine: %d - extraneous comma", flag->line);
+                printf("\nLine: %d - Extraneous comma", flag->line);
             }
             flag->firstPass = false;
             return NULL;
@@ -93,28 +93,29 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
         return instruction;
     } else { /* copy functions - 2 parameters rs + rd */
         temp = getReg(input, flag);
-        if (temp != NUM_OF_REG) {
+        input = input->next;
+
+        if (temp <= NUM_OF_REG) {
             instruction->rs = temp;
             rs = true;
-            input = input->next;
 
             temp = getReg(input, flag);
-            if (temp != NUM_OF_REG) {
+            if (temp <= NUM_OF_REG) {
                 instruction->rd = temp;
                 rd = true;
                 input = input->next;
             }
         }
 
-        if (!rs || !rd) {
-            printf("Line: %d - Missing operand", flag->line);
+        if (!rs || !rd && temp <= NUM_OF_REG) { /* if any of the 2 required operands is missing */
+            printf("\nLine: %d - Missing operand", flag->line);
             flag->firstPass = false;
             return NULL;
-        } else if (input != NULL) {
+        } else if (input != NULL) { /* if all operands were found but there is more input after */
             if (strlen(input->val) != 0) {
-                printf("\nLine: %d - extraneous operand", flag->line);
+                printf("\nLine: %d - Extraneous operand", flag->line);
             } else {
-                printf("\nLine: %d - extraneous comma", flag->line);
+                printf("\nLine: %d - Extraneous comma", flag->line);
             }
             flag->firstPass = false;
             return NULL;
@@ -241,7 +242,6 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
     }
 }
 
-
 /*
 * This method parses the instruction for J type function.
 * It check if all the operands and parameters are valid.
@@ -268,7 +268,7 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
         case stop:
             if (input->next != NULL) { /* if there was more thext after stop instruction */
                 flag->firstPass = false;
-                printf("\nLine: %d - Illegal parameter. extraneous operand", flag->line);
+                printf("\nLine: %d - Extraneous operand", flag->line);
                 free(tempNode);
                 return NULL;
             }
@@ -283,14 +283,18 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
 
     input = input->next;
     if (input->next != NULL) { /* J functions accept only 1 operand, so we check to see if there is more text after current word */
-        printf("\nLine: %d - Illegal parameter. extraneous operand", flag->line);
+        if (strlen(input->next->val) != 0) {
+            printf("\nLine: %d - Extraneous operand", flag->line);
+        } else {
+            printf("\nLine: %d - Extraneous comma", flag->line);
+        }
         flag->firstPass = false;
         free(tempNode);
         return NULL;
     }
 
     if (instruction->opcode == jmp_opcode) { /* if jmp function, check for register as parameter */
-        if (strchr(input->val, '$')) { /* check if operands is register or label */
+        if (strchr(input->val, '$')) {       /* check if operands is register or label */
             instruction->reg = true;
             instruction->address = getReg(input, flag);
             if (instruction->address != NUM_OF_REG) {
@@ -313,7 +317,7 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
     return instruction;
 }
 
-unsigned int getReg(node_t *node, flags *flag) {
+char getReg(node_t *node, flags *flag) {
     char *registerList[NUM_OF_REG] = {
         "$0", "$1", "$2", "$3",
         "$4", "$5", "$6", "$7",
@@ -328,6 +332,7 @@ unsigned int getReg(node_t *node, flags *flag) {
     /*
     * if i=0, registerList[i] = $0. if i=1, registerList[i] = $1. if i=28, registerList[i] = $28. if i=n, registerList[i] = $n
     * this way, as soon as our input value = registerList[i], we know which register it is by looking at i
+    * return register number if found, NUM_OF_REG if register is found but out of range or NUM_OF_REG + 1 if input is not a register
     */
     if (node != NULL && *(node->val) != '\0') {
         if (strchr(node->val, '$')) {
@@ -342,6 +347,7 @@ unsigned int getReg(node_t *node, flags *flag) {
             flag->firstPass = false;
             printf("\nLine: %d - Illegal parameter", flag->line);
         }
+        return NUM_OF_REG;
     }
-    return NUM_OF_REG;
+    return NUM_OF_REG + 1;
 }

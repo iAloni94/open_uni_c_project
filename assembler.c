@@ -35,7 +35,7 @@ void assemble(char *fname) {
             printf("\nAssembly completed.");
         }
         if (!flag->firstPass || !flag->secondPass) {
-            printf("\nErrors were detected. No output files were created.");
+            printf("\nErrors were detected. No output files were created.\n");
         }
     } else {
         printf("\nFailed to open file. Trying next file.");

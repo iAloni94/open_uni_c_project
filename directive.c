@@ -30,17 +30,29 @@ bool checkNum(node_t *input, flags *flag) {
 
 /* This function chcek whether the directive string oprands is valid */
 char *checkStr(node_t *input, flags *flag) { /*  this funtion checks if the string is valid i.e starts and ends with a " */
-    char *diff;
+    char *second_quotation_mark;
     if (input->next != NULL) {
-        printf("\nLine: %d - extraneous operand", flag->line);
+        printf("\nLine: %d - Extraneous operand", flag->line);
         flag->firstPass = false;
-        return false;
-    } else if (*(input->val) == '\"') {                /* if first char is " */
-        if ((diff = strchr((input->val + 1), '\"'))) { /* if there is another " */
-            if (*(diff + 1) == '\0') {                 /* if the second " is last char in string */
-                return diff;
+        return NULL;
+    } else if (*(input->val) == '\"') {                                 /* if first char is " */
+        if ((second_quotation_mark = strchr((input->val + 1), '\"'))) { /* if there is another " */
+            if (*(second_quotation_mark + 1) == '\0') {                 /* if the second " is last char in string */
+                return second_quotation_mark;
+            } else { /* if first char is not " */
+                printf("\nLine: %d - Extraneous text after closing quotation mark", flag->line);
+                flag->firstPass = false;
+                return NULL;
             }
+        } else { /* there was not another " */
+            printf("\nLine: %d - Closing quotation mark was not found", flag->line);
+            flag->firstPass = false;
+            return NULL;
         }
+    } else { /* if the second " wasnt the last char in string */
+        printf("\nLine: %d - String should begin with a quotation mark", flag->line);
+        flag->firstPass = false;
+        return NULL;
     }
     printf("\nLine: %d - Illegal string", flag->line);
     flag->firstPass = false;
@@ -108,7 +120,7 @@ dir_t *save_half_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *fl
 
 /* save 4 byte size numeral data */
 dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
-    int temp, diff;
+    int temp, second_quotation_mark;
     if (input != NULL) {
         while (input != NULL) {
             if ((checkNum(input, flag))) {
@@ -121,12 +133,12 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
             * INT_MIN - 1 = INT_MAX
             */
                 temp = atoi(input->val);
-                if (strchr(input->val, '-')) {   /* if input is a negative number that exceed 32 bits, temp would be positive because of overflow */
-                    diff = (INT_MAX + temp) + 1; /* INT_MAX - INT_MIN = -1 but both in range so we add 1 to result */
-                } else {                         /* if input is a positive number that exceed 32 bits, temp would be negative because of overflow */
-                    diff = INT_MAX - (temp);
+                if (strchr(input->val, '-')) {                    /* if input is a negative number that exceed 32 bits, temp would be positive because of overflow */
+                    second_quotation_mark = (INT_MAX + temp) + 1; /* INT_MAX - INT_MIN = -1 but both in range so we add 1 to result */
+                } else {                                          /* if input is a positive number that exceed 32 bits, temp would be negative because of overflow */
+                    second_quotation_mark = INT_MAX - (temp);
                 }
-                if (diff >= 0) {
+                if (second_quotation_mark >= 0) {
                     dataImg->word = temp;
                     dataImg->flag = word;
                     dataImg->next = calloc(sizeof(dir_t), 1);
@@ -150,19 +162,19 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
 
 /* save string data */
 dir_t *save_str(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
-    char *str = checkStr(input, flag);
+    char *second_quotation_mark = checkStr(input, flag);
     int i = 1;
-    if (str != NULL) {
-        while (str - (input->val + i) != 0) {
+    if (second_quotation_mark != NULL) {
+        while (second_quotation_mark - (input->val + i) != 0) { /* pointer arithmatics, subtract pointers until they are equal */
             dataImg->byte = *(input->val + i);
-            dataImg->flag = asci;
+            dataImg->flag = str;
             dataImg->next = calloc(sizeof(dir_t), 1);
             dataImg = dataImg->next;
             *DC += 1;
             i++;
         }
-        dataImg->byte = 0; /* Null terminator */
-        dataImg->flag = asci;
+        dataImg->byte = 0; /* Add null terminator */
+        dataImg->flag = str;
         *DC += 1;
         dataImg->next = calloc(sizeof(dir_t), 1);
         dataImg = dataImg->next;

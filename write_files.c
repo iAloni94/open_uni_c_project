@@ -37,14 +37,14 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
 
     /*  print code image*/
     /* shift mask to desired 4 bits location and then shift the result to the rightmost 4 bits for printing */
-    for (i = 0; *(codeImg + i) != 0; i++) {
+    for (i = 0; *(codeImg + i) != 0; i++, IC += 4) {
         a = *(codeImg + i) & MASK;                 /* instruction: bytes 0-8; mask:   00000000 00000000 00000000 11111111 */
         b = (*(codeImg + i) & (MASK << 8)) >> 8;   /* instruction: bytes 9-16; mask:  00000000 00000000 11111111 00000000 */
         c = (*(codeImg + i) & (MASK << 16)) >> 16; /* instruction: bytes 17-24; mask: 00000000 11111111 00000000 00000000 */
         d = (*(codeImg + i) & (MASK << 24)) >> 24; /* instruction: bytes 25-32; mask: 11111111 00000000 00000000 00000000 */
 
         fprintf(fp, "\n%04d  %02X %02X %02X %02X", IC, a, b, c, d);
-        IC += 4;
+        
     }
 
     /* print data image */
@@ -52,7 +52,7 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
     i = 0;
     while (dataImg->next != NULL) {
         switch (dataImg->flag) {
-            case asci:
+            case str:
             case byte:
                 *(data + i) = dataImg->byte;
                 break;
@@ -73,10 +73,10 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
         i++;
     }
 
-    for (i = 0; i < DCF; i += 4) {
+    for (i = 0; i < DCF; i += 4, j += 4) {
         fprintf(fp, "\n%04d  ", ICF + j);
         fprintf(fp, "%02X %02X %02X %02X", data[i], data[i + 1], data[i + 2], data[i + 3]);
-        j += 4;
+        
     }
     free(data);
 }

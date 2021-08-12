@@ -6,7 +6,7 @@
 #include "global.h"
 
 node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
-    int i = 0, j = 0;
+    int i = 0, j = 0;                    /* i follows the file input line, j follows the node value */
     node_t* head = initList();
     node_t* node = head;
     char temp;
@@ -41,43 +41,46 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                 return head;
             }
             if (temp == '\"') quotation_mark = true;
-            if (!quotation_mark) { /* if we found quotation marks, enter all folowing text to to the same node */
+            if (!quotation_mark) {
                 if (temp == ';') {
-                    if (i != 0) {
+                    if (i != 0) { /* if ";" is not at the start of the line, it should not be used at all */
                         printf("\nLine: %d - Illegal character", flag->line);
                         freeInputList(head);
                         flag->firstPass = false;
                         return NULL;
-                    } else {
+                    } else { /* skip line */
                         freeInputList(head);
                         return NULL;
                     }
                 }
 
-                if (temp == ':') {
-                    label = true;
-                }
+                /* this only mark the parser to take into account that a label is being parced */
+                if (temp == ':') label = true;
 
-                if (comma && temp == ',') {
+                if (comma && temp == ',') { /* if the last non white char was a comma and we found another one, report error */
                     flag->firstPass = false;
                     printf("\nLine: %d - Consecutive commas", flag->line);
                     freeInputList(head);
                     return NULL;
                 }
                 if (isspace(temp)) {
-                    while (isspace(temp) && temp != '\n') {
+                    while (isspace(temp) && temp != '\n') { /* find next non white char */
                         i++;
                         temp = tempLine[i];
                     }
-                    if (temp == '\0' || temp == '\n') {
+                    if (temp == '\0' || temp == '\n') { /* line ended with white char */
                         return head;
                     }
-                    if (!comma) { /* if there was no comma before this space */
-                        if (temp == ',') comma = true;
-                        if (!firstNode) {
+                    /* if there was no comma before this space. 
+                    * there are 5 possibilities, either is a label, an instruction or a directive.
+                    * or a label->instruction, label->directive
+                    */
+                    if (!comma) {
+                        if (temp == ',') comma = true; /* current char is ',' */
+                        if (!firstNode) {              /* in case a label was parsed already */
                             if ((label || instruction || directive || comma)) {
                                 if (label) {
-                                    if (comma) {
+                                    if (comma) { /* if there is a comma after label (with space) "LABEL:    ," */
                                         printf("\nLine: %d - Extraneous character after label name", flag->line);
                                         flag->firstPass = false;
                                         freeInputList(head);
@@ -87,7 +90,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                                 } else if (instruction || directive) {
                                     instruction = false;
                                     directive = false;
-                                    if (comma) { /* if its and instrcution or directive, there shold not be a comma after*/
+                                    if (comma) { /* if its and instrcution or directive, there shold not be a comma after */
                                         printf("\nLine: %d - extraneous comma", flag->line);
                                         flag->firstPass = false;
                                         freeInputList(head);
@@ -104,7 +107,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                                         temp = tempLine[i];
                                     }
                                 }
-                            } else { /* if */
+                            } else {
                                 printf("\nLine: %d - Missing comma", flag->line);
                                 freeInputList(head);
                                 flag->firstPass = false;
@@ -114,7 +117,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                     }
                     continue;
                 } else if (temp == ',') {
-                    if (label) {
+                    if (label) { /* if there is a comma after label (no space) "LABEL:," */
                         printf("\nLine: %d - Extraneous character after label name", flag->line);
                         flag->firstPass = false;
                         freeInputList(head);
@@ -136,7 +139,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                     i++;
                     temp = tempLine[i];
                 }
-            } else {
+            } else { /*  quotation mark found, enter all following text to to the same node */
                 *(currVal + j) = temp;
                 j++;
                 i++;

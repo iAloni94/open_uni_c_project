@@ -78,7 +78,7 @@ typedef struct I {
     unsigned int opcode : 6;
     unsigned int rs : 5;
     unsigned int rt : 5;
-    unsigned int immed : 16;
+    int immed : 16;
 } I;
 
 typedef struct J {

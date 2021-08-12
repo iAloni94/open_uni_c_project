@@ -33,7 +33,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                 node = head;
 
                 if (flag->label) {                                                      /* if ':' was found, there is a suspected label */
-                    if (flag->label = isLabel(node, flag, symbol_list_head)) {          /* raise flag if label found */
+                    if ((flag->label = isLabel(node, flag, symbol_list_head))) {          /* raise flag if label found */
                         flag->label = !(isDeclared(node->val, symbol_list_head, flag)); /* check if label was already declared*/
                     }
                     node = node->next;
@@ -74,7 +74,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                             printf("\nMemory allocation error");
                             exit(0);
                         }
-                        if ((instruction = check_i_param(funcNum, node->next, instruction, flag))) {
+                        if ((instruction = check_i_param(funcNum, node->next, instruction, flag, symbol_list_head, *IC))) {
                             first_pass_32bit = i_binary_instruction(instruction);
                             free(instruction);
                         }

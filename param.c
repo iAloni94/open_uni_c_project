@@ -12,6 +12,8 @@
 
 #include "global.h"
 
+#define IN_RANGE_IMMED(n) n >= SHRT_MIN &&n <= SHRT_MAX ? true : false /* chec if n is in 16 bit range */
+
 /*
 * This method parses the instruction for R type function.
 * there are 2 types of R function, arithmatics and copy.
@@ -77,7 +79,7 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             }
         }
 
-        if (!rs || !rd || !rt && temp <= NUM_OF_REG) { /* if any of the 3 required operands is missing */
+        if ((!rs || !rd || !rt) && temp <= NUM_OF_REG) { /* if any of the 3 required operands is missing */
             printf("\nLine: %d - Missing operands", flag->line);
             flag->firstPass = false;
             return NULL;
@@ -107,7 +109,7 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             }
         }
 
-        if (!rs || !rd && temp <= NUM_OF_REG) { /* if any of the 2 required operands is missing */
+        if ((!rs || !rd) && temp <= NUM_OF_REG) { /* if any of the 2 required operands is missing */
             printf("\nLine: %d - Missing operand", flag->line);
             flag->firstPass = false;
             return NULL;
@@ -125,121 +127,130 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
     }
 }
 
-I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
-    char rs = false, rt = false, immed = false;
-    int i = 0;
+I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag, sym_t *symbol, unsigned int IC) {
+    bool rs = false, rt = false, immed = false;
+    char temp, imm_temp[MAX_LINE_LENGTH] = {0};
+    node_t *tempNode = calloc(sizeof(node_t), 1);
 
-    if (funcNum >= addi && funcNum <= nori) {
-        /*Set the opcode to the function name + the gap to make is similar to number in the list */
-        instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
-
-        /* getting the rs value from register */
-        if (instruction->rs >= NUM_OF_REG || instruction->rs >= NUM_OF_REG) {
-            instruction->rs = getReg(input->val, flag);
-            rs = true;
-            input = input->next;
-            char *rtAdress = input;
-        }
-        instruction->immed = input->val;
-        input = input->next;
-
-        instruction->rt = getReg(input->val, flag);
-        if (instruction->rt != NUM_OF_REG) {
-            rt = true;
-        }
-    }
-
-    /* while (i < strlen(input->next->val))
-     {
-         if (!IS_NUM(*(input->next->val + i)))
-         {
-             flag->firstPass = false;
-             printf("\nLine: %d - Illegal parameter. Immed value should only be an integer", flag->line);
-             return NULL;
-         }
-         i++;
-     }
-     instruction->immed = atoi(input->next->val);
-*/
+    /* -------------------- I think this part is done ------------------ */
     /*
     * Check if the funcNum is one of these 5 Arithmatic and Logic function: addi, subi, andi, ori and nori.
-    * Each of them holds 4 fields of data = {opcode, rs, rt, immed} 
-    *  */
-
-    else if (funcNum >= beq && funcNum <= bgt) {
-        /*
-        * Check if the funcNum is one of these 4 Conditional Directional function: beq, bne, blt, bgt.  
-        * each function we need to check the value that is inside the register (binary / decimal?) */
-        /* the distance is from the current location of the instruction minus the current value in the loop. 
-        if the loop adress is smaller than the adress of the instruction 
-        (declared before it{in this case I am not sure what is the purpose of minus}) 
-        /* bne - check if the value in register "rs" is -- Not Equals-- to the value in register "rt" */
-        /* blt - check if the value in register "rs" is -- Lower Than -- the value in register "rt" */
-        /* bgt - check if the value in register "rs" is -- Greater Than -- to the value in register "rt" */
-
-        /*Set the opcode to the function name + the gap to make is similar to number in the list */
-
-        instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
-
-        /* getting the rs value from register */
-        instruction->rs = getReg(input->val, flag);
-        if (instruction->rs != NUM_OF_REG) {
-            rs = true;
-            input = input->next;
-            /* char *rtAdress = input; */
-        }
-
-        instruction->rt = getReg(input->val, flag);
-        if (instruction->rt != NUM_OF_REG) {
-            rt = true;
-            input = input->next;
-        }
-
-        instruction->immed = input->val;
-    }
-
-    else if (funcNum >= lb && funcNum <= sh) { /* Type of save and load functions:
-    lb - load byte - load byte from the memory
-    sb - save byte - save byte in the memory
-    lw - load word - load word from the memory
-    sw - save word - save word in the memory
-    lh - load half word - load half word from the memory
-    sh - save half word - save half word in the memory
-    
-    in all of these function, the first register contains the adress in the memory
-    the immediate, is th second operand, and he represent the "offset"
-    opcode is the same, and all the rest change the same
-    in this case we need to swip the locations of the "rt" and the "immediate"
-    the "label" is the adress in the memory
+    * Each of them holds 4 fields of data = {opcode, rs, rt, immed} - 2 parameters (rt, rs) -> input in immed
     */
 
-        instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
+    /*Set the opcode to the function name + the gap to make is match to number in the list */
+    instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
 
-        /* getting the rs value from register */
-        instruction->rs = getReg(input->val, flag);
-        if (instruction->rs != NUM_OF_REG) {
-            rs = true;
-            input = input->next;
-            /* char *rtAdress = input; */
+    if (funcNum >= addi && funcNum <= nori) {
+        if (checkNum(input->next, flag)) {
+            instruction->immed = atoi(input->next->val); /* get immed at begining because all 3 type of func use it */
+            immed = true;
+
+            temp = getReg(input, flag);
+            if (temp <= NUM_OF_REG) {
+                instruction->rs = temp;
+                rs = true;
+                input = input->next->next; /* skip immed value */
+
+                temp = getReg(input, flag);
+                if (temp <= NUM_OF_REG) {
+                    rt = true;
+                    input = input->next;
+                }
+            }
         }
-        instruction->immed = input->val;
-        input = input->next;
+    }
+    /*
+        * Check if the funcNum is one of these 4 Conditional Directional function : beq, bne, blt, bgt.
+        * Each of them holds 4 fields of data = {opcode, rs, rt, immed} - 3 parameters (rt ,rs, immed)
+        */
 
-        instruction->rt = getReg(input->val, flag);
-        if (instruction->rt != NUM_OF_REG) {
-            rt = true;
-            input = input->next;
+    else if (funcNum >= beq && funcNum <= bgt) {
+        /* -------------------- Need to check with you how to get the memory location of the funct name ------------------ */
+
+        /*int distanceFromDestination = 0, locationOfFunc = 0; */
+
+        /* here - get the adress in the memory of the funcName
+            * and set it to locationOfFunc
+            * locationOfFunc = funcName.adress
+            */
+        temp = getReg(input, flag);
+        if (temp <= NUM_OF_REG) {
+            instruction->rs = temp;
+            rs = true;
+            input = input->next; /* skip immed value */
+
+            temp = getReg(input, flag);
+            if (temp <= NUM_OF_REG) {
+                instruction->rt = temp;
+                rt = true;
+                input = input->next;
+            }
+
+            strcpy(imm_temp, input->val); /* getting the label ready for parsing (adding ':') */
+            strcat(imm_temp, ":");
+            tempNode->val = imm_temp;
+            if (isLabel(tempNode, flag, symbol)) { /* if operand is label */
+                immed = true;
+                instruction->immed = IC; /* save current instruction address for later */
+                input = input->next;
+            }
+            /* distanceFromDestination = atoi(input->val);
+            instruction->immed = distanceFromDestination - locationOfFunc; */
         }
     }
 
-    if (funcNum <= addi && funcNum <= sh && (rs && rt && immed)) {
-        return instruction;
-    } else if (rs && rt) {
-        return instruction;
-    } else {
+    /*
+    * Check if the funcNum is one of these 6 Save and Load function : lt, sb, lw, sw, lh,sh.
+    * Each of them holds 4 fields of data = {opcode, rs, rt, immed} - 3 parameters (rt ,rs, immed)
+    * Type of  functions:  
+    * in all of these function, the first register contains the adress in the memory
+    * the immediate, is th second operand, and he represent the "offset"
+    * opcode is the same, and all the rest change the same
+    * in this case we need to swip the locations of the "rt" and the "immediate"
+    * the "label" is the adress in the memory
+    */
+    else if (funcNum >= lb && funcNum <= sh) {
+        /* -------------------- I think this is also done right? no need to implement further I guess.. ------------------ */
+        if (checkNum(input->next, flag)) {
+            instruction->immed = atoi(input->next->val); /* get immed at begining because all 3 type of func use it */
+            immed = true;
+
+            temp = getReg(input, flag);
+            if (temp <= NUM_OF_REG) {
+                instruction->rs = temp;
+                rs = true;
+
+                input = input->next->next; /* skip immed value */
+
+                instruction->rt = getReg(input, flag);
+                if (instruction->rt != NUM_OF_REG) {
+                    rt = true;
+                    input = input->next;
+                }
+            }
+        }
+    }
+
+    /*  check for errors in the input */
+    if ((!rs || !rt) && temp <= NUM_OF_REG) {
+        printf("\nLine: %d - Missing operand", flag->line);
+        flag->firstPass = false;
+        return NULL;
+    } else if (!immed) {
+        printf("\nLine: %d - Missing immediate", flag->line);
+        flag->firstPass = false;
+        return NULL;
+    } else if (input != NULL) {
+        if (strlen(input->val) != 0) {
+            printf("\nLine: %d - Extraneous operand", flag->line);
+        } else {
+            printf("\nLine: %d - Extraneous comma", flag->line);
+        }
         flag->firstPass = false;
         return NULL;
     }
+    return instruction;
 }
 
 /*
@@ -346,8 +357,8 @@ char getReg(node_t *node, flags *flag) {
         } else {
             flag->firstPass = false;
             printf("\nLine: %d - Illegal parameter", flag->line);
+            return NUM_OF_REG + 1;
         }
-        return NUM_OF_REG;
     }
-    return NUM_OF_REG + 1;
+    return NUM_OF_REG;
 }

@@ -8,6 +8,10 @@
 
 #define MASK 0xFF /* 00000000 00000000 00000000 11111111 */
 
+/*
+* In order to print the output files, first we will get the fine name without the ".as" extention
+* That way a file with the same name and a different extention (.obj, .ent, .ext) can be created
+*/
 FILE* createFile(char* fname, char* extention) {
     int i;
     char ext_diff = strlen(fname) - 3; /* length of ".as" = 3 */
@@ -23,6 +27,8 @@ FILE* createFile(char* fname, char* extention) {
     return output_file_ptr;
 }
 
+
+/* This function print the .obj file according to the specifications */
 void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF, unsigned int DCF) {
     unsigned int a, b, c, d, i = 0, j = 0, IC = 100;
     unsigned char* data = malloc(DCF);

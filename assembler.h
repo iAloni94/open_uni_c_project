@@ -1,7 +1,3 @@
-/*
-* This file contains the symbol table and register structs
-*/
-
 #ifndef __ASSEMBLER_H
 #define __ASSEMBLER_H
 

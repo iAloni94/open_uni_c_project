@@ -14,14 +14,14 @@ void assemble(char *fname) {
 
     FILE *fp;
 
-    flag->label = false;     /* if a label was found */
-    flag->direction = false; /* if its a directive line */
-    flag->firstPass = true;  /* if the 1st pass was successful */
-    flag->lastLine = false;  /* marks last line in input file */
-    flag->external = false;  /* this marks whether to create the .ext fie */
-    flag->external = false;  /* this marks whether to create the .ext fie */
-    flag->isExt = false;     /* this marks whether current label being processed is external is external */
-    flag->line = 1;          /* indicates which line is being processed */
+    flag->label = false;
+    flag->direction = false;
+    flag->firstPass = true;
+    flag->lastLine = false;
+    flag->external = false;
+    flag->entry = false;
+    flag->isExt = false;
+    flag->line = 1;
 
     if ((fp = fopen(fname, "r")) != NULL) {
         printf("Assembling file: %s", fname);
@@ -34,10 +34,12 @@ void assemble(char *fname) {
 
             printf("\nAssembly completed.");
         }
-
-    } /* second pass end */
-    if (!flag->firstPass || !flag->secondPass) {
-        printf("\nErrors were detected. No output files were created.");
+        if (!flag->firstPass || !flag->secondPass) {
+            printf("\nErrors were detected. No output files were created.");
+        }
+    } else {
+        printf("\nFailed to open file. Trying next file.");
+        return;
     }
     freeMemory(flag, symbol_list_head, data_img, fp); /* Closing files and clearing memory before ending assembly process */
     printf("\n");

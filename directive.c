@@ -7,6 +7,7 @@
 #define IN_RANGE_BYTE(n) n >= CHAR_MIN &&n <= CHAR_MAX ? true : false
 #define IN_RANGE_H_WORD(n) n >= SHRT_MIN &&n <= SHRT_MAX ? true : false
 
+/* This function chcek whether the directive numeral oprands is valid */
 bool checkNum(node_t *input, flags *flag) {
     char c;
     int i = 0;
@@ -27,6 +28,7 @@ bool checkNum(node_t *input, flags *flag) {
     return true;
 }
 
+/* This function chcek whether the directive string oprands is valid */
 char *checkStr(node_t *input, flags *flag) { /*  this funtion checks if the string is valid i.e starts and ends with a " */
     char *diff;
     if (input->next != NULL) {
@@ -45,6 +47,7 @@ char *checkStr(node_t *input, flags *flag) { /*  this funtion checks if the stri
     return NULL;
 }
 
+/* save byte size numeral data */
 dir_t *save_byte(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
     int temp;
     if (input != NULL) {
@@ -74,6 +77,7 @@ dir_t *save_byte(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
     return dataImg;
 }
 
+/* save 2 byte size numeral data */
 dir_t *save_half_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
     int temp;
     if (input != NULL) {
@@ -102,6 +106,7 @@ dir_t *save_half_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *fl
     return dataImg;
 }
 
+/* save 4 byte size numeral data */
 dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
     int temp, diff;
     if (input != NULL) {
@@ -143,6 +148,7 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
     return dataImg;
 }
 
+/* save string data */
 dir_t *save_str(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
     char *str = checkStr(input, flag);
     int i = 1;
@@ -184,10 +190,11 @@ void ext_handler(sym_t *symbol, node_t *input, flags *flag, unsigned int IC, uns
     free(tempNode);
 }
 
+/* entry */
 void ent_handler(sym_t *symbol, node_t *input, flags *flag) {
     flag->entry = true;
     input = input->next;
-    if (isDeclared(input->val, symbol, flag)) { /* step 6 */
+    if (isDeclared(input->val, symbol, flag)) {
         while (symbol != NULL) {
             if (!strcmp(input->val, symbol->name)) {
                 char *temp = malloc(LABEL_MAX_LENGTH);

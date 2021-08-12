@@ -51,7 +51,7 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
                     freeInputList(head);
                     flag->line += 1;
                     continue;
-                } else if (flag->direction) {
+                } else if (flag->direction) { /* skip other directions */
                     freeInputList(head);
                     flag->line += 1;
                     flag->direction = false;

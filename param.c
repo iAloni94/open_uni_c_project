@@ -12,13 +12,20 @@
 
 #include "global.h"
 
+/*
+* This method parses the instruction for R type function.
+* there are 2 types of R function, arithmatics and copy.
+* each type requires different number of opernads.
+* It check if all the operands and parameters are valid.
+* if all operands check out, a 32 bit instruction is built based on them
+*/
 R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
     char rs = false, rt = false, rd = false, temp;
 
     switch (funcNum) { /* opcode */
-        case 5:
-        case 6:
-        case 7:
+        case move:
+        case mvhi:
+        case mvlo:
             instruction->opcode = mv_opcode;
             break;
         default:
@@ -48,7 +55,7 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             break;
     }
 
-    if (funcNum <= nor) { /* arithmatics functions - 3 parameters */
+    if (funcNum <= nor) { /* v functions - 3 operands rs + rd + rt */
         temp = getReg(input, flag);
         if (temp != NUM_OF_REG) {
             instruction->rs = temp;
@@ -70,11 +77,11 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             }
         }
 
-        if (!rs || !rd || !rt) {
+        if (!rs || !rd || !rt) { /* if any of the 3 required operands was not valid */
             printf("\nLine: %d - Missing operands", flag->line);
             flag->firstPass = false;
             return NULL;
-        } else if (input != NULL) {
+        } else if (input != NULL) { /* if all operands were found but there is more input after */
             if (strlen(input->val) != 0) {
                 printf("\nLine: %d - extraneous operand", flag->line);
             } else {
@@ -84,8 +91,7 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             return NULL;
         }
         return instruction;
-    }
-    else { /* copy functions - 2 parameters rs + rd */
+    } else { /* copy functions - 2 parameters rs + rd */
         temp = getReg(input, flag);
         if (temp != NUM_OF_REG) {
             instruction->rs = temp;
@@ -105,8 +111,12 @@ R *check_r_param(int funcNum, node_t *input, R *instruction, flags *flag) {
             flag->firstPass = false;
             return NULL;
         } else if (input != NULL) {
+            if (strlen(input->val) != 0) {
+                printf("\nLine: %d - extraneous operand", flag->line);
+            } else {
+                printf("\nLine: %d - extraneous comma", flag->line);
+            }
             flag->firstPass = false;
-            printf("\nLine: %d - extraneous operand", flag->line);
             return NULL;
         } else {
             return instruction;
@@ -231,6 +241,14 @@ I *check_i_param(int funcNum, node_t *input, I *instruction, flags *flag) {
     }
 }
 
+
+/*
+* This method parses the instruction for J type function.
+* It check if all the operands and parameters are valid.
+* stop function doesnt accept any opreands, jmp accept registers or label as operands
+* la and call only accept labels as operands. 
+* if all operands check out, a 32 bit instruction is built based on them
+*/
 J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t *symbol) {
     char temp[MAX_LINE_LENGTH] = {0};
     node_t *tempNode = calloc(sizeof(node_t), 1);
@@ -248,7 +266,7 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
             instruction->reg = 0;
             break;
         case stop:
-            if (input->next != NULL) {
+            if (input->next != NULL) { /* if there was more thext after stop instruction */
                 flag->firstPass = false;
                 printf("\nLine: %d - Illegal parameter. extraneous operand", flag->line);
                 free(tempNode);
@@ -264,7 +282,7 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
     }
 
     input = input->next;
-    if (input->next != NULL) {
+    if (input->next != NULL) { /* J functions accept only 1 operand, so we check to see if there is more text after current word */
         printf("\nLine: %d - Illegal parameter. extraneous operand", flag->line);
         flag->firstPass = false;
         free(tempNode);
@@ -272,7 +290,7 @@ J *check_j_param(int funcNum, node_t *input, J *instruction, flags *flag, sym_t 
     }
 
     if (instruction->opcode == jmp_opcode) { /* if jmp function, check for register as parameter */
-        if (strchr(input->val, '$')) {
+        if (strchr(input->val, '$')) { /* check if operands is register or label */
             instruction->reg = true;
             instruction->address = getReg(input, flag);
             if (instruction->address != NUM_OF_REG) {

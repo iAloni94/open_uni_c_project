@@ -26,6 +26,7 @@ void freeSymbolTable(sym_t *node) {
     free(node);
 }
 
+/* return the address of @name */
 unsigned int getSymbolAddress(char *name, sym_t *symbol) {
     while (symbol != NULL && symbol->name != NULL) {
         if (!strcmp(name, symbol->name)) {
@@ -74,7 +75,8 @@ bool isReserved(char *str, flags *flag) { /* checks if label is a reseved word *
     return false;
 }
 
-bool isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check if a label was already decalred*/
+/* this functions check if a label was already decalred */
+bool isDeclared(char *str, sym_t *symbol, flags *flag) {
     while (symbol != NULL && symbol->name != NULL) {
         if (!strcmp(str, symbol->name)) {
             if (!flag->entry) { /* first pass check */
@@ -99,6 +101,7 @@ bool isDeclared(char *str, sym_t *symbol, flags *flag) { /* this functions check
     return false;
 }
 
+/* insert new label to symbol table */
 void insertLabel(sym_t *symbol, node_t *head, flags *flag, unsigned int IC, unsigned int DC) {
     if (symbol != NULL && symbol->name != NULL) { /* if first node */
         while (symbol->next != NULL) symbol = symbol->next;
@@ -122,6 +125,7 @@ void insertLabel(sym_t *symbol, node_t *head, flags *flag, unsigned int IC, unsi
     flag->label = false;
 }
 
+/* Updates each symbol address after first pass */
 void updateSymbolAddress(sym_t *symbol, unsigned int ICF) {
     while (symbol != NULL) {
         if (!strcmp(symbol->attribute, "data")) {

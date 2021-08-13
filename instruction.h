@@ -5,12 +5,14 @@
 #ifndef __INSTRUCTION_H
 #define __INSTRUCTION_H
 
+#define REG_BIT 25
+
 /* this enum is for code readability and is based on the table from the maman instructions */
 typedef enum functions {
     /* logical instructions */
     add = 0,
     sub = 1,
-    and = 2,
+        and = 2,
     or = 3,
     nor = 4,
     /* copy instructions */

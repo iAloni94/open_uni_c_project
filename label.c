@@ -7,7 +7,7 @@
 #define RES_WORD_NUM 33
 
 char *savedWords[] = {
-    "dd", "dw", "db", "asciz", "entry", "extern",
+    "dh", "dw", "db", "asciz", "entry", "extern",
     "add", "sub", "and", "or",
     "nor", "move", "mvhi", "mvlo",
     "addi", "subi", "andi", "ori",
@@ -76,6 +76,7 @@ bool isReserved(char *str, flags *flag) {
     int i;
     for (i = 0; i < RES_WORD_NUM; i++) {
         if (!strcmp(savedWords[i], str)) {
+            printf("Line: %d - Label name is a reserved word", flag->line);
             flag->firstPass = false;
             return true;
         }

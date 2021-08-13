@@ -8,6 +8,8 @@
 #define MAX_LINE_LENGTH 80
 #define LABEL_MAX_LENGTH 31
 #define FILE_EXT ".as"
-#define MEM_SIZE 33554432 /* 2^25 */
+#define CODE_MEM_SIZE 10000
+#define INITIAL_MEM_ADDRESS 100
+#define MEM_STEP 4
 
 #endif

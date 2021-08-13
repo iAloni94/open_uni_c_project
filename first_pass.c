@@ -33,7 +33,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                 node = head;
 
                 if (flag->label) {                                                      /* if ':' was found, there is a suspected label */
-                    if ((flag->label = isLabel(node, flag, symbol_list_head))) {          /* raise flag if label found */
+                    if ((flag->label = isLabel(node, flag, symbol_list_head))) {        /* raise flag if label found */
                         flag->label = !(isDeclared(node->val, symbol_list_head, flag)); /* check if label was already declared*/
                     }
                     node = node->next;
@@ -94,7 +94,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                         printf("\nLine: %d - Unrecognized instruction \"%s\"", flag->line, node->val);
                         freeInputList(head);
                         flag->line += 1;
-                        (*IC) += 4;
+                        (*IC) += MEM_STEP;
                         continue;
                     }
 
@@ -104,11 +104,16 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                     freeInputList(head);
                     code_img[codeCounter] = first_pass_32bit; /* insert binary instruction to memory image */
                     codeCounter++;
-                    (*IC) += 4;
+                    (*IC) += MEM_STEP;
                     flag->line++;
                 } else {               /* if directive */
                     if (flag->label) { /* if label is found, inserts label into symbol table. each node is a label */
-                        insertLabel(symbol_list_head, head, flag, *IC, *DC);
+                        if (dirNum == ext || dirNum == ent) {
+                            printf("\nWarning! Line: %d - label before external or entry directive ignored", flag->line);
+                        } else {
+                            insertLabel(symbol_list_head, head, flag, *IC, *DC);
+                        }
+                        flag->label = false;
                     }
                     switch (dirNum) {
                         case db:
@@ -129,6 +134,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                         default:
                             break;
                     }
+
                     freeInputList(head);
                     flag->direction = false;
                     flag->line += 1;

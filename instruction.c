@@ -127,26 +127,30 @@ R *get_r_instruction(int funcNum, node_t *input, R *instruction, flags *flag) {
     }
 }
 
+/*
+* This method parses the instruction for I type function.
+* there are 3 types of I functions: Arithmatic and Logic, Save and Load, and Conditional Directional.
+* It checks if all the operands and parameters are valid.
+* if all operands check out, a 32 bit instruction is built based on them
+*/
 I *get_i_instruction(int funcNum, node_t *input, I *instruction, flags *flag, sym_t *symbol, unsigned int IC) {
     bool rs = false, rt = false, immed = false;
     char temp, imm_temp[MAX_LINE_LENGTH] = {0};
     node_t *tempNode = calloc(sizeof(node_t), 1);
 
-    /* -------------------- I think this part is done ------------------ */
     /*
-    * Check if the funcNum is one of these 5 Arithmatic and Logic function: addi, subi, andi, ori and nori.
+    * Arithmatics and Save/Load are being examed in the same way, since both function accepts the same operands in this order: rs->immed->rt 
+    * Check if the funcNum is one of these 5 Arithmatic and Logic functions: addi, subi, andi, ori and nori.
+    * or if the funcNum is one of these 6 Save and Load functions: lb, sb, lw, sw, lh, and sh.
     * Each of them holds 4 fields of data = {opcode, rs, rt, immed} - 2 parameters (rt, rs) -> input in immed
     */
 
     /*Set the opcode to the function name + the gap to make is match to number in the list */
     instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
 
-    /*
-    * arithmatics and save/load function accepts the same operands in this order: rs->immed->rt 
-    */
     if ((funcNum >= addi && funcNum <= nori) || (funcNum >= lb && funcNum <= sh)) {
         temp = getReg(input, flag); /* check rs is valid*/
-        if (temp <= NUM_OF_REG) {
+        if (temp < NUM_OF_REG) {
             instruction->rs = temp;
             rs = true;
             input = input->next;
@@ -155,20 +159,17 @@ I *get_i_instruction(int funcNum, node_t *input, I *instruction, flags *flag, sy
                 instruction->immed = atoi(input->val);
                 immed = true;
                 input = input->next;
-
-                temp = getReg(input, flag); /* check rt is valid*/
-                if (temp <= NUM_OF_REG) {
-                    instruction->rt = temp;
-                    rt = true;
+                if (input != NULL) {
+                    temp = getReg(input, flag); /* check rt is valid*/
+                    if (temp < NUM_OF_REG) {
+                        instruction->rt = temp;
+                        rt = true;
+                    }
                     input = input->next;
                 }
             }
         }
     }
-    /*
-        * Check if the funcNum is one of these 4 Conditional Directional function : beq, bne, blt, bgt.
-        * Each of them holds 4 fields of data = {opcode, rs, rt, immed} - 3 parameters (rt ,rs, immed)
-        */
 
     else if (funcNum >= beq && funcNum <= bgt) {
         temp = getReg(input, flag);
@@ -183,21 +184,24 @@ I *get_i_instruction(int funcNum, node_t *input, I *instruction, flags *flag, sy
                 rt = true;
                 input = input->next;
             }
-
-            strcpy(imm_temp, input->val); /* getting the label ready for parsing (adding ':'). See isLabel() comment for more detail */
-            strcat(imm_temp, ":");
-            tempNode->val = imm_temp;
-            if (isLabel(tempNode, flag, symbol)) { /* if operand is label */
-                immed = true;
-                instruction->immed = IC; /* save current instruction address for later */
-                input = input->next;
+            if (input != NULL) {
+                strcpy(imm_temp, input->val); /* getting the label ready for parsing (adding ':'). See isLabel() comment for more detail */
+                strcat(imm_temp, ":");
+                tempNode->val = imm_temp;
+                if (isLabel(tempNode, flag, symbol)) { /* if operand is label */
+                    immed = true;
+                    instruction->immed = IC; /* save current instruction address for later */
+                    input = input->next;
+                }
             }
         }
     }
 
-    /*  check for errors in the input */
+    /* free memory */
     free(tempNode);
-    if ((!rs || !rt) && temp <= NUM_OF_REG) {
+
+    /*  check for errors in the input */
+    if ((!rs || !rt) && temp < NUM_OF_REG) {
         printf("\nLine: %d - Missing operand", flag->line);
         flag->firstPass = false;
         return NULL;
@@ -309,7 +313,7 @@ char getReg(node_t *node, flags *flag) {
     * this way, as soon as our input value = registerList[i], we know which register it is by looking at i
     * return register number if found, NUM_OF_REG if register is found but out of range or NUM_OF_REG + 1 if input is not a register
     */
-    if (node != NULL && *(node->val) != '\0') {
+    if (node != NULL || *(node->val) != '\0') {
         if (strchr(node->val, '$')) {
             for (i = 0; i < NUM_OF_REG; i++) {
                 if (!strcmp(node->val, registerList[i])) {
@@ -320,9 +324,9 @@ char getReg(node_t *node, flags *flag) {
             flag->firstPass = false;
         } else {
             flag->firstPass = false;
-            printf("\nLine: %d - Illegal parameter", flag->line);
-            return NUM_OF_REG + 1;
+            printf("\nLine: %d - Expected register, instead got \"%s\"", flag->line, node->val);
+            return NUM_OF_REG;
         }
     }
-    return NUM_OF_REG;
+    return NUM_OF_REG + 1;
 }

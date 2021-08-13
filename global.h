@@ -28,7 +28,7 @@ J *get_j_instruction(int, node_t *, J *, flags *, sym_t *);
 char getReg(node_t *, flags *);
 
 /* utils.c */
-void freeMemory(flags *, sym_t *, dir_t *, FILE *);
+void freeMemory(flags *, sym_t *, dir_t *, ext_t *, FILE *);
 void freeDataImg(dir_t *);
 void calcDistance(unsigned int *, unsigned int);
 

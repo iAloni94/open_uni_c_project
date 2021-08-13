@@ -18,7 +18,7 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
 
     char *directives[NUM_OF_DIR] = {".db", ".dh", ".dw", ".asciz", ".extern", ".entry"};
 
-    int funcNum, dirNum, i, codeCounter = 0, IC = 100;
+    int funcNum, dirNum, i, codeCounter = 0, IC = INITIAL_MEM_ADDRESS;
     node_t *head, *node;
     sym_t *temp_sym = symbol_list_head;
     ext_t *ext_node = ext_list_head;
@@ -52,6 +52,7 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
                 if (dirNum == ent) { /* handle entry directive */
                     ent_handler(symbol_list_head, node, flag);
                     freeInputList(head);
+                    flag->direction = false;
                     flag->line += 1;
                     continue;
                 } else if (flag->direction) { /* skip other directions */
@@ -74,18 +75,22 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
                     while (node->next != NULL) node = node->next; /* go to last node because thats where the label is */
 
                     temp_sym = getSymbol(node->val, symbol_list_head);
-                    label_address = temp_sym->address;
-                    if (!temp_sym) {
-                        printf("\nLine: %d -  label was not declared!", flag->line);
+                    if (temp_sym != NULL) {
+                        label_address = temp_sym->address;
+                        if (!temp_sym) {
+                            printf("\nLine: %d -  label was not declared!", flag->line);
+                            flag->secondPass = false;
+                        }
+                    } else {
+                        printf("\nLine: %d - No reference to \"%s\" label", flag->line, node->val);
                         flag->secondPass = false;
                     }
-
                     temp_sym = symbol_list_head;
 
                     while (temp_sym != NULL && temp_sym->name != NULL) { /* check if label is external */
                         if (temp_sym->address == label_address) {
                             if (!strcmp(temp_sym->attribute, "external")) {
-                                printf("Line: %d -  Conditional branching does not accept external labels", flag->line);
+                                printf("\nLine: %d -  Conditional branching does not accept external labels", flag->line);
                                 flag->secondPass = false;
                             }
                         }
@@ -97,9 +102,14 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
                 }
 
                 if (funcNum >= jmp && funcNum <= call) {
-                    if (!CHECK_BIT(code_img[codeCounter], 25)) { /* if reg bit is off - update address field in code image */
+                    if (!CHECK_BIT(code_img[codeCounter], REG_BIT)) { /* if reg bit is off - update address field in code image */
                         temp_sym = getSymbol(node->next->val, symbol_list_head);
-                        code_img[codeCounter] = code_img[codeCounter] | temp_sym->address;
+                        if (temp_sym != NULL) {
+                            code_img[codeCounter] = code_img[codeCounter] | temp_sym->address;
+                        } else {
+                            printf("\nLine: %d - No reference to \"%s\" label", flag->line, node->next->val);
+                            flag->secondPass = false;
+                        }
 
                         if ((temp_sym = getSymbol(node->next->val, symbol_list_head))) {
                             if (!strcmp(temp_sym->attribute, "external")) {
@@ -115,7 +125,7 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
             freeInputList(head);
             codeCounter++;
             flag->line += 1;
-            IC += 4;
+            IC += MEM_STEP;
         } /* end while */
     }
 }

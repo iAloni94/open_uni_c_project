@@ -63,6 +63,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                 if (comma && temp == ',') { /* if the last non white char was a comma and we found another one, report error */
                     flag->firstPass = false;
                     printf("\nLine: %d - Consecutive commas", flag->line);
+                    flag->label = true;
                     freeInputList(head);
                     return NULL;
                 }
@@ -86,6 +87,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                                     if (comma) { /* if there is a comma after label (with space) "LABEL:    ," */
                                         printf("\nLine: %d - Extraneous character after label name", flag->line);
                                         flag->firstPass = false;
+                                        flag->label = false;
                                         freeInputList(head);
                                         return NULL;
                                     }
@@ -96,6 +98,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                                     if (comma) { /* if its and instrcution or directive, there shold not be a comma after */
                                         printf("\nLine: %d - extraneous comma", flag->line);
                                         flag->firstPass = false;
+                                        flag->label = false;
                                         freeInputList(head);
                                         return NULL;
                                     }
@@ -113,6 +116,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                             } else {
                                 printf("\nLine: %d - Missing comma", flag->line);
                                 freeInputList(head);
+                                flag->label = false;
                                 flag->firstPass = false;
                                 return NULL;
                             }
@@ -123,6 +127,7 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
                     if (label) { /* if there is a comma after label (no space) "LABEL:," */
                         printf("\nLine: %d - Extraneous character after label name", flag->line);
                         flag->firstPass = false;
+                        flag->label = false;
                         freeInputList(head);
                         return NULL;
                     }

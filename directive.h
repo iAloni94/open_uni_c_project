@@ -1,7 +1,6 @@
 #ifndef __DIRECTIVE_H
 #define __DIRECTIVE_H
 
-
 /* this enum is for easier readability of the code int the first pass */
 enum {
     db = 0,    /* declare a location in the memory for 1 byte for each of the inputs, seperate by "comma". the label points the first item in the array. */

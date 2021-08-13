@@ -145,7 +145,7 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
                     dataImg = dataImg->next;
                     *DC += 4;
                 } else {
-                    printf("\nLine: %d - Integer \"%d\" is outside 4 byte capacity range (-2,147,483,648 to 2,147,483,647 )", flag->line, temp);
+                    printf("\nLine: %d - Integer \"%s\" is outside 4 byte capacity range (-2,147,483,648 to 2,147,483,647 )", flag->line, input->val);
                     flag->firstPass = false;
                 }
                 input = input->next;

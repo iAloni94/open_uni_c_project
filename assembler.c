@@ -6,8 +6,8 @@
 #include "global.h"
 
 void assemble(char *fname) {
-    unsigned int DC = 0, IC = 100, ICF, DCF;
-    unsigned int code_img[1000] = {0};
+    unsigned int DC = 0, IC = INITIAL_MEM_ADDRESS, ICF, DCF;
+    unsigned int code_img[CODE_MEM_SIZE] = {0};
     dir_t *data_img = calloc(sizeof(dir_t), 1);
     sym_t *symbol_list_head = (sym_t *)calloc(sizeof(sym_t), 1);
     flags *flag = (flags *)malloc(sizeof(flags));
@@ -40,9 +40,8 @@ void assemble(char *fname) {
         }
     } else {
         printf("\nFailed to open file. Trying next file.");
-        return;
     }
-    freeMemory(flag, symbol_list_head, data_img, fp); /* Closing files and clearing memory before ending assembly process */
+    freeMemory(flag, symbol_list_head, data_img, ext_list_head, fp); /* Closing files and clearing memory before ending assembly process */
     printf("\n");
     return;
 }

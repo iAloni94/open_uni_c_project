@@ -8,7 +8,7 @@ typedef struct symbol {
     struct symbol *next;
 } sym_t;
 
-typedef struct external{
+typedef struct external {
     char *name;
     unsigned int address;
     struct external *next;

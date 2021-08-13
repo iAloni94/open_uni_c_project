@@ -1,3 +1,5 @@
+//check for memory leaks
 valgrind --leak-check=yes ./assembler text.as
 
+// get number of lines in each file in dir
 git ls-files | xargs wc -l

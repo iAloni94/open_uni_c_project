@@ -94,7 +94,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                         printf("\nLine: %d - Unrecognized instruction \"%s\"", flag->line, node->val);
                         freeInputList(head);
                         flag->line += 1;
-                        (*IC) += MEM_STEP;
+                        (*IC) += INSTRUCTION_SIZE;
                         continue;
                     }
 
@@ -104,7 +104,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                     freeInputList(head);
                     code_img[codeCounter] = first_pass_32bit; /* insert binary instruction to memory image */
                     codeCounter++;
-                    (*IC) += MEM_STEP;
+                    (*IC) += INSTRUCTION_SIZE;
                     flag->line++;
                 } else {               /* if directive */
                     if (flag->label) { /* if label is found, inserts label into symbol table. each node is a label */

@@ -5,8 +5,6 @@
 
 #include "global.h"
 
-#define MASK_1_BTYE 0xFFFF /* ..00 0000 1111 1111 1111 1111 */
-
 void freeDataImg(dir_t *data) {
     while (data != NULL) {
         dir_t *temp = data;

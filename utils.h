@@ -9,6 +9,7 @@
 #define LOWER_CASE_Z_ASCII_VALUE 122
 #define ZERO_ASCII_VALUE 48
 #define NINE_ASCII_VALUE 57
+#define MASK_1_BTYE 0xFFFF /* ..11 1111 1111 1111 1111 1111 */
 
 #define IS_LETTER(c) (c >= CAPITAL_A_ASCII_VALUE && c <= LOWER_CASE_Z_ASCII_VALUE) ? true : false
 #define IS_NUM(c) (c >= ZERO_ASCII_VALUE && c <= NINE_ASCII_VALUE) ? true : false

@@ -13,7 +13,7 @@ input.o: input.c global.h
 instruction.o: instruction.c global.h
 	${CC} ${CFLAGS} -c instruction.c
 
-to_binary.o: to_binary.c instruction.h
+to_binary.o: to_binary.c instruction.h utils.h
 	${CC} ${CFLAGS} -c to_binary.c
 
 utils.o: utils.c global.h

@@ -35,8 +35,8 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
 
     /*  print code image*/
     /* shift mask to desired 4 bits location and then shift the result to the rightmost 4 bits for printing */
-    for (i = 0; *(codeImg + i) != 0; i++, IC += 4) {
-        a = *(codeImg + i) & MASK;                 /* instruction: bytes 0-8; mask:   00000000 00000000 00000000 11111111 */
+    for (i = 0; *(codeImg + i) != 0; i++, IC += INSTRUCTION_SIZE) {
+        a = (*(codeImg + i) & MASK);                 /* instruction: bytes 0-8; mask:   00000000 00000000 00000000 11111111 */
         b = (*(codeImg + i) & (MASK << 8)) >> 8;   /* instruction: bytes 9-16; mask:  00000000 00000000 11111111 00000000 */
         c = (*(codeImg + i) & (MASK << 16)) >> 16; /* instruction: bytes 17-24; mask: 00000000 11111111 00000000 00000000 */
         d = (*(codeImg + i) & (MASK << 24)) >> 24; /* instruction: bytes 25-32; mask: 11111111 00000000 00000000 00000000 */

@@ -3,6 +3,7 @@
 */
 
 #include "instruction.h"
+#include "utils.h"
 
 unsigned int r_binary_instruction(R *instruction) {
     unsigned int my_32bit = 0;
@@ -43,8 +44,7 @@ unsigned int i_binary_instruction(I *instruction) {
     my_32bit |= (temp << 16);
 
     immed = instruction->immed; /* (0-15) */
-    unsigned int mask = 0xFFFF; /* ..00 0000 1111 1111 1111 1111 */
-    immed = immed & mask;
+    immed = immed & MASK_1_BTYE;
     my_32bit |= (immed);
 
     return my_32bit;

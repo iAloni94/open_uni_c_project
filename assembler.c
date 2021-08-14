@@ -10,8 +10,8 @@ void assemble(char *fname) {
     unsigned int code_img[CODE_MEM_SIZE] = {0};
     dir_t *data_img = calloc(sizeof(dir_t), 1);
     sym_t *symbol_list_head = (sym_t *)calloc(sizeof(sym_t), 1);
-    flags *flag = (flags *)malloc(sizeof(flags));
-    ext_t *ext_list_head = calloc(sizeof(ext_t), 1);
+    flags *flag = (flags *)calloc(sizeof(flags), 1);
+    ext_t *ext_list_head = (ext_t *)calloc(sizeof(ext_t), 1);
 
     FILE *fp;
 

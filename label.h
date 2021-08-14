@@ -1,6 +1,8 @@
 #ifndef __LABEL_H
 #define __LABEL_H
 
+#define LABEL_MAX_LENGTH 31
+
 typedef struct symbol {
     char *name;
     char *attribute; /* code, data, external, entry */

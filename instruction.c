@@ -145,7 +145,7 @@ I *get_i_instruction(int funcNum, node_t *input, I *instruction, flags *flag, sy
     * Each of them holds 4 fields of data = {opcode, rs, rt, immed} - 2 parameters (rt, rs) -> input in immed
     */
 
-    /*Set the opcode to the function name + the gap to make is match to number in the list */
+    /* Set the opcode to the function name + the gap to make is match to number in the list */
     instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
 
     if ((funcNum >= addi && funcNum <= nori) || (funcNum >= lb && funcNum <= sh)) {

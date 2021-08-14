@@ -120,7 +120,7 @@ dir_t *save_half_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *fl
 
 /* save 4 byte size numeral data */
 dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
-    int temp, second_quotation_mark;
+    int temp, diff;
     if (input != NULL) {
         while (input != NULL) {
             if ((checkNum(input, flag))) {
@@ -133,12 +133,12 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
             * INT_MIN - 1 = INT_MAX
             */
                 temp = atoi(input->val);
-                if (strchr(input->val, '-')) {                    /* if input is a negative number that exceed 32 bits, temp would be positive because of overflow */
-                    second_quotation_mark = (INT_MAX + temp) + 1; /* INT_MAX - INT_MIN = -1 but both in range so we add 1 to result */
-                } else {                                          /* if input is a positive number that exceed 32 bits, temp would be negative because of overflow */
-                    second_quotation_mark = INT_MAX - (temp);
+                if (strchr(input->val, '-')) {   /* if input is a negative number that exceed 32 bits, temp would be positive because of overflow */
+                    diff = (INT_MAX + temp) + 1; /* INT_MAX - INT_MIN = -1 but both in range so we add 1 to result */
+                } else {                         /* if input is a positive number that exceed 32 bits, temp would be negative because of overflow */
+                    diff = INT_MAX - (temp);
                 }
-                if (second_quotation_mark >= 0) {
+                if (diff >= 0) {
                     dataImg->word = temp;
                     dataImg->flag = word;
                     dataImg->next = calloc(sizeof(dir_t), 1);

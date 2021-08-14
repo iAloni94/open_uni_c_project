@@ -13,6 +13,8 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
     bool comma = false, label = false, instruction = true, directive = true, quotation_mark = false, firstNode = true;
     char* currVal = node->val;
     char tempLine[MAX_LINE_LENGTH + 2] = {0}; /* +2 because 1 for the 81 char + 1 for null terminator */
+
+    
     if (head) {
         fgets(tempLine, MAX_LINE_LENGTH + 2, fp);
 
@@ -164,14 +166,14 @@ node_t* getLine(FILE* fp, flags* flag) { /* saves each word a new node */
 
 node_t* initList() {
     node_t* head = malloc(sizeof(node_t));
-    head->val = calloc(1, 100);
+    head->val = calloc(1, MAX_LINE_LENGTH);
     head->next = NULL;
     return head;
 }
 
 node_t* addNode() {
     node_t* newNode = malloc(sizeof(node_t));
-    newNode->val = calloc(1, 100);
+    newNode->val = calloc(1, MAX_LINE_LENGTH);
     newNode->next = NULL;
     return newNode;
 }

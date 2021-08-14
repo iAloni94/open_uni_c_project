@@ -125,7 +125,7 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
             freeInputList(head);
             codeCounter++;
             flag->line += 1;
-            IC += MEM_STEP;
+            IC += INSTRUCTION_SIZE;
         } /* end while */
     }
 }

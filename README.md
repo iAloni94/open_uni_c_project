@@ -32,8 +32,9 @@ The first run is defined in the first_pass.c file. This file contains the algori
 ### Input files and activating the assembler:
 
 In order to run your input file in the assembler, write this phrase in the CLI:
-file ps.as;
-sample source code;
+
+> file ps.as;
+> sample source code;
 
 ### Output files:
 

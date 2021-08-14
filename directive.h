@@ -27,6 +27,4 @@ typedef struct DIRECTIVE {
     struct DIRECTIVE *next;
 } dir_t;
 
-typedef struct DIRECTIVE *data_ptr;
-
 #endif

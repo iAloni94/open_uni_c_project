@@ -12,7 +12,7 @@ typedef enum functions {
     /* logical instructions */
     add = 0,
     sub = 1,
-        and = 2,
+    and = 2,
     or = 3,
     nor = 4,
     /* copy instructions */

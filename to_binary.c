@@ -44,7 +44,7 @@ unsigned int i_binary_instruction(I *instruction) {
     my_32bit |= (temp << 16);
 
     immed = instruction->immed; /* (0-15) */
-    immed = immed & MASK_1_BTYE;
+    immed = immed & MASK_2_BTYE;
     my_32bit |= (immed);
 
     return my_32bit;

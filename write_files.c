@@ -4,7 +4,7 @@
 
 #include "global.h"
 
-#define MASK 0xFF /* 00000000 00000000 00000000 11111111 */
+#define MASK_1_BYTE 0xFF /* ..00 0000 0000 1111 1111 */
 #define LENGTH_OF_AS 3
 
 /*
@@ -36,10 +36,10 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
     /*  print code image*/
     /* shift mask to desired 4 bits location and then shift the result to the rightmost 4 bits for printing */
     for (i = 0; *(codeImg + i) != 0; i++, IC += INSTRUCTION_SIZE) {
-        a = (*(codeImg + i) & MASK);                 /* instruction: bytes 0-8; mask:   00000000 00000000 00000000 11111111 */
-        b = (*(codeImg + i) & (MASK << 8)) >> 8;   /* instruction: bytes 9-16; mask:  00000000 00000000 11111111 00000000 */
-        c = (*(codeImg + i) & (MASK << 16)) >> 16; /* instruction: bytes 17-24; mask: 00000000 11111111 00000000 00000000 */
-        d = (*(codeImg + i) & (MASK << 24)) >> 24; /* instruction: bytes 25-32; mask: 11111111 00000000 00000000 00000000 */
+        a = (*(codeImg + i) & MASK_1_BYTE);                 /* instruction: bytes 0-8; mask:   00000000 00000000 00000000 11111111 */
+        b = (*(codeImg + i) & (MASK_1_BYTE << 8)) >> 8;   /* instruction: bytes 9-16; mask:  00000000 00000000 11111111 00000000 */
+        c = (*(codeImg + i) & (MASK_1_BYTE << 16)) >> 16; /* instruction: bytes 17-24; mask: 00000000 11111111 00000000 00000000 */
+        d = (*(codeImg + i) & (MASK_1_BYTE << 24)) >> 24; /* instruction: bytes 25-32; mask: 11111111 00000000 00000000 00000000 */
 
         fprintf(fp, "\n%04d  %02X %02X %02X %02X", IC, a, b, c, d);
     }

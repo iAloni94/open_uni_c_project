@@ -89,7 +89,7 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
                     }
                     temp_sym = symbol_list_head;
 
-                    while (temp_sym != NULL && temp_sym->name != NULL) { /* check if label is external */
+                    while (temp_sym != NULL && temp_sym->name != NULL && flag->secondPass) { /* check if label is external */
                         if (temp_sym->address == label_address) {
                             if (!strcmp(temp_sym->attribute, "external")) {
                                 printf("\nLine: %d -  Conditional branching does not accept external labels", flag->line);

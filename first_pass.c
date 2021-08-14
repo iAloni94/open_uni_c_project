@@ -3,6 +3,9 @@
 
 #include "global.h"
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned int *DCF, unsigned int *code_img, dir_t *data_img, sym_t *symbol_list_head, flags *flag, FILE *fp) {
     char *functionName[NUM_OF_FUNC] = {
         "add", "sub", "and", "or",
@@ -109,7 +112,7 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                 } else {               /* if directive */
                     if (flag->label) { /* if label is found, inserts label into symbol table. each node is a label */
                         if (dirNum == ext || dirNum == ent) {
-                            printf("\nWarning! Line: %d - label before external or entry directive ignored", flag->line);
+                            printf(ANSI_COLOR_RED "\nLine: %d - Warning! Label before external or entry directive ignored" ANSI_COLOR_RESET, flag->line);
                         } else {
                             insertLabel(symbol_list_head, head, flag, *IC, *DC);
                         }

@@ -18,3 +18,4 @@ Labe!: add $27, $13, $30
 ERR: nori $7, 2, $4
 .extern ERR
 add: la ERR
+IDO: .extern HELLO

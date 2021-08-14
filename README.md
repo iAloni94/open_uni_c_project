@@ -33,12 +33,12 @@ The first run is defined in the first_pass.c file. This file contains the algori
 
 In order to run your input file in the assembler, write this phrase in the CLI:
 
-> file <filename>.as;
+> filename.as;
 
 ### Output files:
 
 The output files for this file will be:
 
-- <filename>.bo
-- <filename>.ent (if the source code doesn't contain an ".extern" instruction, this file wouldn't be generated)
-- <filename>.ext (if the source code doesn't contain an ".entry" instruction, this file wouldn't be generated)
+- > filename.bo
+- > filename.ent (if the source code doesn't contain an ".extern" instruction, this file wouldn't be generated)
+- > filename.ext (if the source code doesn't contain an ".entry" instruction, this file wouldn't be generated)

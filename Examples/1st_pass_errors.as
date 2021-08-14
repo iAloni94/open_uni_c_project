@@ -6,7 +6,7 @@ ERR: .asciz "Error_Test
 .dh 32768
 .db -129
 mult $2, $3, $4
-addi $2, -5, $31
+add $11, ; $8, $19
 subi $15, 55, 
 bne $29, $0
 .dh 
@@ -18,5 +18,3 @@ Labe!: add $27, $13, $30
 ERR: nori $7, 2, $4
 .extern ERR
 add: la ERR
-
-

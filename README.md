@@ -1,8 +1,11 @@
 # Assembler software for assembly language written in C.
 
-### This is a Final project in the course “System ProgrammingLaboratory in C language - 20465” in the Open University of Israel. Lecturer: Roy Rachmany This project was written by Ido Aloni and Yoav Brand
+### This is a Final project in the course “System Programming Laboratory in C language - 20465” in the Open University of Israel.
 
-** As part of the course “System ProgrammingLaboratory in C language”, we wrote this project that translates assembly language to “Machine Code” language. The main goal of this assembler is to create a file that contains “Machine Code” (output) from an assembly file (input). **
+**Lecturer: Roy Rachmany**
+**This project was written by Ido Aloni and Yoav Brand**
+
+**General description: As part of the course “System ProgrammingLaboratory in C language”, we wrote this project that translates assembly language to “Machine Code” language. The main goal of this assembler is to create a file that contains “Machine Code” (output) from an assembly file (input).**
 
 ### Hardware:
 

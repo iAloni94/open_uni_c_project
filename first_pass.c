@@ -112,7 +112,8 @@ void firstPass(unsigned int *IC, unsigned int *ICF, unsigned int *DC, unsigned i
                 } else {               /* if directive */
                     if (flag->label) { /* if label is found, inserts label into symbol table. each node is a label */
                         if (dirNum == ext || dirNum == ent) {
-                            printf(ANSI_COLOR_RED "\nLine: %d - Warning! Label before external or entry directive ignored" ANSI_COLOR_RESET, flag->line);
+                            printf(ANSI_COLOR_RED "\nWarning! " ANSI_COLOR_RESET);
+                            printf("Line: %d - Label before external or entry directive ignored", flag->line);
                         } else {
                             insertLabel(symbol_list_head, head, flag, *IC, *DC);
                         }

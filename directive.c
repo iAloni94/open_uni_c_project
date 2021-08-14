@@ -124,7 +124,8 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
     if (input != NULL) {
         while (input != NULL) {
             if ((checkNum(input, flag))) {
-                /* 
+
+            /* 
             * Check for int overflow
             * Because of int overflow, if an integers value exceeds 32 bit capacity, it "wraps around" in the opposite direction
             * for example:

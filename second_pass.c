@@ -18,10 +18,10 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
 
     char *directives[NUM_OF_DIR] = {".db", ".dh", ".dw", ".asciz", ".extern", ".entry"};
 
-    int funcNum, dirNum, i, codeCounter = 0, IC = INITIAL_MEM_ADDRESS;
+    int funcNum, dirNum, i, codeCounter = 0, IC = INITIAL_MEM_ADDRESS; /* IC is set again for updating the external table */
     node_t *head, *node;
     sym_t *temp_sym = symbol_list_head;
-    ext_t *ext_node = ext_list_head;
+    ext_t *ext_node = ext_list_head; /* External table */
 
     if (flag->firstPass) { /* second pass */
 
@@ -62,20 +62,22 @@ void secondPass(unsigned int ICF, unsigned int DCF, unsigned int *code_img, sym_
                     continue;
                 }
 
-                funcNum = NUM_OF_FUNC;
-                for (i = 0; i < NUM_OF_FUNC; i++) { /* step 7 */
+                funcNum = NUM_OF_FUNC; 
+                for (i = 0; i < NUM_OF_FUNC; i++) {
                     if (!strcmp(node->val, functionName[i])) {
                         funcNum = i;
                         break;
                     }
                 }
+
+
                 if (funcNum >= beq && funcNum <= bgt) {
                     unsigned int label_address;
 
                     while (node->next != NULL) node = node->next; /* go to last node because thats where the label is */
 
                     temp_sym = getSymbol(node->val, symbol_list_head);
-                    if (temp_sym != NULL) {
+                    if (temp_sym != NULL) { 
                         label_address = temp_sym->address;
                         if (!temp_sym) {
                             printf("\nLine: %d -  label was not declared!", flag->line);

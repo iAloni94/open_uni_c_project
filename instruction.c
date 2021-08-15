@@ -57,21 +57,21 @@ R *get_r_instruction(int funcNum, node_t *input, R *instruction, flags *flag) {
             break;
     }
 
-    if (funcNum <= nor) { /* arithmatics functions - 3 operands rs + rd + rt */
-        temp = getReg(input, flag);
-        if (temp <= NUM_OF_REG) {
+    if (funcNum <= nor) {           /* arithmatics functions - 3 operands rs + rd + rt */
+        temp = getReg(input, flag); 
+        if (temp < NUM_OF_REG) {/* Check rs value */
             instruction->rs = temp;
             rs = true;
             input = input->next;
 
-            temp = getReg(input, flag);
-            if (temp <= NUM_OF_REG) {
+            temp = getReg(input, flag); 
+            if (temp < NUM_OF_REG) {/* Check rt value */
                 instruction->rt = temp;
                 rt = true;
                 input = input->next;
 
-                temp = getReg(input, flag);
-                if (temp <= NUM_OF_REG) {
+                temp = getReg(input, flag); 
+                if (temp < NUM_OF_REG) {/* Check rd value */
                     instruction->rd = temp;
                     rd = true;
                     input = input->next;
@@ -97,12 +97,12 @@ R *get_r_instruction(int funcNum, node_t *input, R *instruction, flags *flag) {
         temp = getReg(input, flag);
         input = input->next;
 
-        if (temp <= NUM_OF_REG) {
+        if (temp < NUM_OF_REG) { /* Check rs value */
             instruction->rs = temp;
             rs = true;
 
-            temp = getReg(input, flag);
-            if (temp <= NUM_OF_REG) {
+            temp = getReg(input, flag); 
+            if (temp < NUM_OF_REG) {/* Check rd value */
                 instruction->rd = temp;
                 rd = true;
                 input = input->next;
@@ -149,8 +149,8 @@ I *get_i_instruction(int funcNum, node_t *input, I *instruction, flags *flag, sy
     instruction->opcode = funcNum + GAP_BETWEEN_LIST_OPCODE;
 
     if ((funcNum >= addi && funcNum <= nori) || (funcNum >= lb && funcNum <= sh)) {
-        temp = getReg(input, flag); /* check rs is valid*/
-        if (temp < NUM_OF_REG) {
+        temp = getReg(input, flag); 
+        if (temp < NUM_OF_REG) {/* check rs is valid*/
             instruction->rs = temp;
             rs = true;
             input = input->next;
@@ -160,8 +160,8 @@ I *get_i_instruction(int funcNum, node_t *input, I *instruction, flags *flag, sy
                 immed = true;
                 input = input->next;
                 if (input != NULL) {
-                    temp = getReg(input, flag); /* check rt is valid*/
-                    if (temp < NUM_OF_REG) {
+                    temp = getReg(input, flag); 
+                    if (temp < NUM_OF_REG) {/* check rt is valid*/
                         instruction->rt = temp;
                         rt = true;
                     }
@@ -173,13 +173,13 @@ I *get_i_instruction(int funcNum, node_t *input, I *instruction, flags *flag, sy
 
     else if (funcNum >= beq && funcNum <= bgt) {
         temp = getReg(input, flag);
-        if (temp <= NUM_OF_REG) {
+        if (temp < NUM_OF_REG) {
             instruction->rs = temp;
             rs = true;
             input = input->next;
 
             temp = getReg(input, flag);
-            if (temp <= NUM_OF_REG) {
+            if (temp < NUM_OF_REG) {
                 instruction->rt = temp;
                 rt = true;
                 input = input->next;
@@ -311,7 +311,7 @@ char getReg(node_t *node, flags *flag) {
     /*
     * if i=0, registerList[i] = $0. if i=1, registerList[i] = $1. if i=28, registerList[i] = $28. if i=n, registerList[i] = $n
     * this way, as soon as our input value = registerList[i], we know which register it is by looking at i
-    * return register number if found, NUM_OF_REG if register is found but out of range or NUM_OF_REG + 1 if input is not a register
+    * return register number if found, NUM_OF_REG if register is not found
     */
     if (node != NULL || *(node->val) != '\0') {
         if (strchr(node->val, '$')) {
@@ -328,5 +328,5 @@ char getReg(node_t *node, flags *flag) {
             return NUM_OF_REG;
         }
     }
-    return NUM_OF_REG + 1;
+    return NUM_OF_REG;
 }

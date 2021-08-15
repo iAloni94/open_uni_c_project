@@ -1,8 +1,11 @@
+#include <ctype.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "global.h"
+
+#define ASCII_QUOTATION_MARK 34
 
 #define IN_RANGE_BYTE(n) n >= CHAR_MIN &&n <= CHAR_MAX ? true : false   /* check if n is in 8 bits range */
 #define IN_RANGE_H_WORD(n) n >= SHRT_MIN &&n <= SHRT_MAX ? true : false /* chec if n is in 16 bit range */
@@ -28,18 +31,33 @@ bool checkNum(node_t *input, flags *flag) {
     return true;
 }
 
-/* This function chcek whether the directive string oprands is valid */
+/* This function chcek whether the directive string oprands is valid
+*  It check if the string is legal and return a pointer to the closing quotation mark.
+*/
 char *checkStr(node_t *input, flags *flag) { /*  this funtion checks if the string is valid i.e starts and ends with a " */
-    char *second_quotation_mark;
+    char *second_quotation_mark, c;
+    int i = 1;
     if (input->next != NULL) {
         printf("\nLine: %d - Extraneous operand", flag->line);
         flag->firstPass = false;
         return NULL;
-    } else if (*(input->val) == '\"') {                                 /* if first char is " */
-        if ((second_quotation_mark = strchr((input->val + 1), '\"'))) { /* if there is another " */
-            if (*(second_quotation_mark + 1) == '\0') {                 /* if the second " is last char in string */
-                return second_quotation_mark;
-            } else { /* if first char is not " */
+    } else if (*(input->val) == ASCII_QUOTATION_MARK) {                 /* if first char is " */
+        if ((second_quotation_mark = strchr((input->val + i), '\"'))) { /* if there is another " */
+            if (*(second_quotation_mark + i) == '\0') {                 /* if the second " is last char in string */
+                i++;
+                c = *(input->val + i);
+                while (c != ASCII_QUOTATION_MARK) { /* check if string is valid */
+                    if (isprint(c)) {
+                        i++;
+                        c = *(input->val + i);
+                    } else {
+                        printf("\nLine: %d - String contains illegal characters", flag->line);
+                        flag->firstPass = false;
+                        return NULL;
+                    }
+                }
+                return second_quotation_mark; /* If string is valid, return pointer to the last quotation mark */
+            } else {                          /* if first char is not " */
                 printf("\nLine: %d - Extraneous text after closing quotation mark", flag->line);
                 flag->firstPass = false;
                 return NULL;
@@ -124,8 +142,7 @@ dir_t *save_word(node_t *input, dir_t *dataImg, unsigned int *DC, flags *flag) {
     if (input != NULL) {
         while (input != NULL) {
             if ((checkNum(input, flag))) {
-
-            /* 
+                /* 
             * Check for int overflow
             * Because of int overflow, if an integers value exceeds 32 bit capacity, it "wraps around" in the opposite direction
             * for example:

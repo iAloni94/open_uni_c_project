@@ -34,6 +34,6 @@ void calcDistance(unsigned int *instruction_address, unsigned int label_address)
     unsigned int curr_address = *instruction_address & MASK_2_BTYE; /* get the address of the instruction itself (rightmost 16 bits) */
     dist = label_address - curr_address;                            /* new address to be entered to code image = the distance between the two */
     dist = dist & MASK_2_BTYE;                                      /* get rightmost 16 bits of new address */
-    *instruction_address = *instruction_address & ~MASK_2_BTYE;     /* turn off bit 0-16 of original machine code */
+    *instruction_address = *instruction_address & (~MASK_2_BTYE);     /* turn off bit 0-16 of original machine code */
     *instruction_address = *instruction_address | dist;
 }

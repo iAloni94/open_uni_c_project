@@ -220,7 +220,6 @@ void ext_handler(sym_t *symbol, node_t *input, flags *flag, unsigned int IC, uns
     free(tempNode);
 }
 
-/* entry */
 void ent_handler(sym_t *symbol, node_t *input, flags *flag) {
     flag->entry = true;
     input = input->next;

@@ -70,9 +70,8 @@ void printObj(FILE* fp, unsigned int* codeImg, dir_t* dataImg, unsigned int ICF,
         i++;
     }
 
-    for (i = 0; i <= DCF; i++, j += 4) {
+    for (i = 0; i <= DCF; i++, j += INSTRUCTION_SIZE) {
         fprintf(fp, "\n%04d  ", ICF + j);
-        /* fprintf(fp, "%02X %02X %02X %02X", data[i], data[i + 1], data[i + 2], data[i + 3]); */
         fprintf(fp, "%02X ", data[i]);
         if (++i < DCF) fprintf(fp, "%02X ", data[i]);
         if (++i < DCF) fprintf(fp, "%02X ", data[i]);
